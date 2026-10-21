@@ -3,6 +3,7 @@ import { Router } from 'express';
 import { requireRole } from '../auth.js';
 import { config } from '../config.js';
 import { query } from '../db.js';
+import { loadDepot } from '../services/planning.js';
 import { ACTIVE_STATUSES, loadTrip } from '../services/trips.js';
 
 const router = Router();
@@ -37,7 +38,9 @@ router.get('/', async (_req, res) => {
     }
   }
   const inProgress = trips.filter(t => t.status === 'in_progress');
+  const depot = await loadDepot();
   res.json({
+    depot: depot && { id: depot.id, name: depot.name, lat: depot.latitude, lon: depot.longitude },
     metrics: {
       pendingOrders: Number(counts.pending),
       truckOnlyOrders: Number(counts.truck_only),
