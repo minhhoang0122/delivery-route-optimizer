@@ -1,16 +1,19 @@
-# React + Vite
+# Frontend: Web App ReactJS
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Giao diện cho Administrator, Dispatcher (máy tính) và Driver (điện thoại), dựng theo file Figma "Điều hành giao hàng – UI".
 
-Currently, two official plugins are available:
+```
+npm install
+npm run dev        # http://localhost:5173, /api chuyển tiếp tới Backend ở cổng 3000
+npm run lint
+npm run build
+```
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+| Thư mục | Nội dung |
+|---|---|
+| `src/pages/admin` | A02 Tài khoản người dùng, A03 Cấp tài khoản |
+| `src/pages/dispatcher` | D01–D12: tổng quan, đơn hàng, nguồn lực, lập kế hoạch, theo dõi, đối chiếu |
+| `src/pages/driver` | R01–R07: chuyến hiện tại, kiểm hàng, ghi kết quả, báo về kho, lịch sử |
+| `src/layouts` | Khung máy tính (thanh điều hướng trái) và khung điện thoại của Driver |
+| `src/components` | Thành phần dùng chung (nút, nhãn, bảng, hộp thoại) và bản đồ Leaflet |
+| `src/offline.js` | Hàng đợi thao tác của Driver trong IndexedDB khi mất mạng |
