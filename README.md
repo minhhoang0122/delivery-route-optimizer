@@ -50,5 +50,8 @@ Mở http://localhost:5173. Màn hình Driver dùng trên điện thoại; khi t
 | `npm run simulate -- incident --trip 3 --factor 3` | Tạo "sự cố giả định" làm một chặng chậm đi, để thử đề xuất đổi tuyến; giao diện ghi rõ là giả định |
 | `npm run test:flow` | Kiểm thử nghiệp vụ và phân quyền qua API (54 kiểm tra), chạy sau `npm run seed -- --reset` |
 | `npm test` (trong `optimization-engine`) | Kiểm thử thuật toán trên ma trận TomTom đã ghi |
+| `npm run experiments` (trong `optimization-engine`) | Thí nghiệm cho Chương 4 (mục 4.4), in bảng kết quả và ghi `experiments/ket_qua.json` |
 
 Nguồn ma trận đặt bằng `MATRIX_SOURCE` trong `.env`: `replay` dùng lại ma trận đã ghi và chỉ lấy thêm chặng còn thiếu, `tomtom` lấy mới theo giao thông hiện tại, `mock` ước lượng theo khoảng cách. Hạn mức miễn phí của TomTom là 20.000 yêu cầu Routing mỗi tháng; một lần lập kế hoạch 20 đơn với hai loại xe tốn khoảng 840 yêu cầu nếu chưa có dữ liệu.
+
+Kiểm tra đổi tuyến tự động theo chu kỳ đặt bằng `REROUTE_CHECK_SECONDS` (mặc định 0 là tắt). Bật thì hệ thống tự đánh giá các chuyến đang giao và chỉ tạo đề xuất khi thời gian các chặng còn lại tăng ít nhất 10% hoặc 120 giây; Dispatcher vẫn phải duyệt.
