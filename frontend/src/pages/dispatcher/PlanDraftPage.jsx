@@ -87,7 +87,7 @@ export default function PlanDraftPage() {
           </Card>
           <Card compact title="So sánh trước và sau cải thiện" extra={saved > 0 && <Badge tone="success">−{duration(saved)}</Badge>}>
             <div className="row">
-              <div className="tile grow" style={{ border: '1px solid var(--border-default)' }}><span className="caption muted">Insertion Heuristic</span><span className="body-large strong secondary">{duration(result?.stats?.insertionSeconds)}</span></div>
+              <div className="tile grow" style={{ border: '1px solid var(--line)' }}><span className="caption muted">Insertion Heuristic</span><span className="body-large strong secondary">{duration(result?.stats?.insertionSeconds)}</span></div>
               <ChevronRight size={20} className="muted" />
               <div className="tile success grow"><span className="caption secondary">Sau Relocate và Swap</span><span className="body-large strong success">{duration(total)}</span></div>
             </div>
@@ -98,7 +98,7 @@ export default function PlanDraftPage() {
               {routes.map((r, i) => {
                 const v = byVehicle.get(r.vehicleId)
                 return (
-                  <div key={r.vehicleId} className="row" style={{ padding: '6px 0', borderBottom: i < routes.length - 1 ? '1px solid var(--border-default)' : 0 }}>
+                  <div key={r.vehicleId} className="row" style={{ padding: '6px 0', borderBottom: i < routes.length - 1 ? '1px solid var(--line)' : 0 }}>
                     <Dot color={routeHex(r.vehicleId)} size={12} />
                     <div className="col grow">
                       <span className="strong">Xe {r.vehicleId} · {v.driverName}</span>
@@ -119,7 +119,7 @@ export default function PlanDraftPage() {
               {unassigned.map(u => {
                 const o = byOrder.get(u.orderId)
                 return (
-                  <div key={u.orderId} className="col" style={{ paddingLeft: 12, borderLeft: '1px solid var(--border-warning)' }}>
+                  <div key={u.orderId} className="col" style={{ paddingLeft: 12, borderLeft: '1px solid var(--warn)' }}>
                     <span className="strong">{o.code} · {o.recipientName} · {kg(o.weightKg)}</span>
                     <span className="caption secondary">{u.reason}</span>
                   </div>

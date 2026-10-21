@@ -18,7 +18,7 @@ const STEPS = [
 function StepLine({ state, label }) {
   const icon = state === 'done' ? <CircleCheck size={18} className="success" />
     : state === 'active' ? <LoaderCircle size={18} className="spin brand" />
-      : <span style={{ width: 14, height: 14, margin: 2, borderRadius: '50%', border: '1.5px solid var(--border-strong)', display: 'inline-block' }} />
+      : <span style={{ width: 14, height: 14, margin: 2, borderRadius: '50%', border: '1.5px solid var(--line-strong)', display: 'inline-block' }} />
   return <div className="row" style={{ gap: 8 }}>{icon}<span className={state === 'active' ? 'strong brand' : state === 'todo' ? 'muted' : ''}>{label}</span></div>
 }
 
@@ -121,7 +121,7 @@ function PlanningForm({ opt, runs, initial }) {
             ]} />
             <div style={{ maxHeight: 520, overflowY: 'auto' }}>
               {shownOrders.map((o, i) => (
-                <div key={o.id} className="col" style={{ padding: '8px 0', borderBottom: i < shownOrders.length - 1 ? '1px solid var(--border-default)' : 0 }}>
+                <div key={o.id} className="col" style={{ padding: '8px 0', borderBottom: i < shownOrders.length - 1 ? '1px solid var(--line)' : 0 }}>
                   <div className="row between">
                     <Checkbox label={`${o.code} · ${o.recipientName}`} checked={orders.has(o.id)} disabled={computing || Boolean(o.problem)} onChange={v => toggle(orders, setOrders, o.id, v)} />
                     <span className={`medium tabular ${orders.has(o.id) ? '' : 'muted'}`}>{kg(o.weightKg)}</span>
@@ -134,7 +134,7 @@ function PlanningForm({ opt, runs, initial }) {
                 </div>
               ))}
             </div>
-            <div className="row between" style={{ padding: '12px 16px', background: 'var(--bg-subtle)', borderRadius: 8 }}>
+            <div className="row between" style={{ padding: '12px 16px', background: 'var(--subtle)', borderRadius: 3 }}>
               <span className="strong">Đã chọn {orders.size}/{validOrders.length} đơn · {kg(selected.weight)}</span>
               <span className="caption muted">Hiển thị {shownOrders.length}/{opt.orders.length}</span>
             </div>
@@ -145,7 +145,7 @@ function PlanningForm({ opt, runs, initial }) {
               {opt.vehicles.map(v => {
                 const on = vehicles.has(v.id)
                 return (
-                  <div key={v.id} className="col" style={{ padding: 12, borderRadius: 8, border: `1px solid ${on ? 'var(--border-brand)' : 'var(--border-default)'}`, background: v.problem ? 'var(--bg-subtle)' : 'var(--bg-surface)' }}>
+                  <div key={v.id} className="col" style={{ padding: 12, borderRadius: 3, border: `1px solid ${on ? 'var(--ink)' : 'var(--line)'}`, background: v.problem ? 'var(--subtle)' : 'var(--surface)' }}>
                     <div className="row between">
                       <Checkbox label={v.driver?.name ?? 'Chưa có Driver'} checked={on} disabled={computing || Boolean(v.problem)} onChange={x => toggle(vehicles, setVehicles, v.id, x)} />
                       {v.problem ? <Badge tone="warning">{v.status !== 'active' ? 'Bảo trì' : 'Không sẵn sàng'}</Badge>
@@ -164,8 +164,7 @@ function PlanningForm({ opt, runs, initial }) {
           </Card>
 
           {!computing ? (
-            <Card style={{ flex: '0 1 280px' }}>
-              <h3 className="h4">Tóm tắt</h3>
+            <Card title="Tóm tắt" style={{ flex: '0 1 280px' }}>
               <div className="row top" style={{ gap: 16 }}>
                 <div className="grow"><Stat label="Đơn" value={orders.size} /></div>
                 <div className="grow"><Stat label="Tổng khối lượng" value={kg(selected.weight)} /></div>

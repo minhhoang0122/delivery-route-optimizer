@@ -12,7 +12,7 @@ function icon(html, size) {
 }
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
 
-const STOP_COLORS = { done: '#16a34a', failed: '#dc2626' }
+const STOP_COLORS = { done: '#2b7a3b', failed: '#c0392b' }
 const WAREHOUSE_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 8.35V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8.35A2 2 0 0 1 3.26 6.5l8-3.2a2 2 0 0 1 1.48 0l8 3.2A2 2 0 0 1 22 8.35Z"/><path d="M6 18h12"/><path d="M6 14h12"/><rect width="12" height="12" x="6" y="10"/></svg>'
 const VEHICLE_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>'
 
@@ -62,7 +62,7 @@ export default function MapView({ height = 480, depot, routes = [], stops = [], 
       bounds.push(...r.points)
     }
     for (const s of stops) {
-      const bg = STOP_COLORS[s.state] || s.color || '#2563eb'
+      const bg = STOP_COLORS[s.state] || s.color || '#1f5fae'
       L.marker([s.lat, s.lon], { icon: icon(`<div class="marker-stop" style="background:${bg}">${esc(s.label)}</div>`, 26), title: s.title })
         .addTo(g).bindTooltip(s.title || String(s.label))
       bounds.push([s.lat, s.lon])

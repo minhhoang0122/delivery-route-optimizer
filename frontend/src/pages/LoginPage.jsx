@@ -32,9 +32,9 @@ export default function LoginPage() {
 
   return (
     <div style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', padding: 16 }}>
-      <form className="card" style={{ width: 'min(400px, 100%)', padding: 32, gap: 24, boxShadow: 'var(--shadow-medium)' }} onSubmit={submit}>
+      <form className="card" style={{ width: 'min(400px, 100%)', padding: 32, gap: 24 }} onSubmit={submit}>
         <div className="col" style={{ alignItems: 'center', gap: 12, textAlign: 'center' }}>
-          <span className="brand-logo" style={{ width: 48, height: 48, borderRadius: 12 }}><Truck size={28} /></span>
+          <span className="brand-logo" style={{ width: 40, height: 40 }}><Truck size={22} /></span>
           <h1 className="h2">Điều hành giao hàng</h1>
           <p className="secondary">Đăng nhập để tiếp tục</p>
         </div>

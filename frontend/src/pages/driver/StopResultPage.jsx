@@ -99,7 +99,7 @@ export default function StopResultPage() {
           </div>
         </div>
         {o.note && (
-          <div className="row top" style={{ padding: 12, borderRadius: 8, background: 'var(--bg-warning-subtle)', gap: 8 }}>
+          <div className="row top" style={{ padding: 12, borderRadius: 3, background: 'var(--warn-bg)', gap: 8 }}>
             <Info size={18} className="warning" />
             <div className="col"><span className="caption strong warning">Ghi chú của người nhận</span><span className="body-large">{o.note}</span></div>
           </div>

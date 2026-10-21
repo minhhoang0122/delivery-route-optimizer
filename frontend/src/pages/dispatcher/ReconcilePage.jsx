@@ -79,7 +79,7 @@ export default function ReconcilePage() {
               {failed.map(s => {
                 const d = decisions[s.order.id]
                 return (
-                  <div key={s.id} className="stack-sm" style={{ padding: 12, borderRadius: 8, border: `1px solid ${d ? 'var(--border-default)' : 'var(--border-warning)'}`, background: d ? 'var(--bg-surface)' : 'var(--bg-warning-subtle)' }}>
+                  <div key={s.id} className="stack-sm" style={{ padding: 12, borderRadius: 3, border: `1px solid ${d ? 'var(--line)' : 'var(--warn)'}`, background: d ? 'var(--surface)' : 'var(--warn-bg)' }}>
                     <div className="row between">
                       <div className="col"><span className="strong">{s.order.code} · {s.order.recipientName}</span><span className="caption muted">{s.attempt?.reason} · {s.order.address}</span></div>
                       {!d && <span className="row caption strong warning" style={{ gap: 4 }}><TriangleAlert size={14} /> Chưa chọn</span>}

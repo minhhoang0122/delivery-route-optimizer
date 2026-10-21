@@ -64,7 +64,7 @@ export default function CreateAccountPage() {
             <div key={name} className="stack">
               {i > 0 && <hr className="divider" />}
               <div className="row top">
-                <span className={`icon-wrap ${tone}`} style={{ borderRadius: 8 }}><Icon size={20} /></span>
+                <span className={`icon-wrap ${tone}`} style={{ borderRadius: 3 }}><Icon size={20} /></span>
                 <div className="col">
                   <span className="strong">{name}</span>
                   <span className="secondary">{desc}</span>

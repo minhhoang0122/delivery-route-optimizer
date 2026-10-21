@@ -47,7 +47,7 @@ export const HOME = { administrator: '/admin/accounts', dispatcher: '/dispatcher
 
 export const ROLE = { administrator: 'Administrator', dispatcher: 'Dispatcher', driver: 'Driver' }
 
-// [nhãn, sắc thái của Status Badge]
+// [nhãn, màu của Status Badge]
 export const ORDER_STATUS = {
   pending: ['Chờ xếp', 'neutral'],
   assigned: ['Đã phân công', 'info'],
@@ -73,7 +73,7 @@ export const PLAN_STATUS = {
 
 /** Màu tuyến theo xe, như "Xe 1" … "Xe 5" trong thiết kế. */
 export const routeColor = vehicleId => `var(--route-${((Number(vehicleId) - 1) % 5 + 5) % 5 + 1})`
-export const ROUTE_HEX = ['#2563eb', '#ea580c', '#16a34a', '#7c3aed', '#db2777']
+export const ROUTE_HEX = ['#1f5fae', '#e8590c', '#2b7a3b', '#6b3fa0', '#b83280']
 export const routeHex = vehicleId => ROUTE_HEX[((Number(vehicleId) - 1) % 5 + 5) % 5]
 
 export const FAIL_REASONS = ['Vắng nhà', 'Không liên lạc được', 'Sai địa chỉ', 'Khách từ chối nhận', 'Khác']

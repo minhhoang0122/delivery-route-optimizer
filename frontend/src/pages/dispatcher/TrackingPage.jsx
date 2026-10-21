@@ -43,7 +43,7 @@ function TripCard({ t, now }) {
       {t.needsAck && <div className="row tile info" style={{ flexDirection: 'row', gap: 8 }}><Route size={16} className="brand" /><span className="caption strong brand">Tuyến mới đang chờ Driver xác nhận</span></div>}
       {t.loadingMismatch && <div className="row tile danger" style={{ flexDirection: 'row', gap: 8 }}><TriangleAlert size={16} className="danger" /><span className="caption strong danger">Hàng không khớp khi xuất phát</span></div>}
       {stale ? (
-        <div className="row tile" style={{ flexDirection: 'row', gap: 8, background: 'var(--bg-warning-subtle)' }}>
+        <div className="row tile" style={{ flexDirection: 'row', gap: 8, background: 'var(--warn-bg)' }}>
           <TriangleAlert size={16} className="warning" /><span className="caption strong warning">Vị trí cũ · cập nhật {ago(t.position?.observedAt, now)}</span>
         </div>
       ) : t.status === 'in_progress' && (
@@ -80,20 +80,22 @@ export default function TrackingPage() {
         }))} />
       </div>
       <ErrorBox error={all.error} onRetry={all.reload} />
-      <div className="grid-split">
-        <div className="stack">
+      <div className="console">
+        <div className="panel-col">
           {trips.length === 0 && <Card><Empty icon={Navigation} title="Không có chuyến nào">Chưa có chuyến ở trạng thái này.</Empty></Card>}
           {trips.map(t => <TripCard key={t.id} t={t} now={now} />)}
         </div>
-        <MapView height={700} depot={active[0]?.depot ?? ended.data?.trips[0]?.depot} routes={layers.flatMap(l => l.routes)} stops={layers.flatMap(l => l.stops)}
+        <div className="map-col">
+        <MapView depot={active[0]?.depot ?? ended.data?.trips[0]?.depot} routes={layers.flatMap(l => l.routes)} stops={layers.flatMap(l => l.stops)}
           vehicles={layers.flatMap(l => l.vehicles)} fitKey={`${filter}:${onMap.map(t => t.id).join(',')}`}>
           {onMap.length > 0 && (
-            <MapOverlay><Legend items={[...onMap.map(t => ({ color: routeHex(t.vehicle.id), label: t.code })), { color: '#16a34a', label: 'Đã giao' }, { color: '#dc2626', label: 'Chưa giao được' }]} /></MapOverlay>
+            <MapOverlay><Legend items={[...onMap.map(t => ({ color: routeHex(t.vehicle.id), label: t.code })), { color: '#2b7a3b', label: 'Đã giao' }, { color: '#c0392b', label: 'Chưa giao được' }]} /></MapOverlay>
           )}
           {staleTrip && (
             <MapOverlay position="bottom-left"><span className="map-chip warning"><TriangleAlert size={16} /> Xe {staleTrip.vehicle.plate}: vị trí cũ hơn 30 giây</span></MapOverlay>
           )}
         </MapView>
+        </div>
       </div>
     </>
   )
