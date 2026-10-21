@@ -1,0 +1,14 @@
+{
+  "name": "optimization-engine",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Thuật toán phân công và lập tuyến: Insertion Heuristic, Relocate, Swap, Local Search (mục 3.4)",
+  "type": "module",
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "scripts": {
+    "test": "node --test"
+  }
+}
