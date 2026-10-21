@@ -92,7 +92,7 @@ function ProposalCard({ trip, now, onChanged }) {
   const incident = p.matrix?.incident
 
   return (
-    <Card tone="brand" title={<div className="row"><span className="icon-wrap tone-info"><Route size={18} /></span><div className="col"><h3 className="h4">Đề xuất đổi tuyến</h3><span className="caption muted">{p.meetsThreshold ? 'Giao thông thay đổi nên hệ thống đề xuất thứ tự giao mới cho các điểm còn lại.' : 'Phương án mới không tiết kiệm đủ, hệ thống giữ tuyến hiện tại.'}</span></div></div>}>
+    <Card tone="brand" title={<div className="row"><span className="icon-wrap tone-info"><Route size={18} /></span><div className="col"><h3 className="h4">Đề xuất đổi tuyến</h3><span className="caption muted">{p.auto ? `Kiểm tra định kỳ: thời gian các chặng còn lại tăng ${duration(p.increase.increase)} so với lúc lập tuyến. ` : ''}{p.meetsThreshold ? 'Hệ thống đề xuất thứ tự giao mới cho các điểm còn lại.' : 'Phương án mới không tiết kiệm đủ, hệ thống giữ tuyến hiện tại.'}</span></div></div>}>
       {!p.valid ? <Alert tone="warning" title="Chưa lấy được dữ liệu tuyến">{p.reason}. Hệ thống đang giữ tuyến hiện tại và không tạo chặng có thời gian bằng 0.</Alert> : (
         <>
           <MapView height={320} depot={trip.depot} routes={routes} stops={stops} vehicles={[{ lat: pos[0], lon: pos[1], color, label: ago(p.position.observedAt, now) }]} fitKey={`p${p.eventId}`}>

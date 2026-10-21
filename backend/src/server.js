@@ -3,6 +3,7 @@ import { createApp } from './app.js';
 import { checkConfig, config } from './config.js';
 import { pool } from './db.js';
 import { failInterruptedRuns } from './services/planning.js';
+import { periodicRerouteCheck } from './services/trips.js';
 
 const problems = checkConfig();
 if (problems.length) {
@@ -22,4 +23,8 @@ await failInterruptedRuns();
 createApp().listen(config.port, () => {
   console.log(`Backend chạy tại http://localhost:${config.port}`);
   console.log(`Nguồn ma trận: ${config.matrixSource}${config.tomtomKey ? ' (có khóa TomTom)' : ' (không có khóa TomTom, chặng thiếu sẽ được ước lượng)'}`);
+  if (config.reroute.checkIntervalSeconds > 0) {
+    setInterval(periodicRerouteCheck, config.reroute.checkIntervalSeconds * 1000);
+    console.log(`Kiểm tra đổi tuyến tự động mỗi ${config.reroute.checkIntervalSeconds} giây`);
+  }
 });

@@ -454,7 +454,11 @@ async function previousBatchIds(trip) {
   return (await query('SELECT matrix_batch_id FROM planning_run_matrices WHERE planning_run_id = $1', [trip.planningRunId])).rows.map(r => r.matrix_batch_id);
 }
 
-export async function evaluateTripReroute(tripId, user) {
+/**
+ * Đánh giá đổi thứ tự các điểm còn lại. Dispatcher bấm nút thì luôn lưu kết quả để trình duyệt;
+ * kiểm tra tự động theo chu kỳ (auto) chỉ lưu đề xuất khi thời gian các chặng chung tăng vượt ngưỡng (mục 3.4.5).
+ */
+export async function evaluateTripReroute(tripId, user, { auto = false } = {}) {
   const trip = await loadTrip(tripId);
   if (!trip) throw notFound('Không tìm thấy chuyến');
   if (trip.status !== 'in_progress') throw conflict('Chỉ đánh giá đổi tuyến khi chuyến đang giao');
@@ -490,6 +494,7 @@ export async function evaluateTripReroute(tripId, user) {
   });
   const oldTravel = await loadBatches(await previousBatchIds(trip));
   const increase = detectIncrease({ points: [...remaining.map(key), dKey], profile, oldTravel, newTravel: matrix.travel });
+  if (auto && !increase.triggered) return null;
 
   const payload = {
     stateVersion: trip.stateVersion,
@@ -501,11 +506,12 @@ export async function evaluateTripReroute(tripId, user) {
     currentStopIds: remaining.map(s => s.id),
     ...ev,
     increase,
+    auto,
     matrix: { batchIds: matrix.batchIds, ...matrix.stats, ms: Math.round(matrixMs) },
   };
   const { rows } = await query(
     `INSERT INTO trip_events (trip_id, actor_id, event_type, payload) VALUES ($1, $2, 'reroute_evaluated', $3) RETURNING id, created_at`,
-    [tripId, user.id, payload]);
+    [tripId, user?.id ?? null, payload]);
   return { eventId: rows[0].id, createdAt: rows[0].created_at, ...payload };
 }
 
@@ -577,4 +583,34 @@ export async function dismissReroute(tripId, eventId, user) {
     if (handled) return;
     await addEvent(c, { tripId, actorId: user.id, type: 'reroute_dismissed', payload: { evaluationEventId: eventId } });
   });
+}
+
+// ---------------------------------------------------------------- kiểm tra theo chu kỳ (UC07 Alternative Flow)
+
+let checking = false;
+
+/**
+ * Mỗi chu kỳ xét các chuyến đang giao: bỏ qua chuyến đang chờ Driver xác nhận, chuyến đã có đề xuất chưa xử lý
+ * hoặc vị trí đã cũ. Đề xuất chỉ được lưu để Dispatcher duyệt, hệ thống không tự áp dụng tuyến mới.
+ */
+export async function periodicRerouteCheck() {
+  if (checking) return;
+  checking = true;
+  try {
+    const { rows } = await query(`SELECT id FROM trips WHERE status = 'in_progress' ORDER BY id`);
+    for (const { id } of rows) {
+      const trip = await loadTrip(id);
+      if (trip.needsAck || (trip.proposal && !trip.proposal.outdated)) continue;
+      if (!trip.position || ageSeconds(trip.position.observedAt) > config.reroute.maxPositionAgeSeconds) continue;
+      if (trip.stops.filter(s => s.status === 'pending').length < 3) continue;
+      try {
+        const ev = await evaluateTripReroute(id, null, { auto: true });
+        if (ev) console.log(`Kiểm tra định kỳ ${trip.code}: thời gian còn lại tăng ${ev.increase.increase} giây, đề xuất tiết kiệm ${ev.savingSeconds} giây`);
+      } catch (err) {
+        if (!(err instanceof HttpError)) console.error(`Kiểm tra định kỳ ${trip.code} lỗi`, err.message);
+      }
+    }
+  } finally {
+    checking = false;
+  }
 }

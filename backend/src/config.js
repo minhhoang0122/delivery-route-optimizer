@@ -35,6 +35,8 @@ export const config = {
     maxEvaluationAgeSeconds: num('EVALUATION_MAX_AGE_SECONDS', 120),
     maxDisplacementM: num('MAX_DISPLACEMENT_M', 100),
     cooldownSeconds: num('REROUTE_COOLDOWN_SECONDS', 120),
+    // Chu kỳ kiểm tra tự động (giây). 0 là tắt: mỗi lần kiểm tra gọi TomTom cho các chặng từ vị trí xe
+    checkIntervalSeconds: num('REROUTE_CHECK_SECONDS', 0),
   },
 };
 
