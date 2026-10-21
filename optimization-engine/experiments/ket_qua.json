@@ -1,0 +1,491 @@
+{
+  "e1": [
+    {
+      "matrix": "16:00",
+      "cap": null,
+      "insertion": 9974,
+      "improved": 9785,
+      "evaluations": 3846,
+      "moves": 5,
+      "vehicles": 1,
+      "longest": 9785,
+      "unassigned": 0,
+      "insertionMs": 0.7021000000000015,
+      "searchMs": 12.889800000000001
+    },
+    {
+      "matrix": "16:00",
+      "cap": 60,
+      "insertion": 12726,
+      "improved": 11639,
+      "evaluations": 4037,
+      "moves": 6,
+      "vehicles": 4,
+      "longest": 3568,
+      "unassigned": 0,
+      "insertionMs": 0.34969999999999857,
+      "searchMs": 9.602699999999999
+    },
+    {
+      "matrix": "16:00",
+      "cap": 45,
+      "insertion": 12923,
+      "improved": 12139,
+      "evaluations": 3214,
+      "moves": 5,
+      "vehicles": 5,
+      "longest": 2655,
+      "unassigned": 1,
+      "insertionMs": 0.26549999999999585,
+      "searchMs": 8.453399999999995
+    },
+    {
+      "matrix": "17:30",
+      "cap": null,
+      "insertion": 10729,
+      "improved": 10347,
+      "evaluations": 3846,
+      "moves": 5,
+      "vehicles": 1,
+      "longest": 10347,
+      "unassigned": 0,
+      "insertionMs": 0.09440000000000737,
+      "searchMs": 9.434299999999993
+    },
+    {
+      "matrix": "17:30",
+      "cap": 60,
+      "insertion": 14764,
+      "improved": 11934,
+      "evaluations": 5187,
+      "moves": 8,
+      "vehicles": 4,
+      "longest": 3447,
+      "unassigned": 0,
+      "insertionMs": 0.08299999999999841,
+      "searchMs": 8.743899999999996
+    },
+    {
+      "matrix": "17:30",
+      "cap": 45,
+      "insertion": 12723,
+      "improved": 10325,
+      "evaluations": 3038,
+      "moves": 6,
+      "vehicles": 4,
+      "longest": 2640,
+      "unassigned": 3,
+      "insertionMs": 0.0910999999999973,
+      "searchMs": 4.862800000000007
+    }
+  ],
+  "e2": [
+    {
+      "name": "Ma trận 17:30 (giao thông thật)",
+      "cases": 8,
+      "improved": 0,
+      "accepted": 0,
+      "avgSaving": 0,
+      "maxSaving": 0,
+      "results": [
+        {
+          "valid": true,
+          "currentSeconds": 3046,
+          "proposedSeconds": 3046,
+          "savingSeconds": 0,
+          "savingRatio": 0,
+          "meetsThreshold": false,
+          "proposedStopIds": [
+            15,
+            16,
+            3,
+            6,
+            20,
+            17
+          ],
+          "evaluations": 30,
+          "vehicle": 1,
+          "remaining": 6
+        },
+        {
+          "valid": true,
+          "currentSeconds": 2936,
+          "proposedSeconds": 2936,
+          "savingSeconds": 0,
+          "savingRatio": 0,
+          "meetsThreshold": false,
+          "proposedStopIds": [
+            16,
+            3,
+            6,
+            20,
+            17
+          ],
+          "evaluations": 18,
+          "vehicle": 1,
+          "remaining": 5
+        },
+        {
+          "valid": true,
+          "currentSeconds": 2683,
+          "proposedSeconds": 2683,
+          "savingSeconds": 0,
+          "savingRatio": 0,
+          "meetsThreshold": false,
+          "proposedStopIds": [
+            3,
+            6,
+            20,
+            17
+          ],
+          "evaluations": 9,
+          "vehicle": 1,
+          "remaining": 4
+        },
+        {
+          "valid": true,
+          "currentSeconds": 2369,
+          "proposedSeconds": 2369,
+          "savingSeconds": 0,
+          "savingRatio": 0,
+          "meetsThreshold": false,
+          "proposedStopIds": [
+            6,
+            20,
+            17
+          ],
+          "evaluations": 3,
+          "vehicle": 1,
+          "remaining": 3
+        },
+        {
+          "valid": true,
+          "currentSeconds": 1846,
+          "proposedSeconds": 1846,
+          "savingSeconds": 0,
+          "savingRatio": 0,
+          "meetsThreshold": false,
+          "proposedStopIds": [
+            12,
+            13,
+            14,
+            1
+          ],
+          "evaluations": 9,
+          "vehicle": 2,
+          "remaining": 4
+        },
+        {
+          "valid": true,
+          "currentSeconds": 1769,
+          "proposedSeconds": 1769,
+          "savingSeconds": 0,
+          "savingRatio": 0,
+          "meetsThreshold": false,
+          "proposedStopIds": [
+            13,
+            14,
+            1
+          ],
+          "evaluations": 3,
+          "vehicle": 2,
+          "remaining": 3
+        },
+        {
+          "valid": true,
+          "currentSeconds": 3135,
+          "proposedSeconds": 3135,
+          "savingSeconds": 0,
+          "savingRatio": 0,
+          "meetsThreshold": false,
+          "proposedStopIds": [
+            8,
+            19,
+            5
+          ],
+          "evaluations": 3,
+          "vehicle": 4,
+          "remaining": 3
+        },
+        {
+          "valid": true,
+          "currentSeconds": 1619,
+          "proposedSeconds": 1619,
+          "savingSeconds": 0,
+          "savingRatio": 0,
+          "meetsThreshold": false,
+          "proposedStopIds": [
+            11,
+            18,
+            4
+          ],
+          "evaluations": 3,
+          "vehicle": 5,
+          "remaining": 3
+        }
+      ]
+    },
+    {
+      "name": "Sự cố giả định ×3",
+      "cases": 8,
+      "improved": 8,
+      "accepted": 8,
+      "avgSaving": 412.625,
+      "maxSaving": 892,
+      "results": [
+        {
+          "valid": true,
+          "currentSeconds": 3552,
+          "proposedSeconds": 3285,
+          "savingSeconds": 267,
+          "savingRatio": 0.07516891891891891,
+          "meetsThreshold": true,
+          "proposedStopIds": [
+            15,
+            3,
+            6,
+            20,
+            17,
+            16
+          ],
+          "evaluations": 60,
+          "vehicle": 1,
+          "remaining": 6
+        },
+        {
+          "valid": true,
+          "currentSeconds": 3564,
+          "proposedSeconds": 3113,
+          "savingSeconds": 451,
+          "savingRatio": 0.12654320987654322,
+          "meetsThreshold": true,
+          "proposedStopIds": [
+            16,
+            6,
+            20,
+            17,
+            3
+          ],
+          "evaluations": 36,
+          "vehicle": 1,
+          "remaining": 5
+        },
+        {
+          "valid": true,
+          "currentSeconds": 3591,
+          "proposedSeconds": 2699,
+          "savingSeconds": 892,
+          "savingRatio": 0.24839877471456417,
+          "meetsThreshold": true,
+          "proposedStopIds": [
+            3,
+            17,
+            6,
+            20
+          ],
+          "evaluations": 18,
+          "vehicle": 1,
+          "remaining": 4
+        },
+        {
+          "valid": true,
+          "currentSeconds": 3421,
+          "proposedSeconds": 3187,
+          "savingSeconds": 234,
+          "savingRatio": 0.06840105232388191,
+          "meetsThreshold": true,
+          "proposedStopIds": [
+            6,
+            17,
+            20
+          ],
+          "evaluations": 6,
+          "vehicle": 1,
+          "remaining": 3
+        },
+        {
+          "valid": true,
+          "currentSeconds": 2186,
+          "proposedSeconds": 1934,
+          "savingSeconds": 252,
+          "savingRatio": 0.11527904849039342,
+          "meetsThreshold": true,
+          "proposedStopIds": [
+            12,
+            14,
+            13,
+            1
+          ],
+          "evaluations": 18,
+          "vehicle": 2,
+          "remaining": 4
+        },
+        {
+          "valid": true,
+          "currentSeconds": 2615,
+          "proposedSeconds": 1981,
+          "savingSeconds": 634,
+          "savingRatio": 0.2424474187380497,
+          "meetsThreshold": true,
+          "proposedStopIds": [
+            13,
+            1,
+            14
+          ],
+          "evaluations": 6,
+          "vehicle": 2,
+          "remaining": 3
+        },
+        {
+          "valid": true,
+          "currentSeconds": 4201,
+          "proposedSeconds": 3814,
+          "savingSeconds": 387,
+          "savingRatio": 0.09212092358962153,
+          "meetsThreshold": true,
+          "proposedStopIds": [
+            8,
+            5,
+            19
+          ],
+          "evaluations": 6,
+          "vehicle": 4,
+          "remaining": 3
+        },
+        {
+          "valid": true,
+          "currentSeconds": 2701,
+          "proposedSeconds": 2517,
+          "savingSeconds": 184,
+          "savingRatio": 0.06812291743798593,
+          "meetsThreshold": true,
+          "proposedStopIds": [
+            11,
+            4,
+            18
+          ],
+          "evaluations": 6,
+          "vehicle": 5,
+          "remaining": 3
+        }
+      ]
+    }
+  ],
+  "e3": [
+    {
+      "name": "20 đơn, 5 xe, không giới hạn",
+      "placed": 20,
+      "unassigned": 0,
+      "reasons": {},
+      "capacity": 0,
+      "type": 0,
+      "duplicate": 0
+    },
+    {
+      "name": "20 đơn, 5 xe, giới hạn 60 phút",
+      "placed": 20,
+      "unassigned": 0,
+      "reasons": {},
+      "capacity": 0,
+      "type": 0,
+      "duplicate": 0
+    },
+    {
+      "name": "Chỉ 3 xe máy (đơn chỉ xe tải phải chưa xếp)",
+      "placed": 17,
+      "unassigned": 3,
+      "reasons": {
+        "Không có xe phù hợp loại xe": 3
+      },
+      "capacity": 0,
+      "type": 0,
+      "duplicate": 0
+    },
+    {
+      "name": "Xe máy 40 kg duy nhất",
+      "placed": 10,
+      "unassigned": 10,
+      "reasons": {
+        "Không có xe phù hợp loại xe": 3,
+        "Vượt tải của mọi xe phù hợp": 7
+      },
+      "capacity": 0,
+      "type": 0,
+      "duplicate": 0
+    },
+    {
+      "name": "Mất dữ liệu mọi chặng tới DH-1049",
+      "placed": 19,
+      "unassigned": 1,
+      "reasons": {
+        "Thiếu dữ liệu tuyến từ TomTom": 1
+      },
+      "capacity": 0,
+      "type": 0,
+      "duplicate": 0
+    }
+  ],
+  "e4": [
+    {
+      "g": 0,
+      "ratio": 0,
+      "accepted": 8,
+      "total": 16,
+      "saving": 3301
+    },
+    {
+      "g": 30,
+      "ratio": 0.025,
+      "accepted": 8,
+      "total": 16,
+      "saving": 3301
+    },
+    {
+      "g": 60,
+      "ratio": 0.05,
+      "accepted": 8,
+      "total": 16,
+      "saving": 3301
+    },
+    {
+      "g": 120,
+      "ratio": 0.1,
+      "accepted": 4,
+      "total": 16,
+      "saving": 2229
+    },
+    {
+      "g": 180,
+      "ratio": 0.15,
+      "accepted": 2,
+      "total": 16,
+      "saving": 1526
+    }
+  ],
+  "e5": [
+    {
+      "n": 5,
+      "medianMs": 0.08299999999999841,
+      "evaluations": 47,
+      "legs": 60
+    },
+    {
+      "n": 10,
+      "medianMs": 0.21349999999998204,
+      "evaluations": 141,
+      "legs": 220
+    },
+    {
+      "n": 15,
+      "medianMs": 1.725200000000001,
+      "evaluations": 1284,
+      "legs": 480
+    },
+    {
+      "n": 20,
+      "medianMs": 4.704200000000014,
+      "evaluations": 4037,
+      "legs": 840
+    }
+  ]
+}

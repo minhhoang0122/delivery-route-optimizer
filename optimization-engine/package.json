@@ -9,6 +9,7 @@
     ".": "./src/index.js"
   },
   "scripts": {
-    "test": "node --test"
+    "test": "node --test",
+    "experiments": "node experiments/chuong4.js --json"
   }
 }
