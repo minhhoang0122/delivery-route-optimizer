@@ -1,0 +1,8 @@
+# Cấu hình riêng của WebStorm, mỗi máy một kiểu
+.idea/
+
+# File chứa khóa bí mật (API key, mật khẩu database)
+.env
+
+# Thư viện cài bằng npm, tải lại được bằng npm install
+node_modules/
