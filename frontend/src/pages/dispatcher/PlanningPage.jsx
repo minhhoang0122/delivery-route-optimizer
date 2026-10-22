@@ -51,6 +51,8 @@ function PlanningForm({ opt, runs, initial }) {
   const [filter, setFilter] = useState('all')
   const [run, setRun] = useState(null)
   const [error, setError] = useState(null)
+  // Chặn bấm đúp: mỗi lần bấm tạo một lần tính và tốn hạn mức TomTom
+  const [submitting, setSubmitting] = useState(false)
   const timer = useRef(null)
 
   useEffect(() => () => clearTimeout(timer.current), [])
@@ -83,6 +85,8 @@ function PlanningForm({ opt, runs, initial }) {
   }
 
   async function compute() {
+    if (submitting) return
+    setSubmitting(true)
     setError(null)
     try {
       const d = await api('/planning/runs', {
@@ -93,6 +97,8 @@ function PlanningForm({ opt, runs, initial }) {
       poll(d.run.id)
     } catch (e) {
       setError(e)
+    } finally {
+      setSubmitting(false)
     }
   }
 
@@ -181,7 +187,7 @@ function PlanningForm({ opt, runs, initial }) {
               <Field label="Giới hạn thời lượng mỗi chuyến (phút)" helper="0 là không giới hạn. Không có giới hạn thì thuật toán có xu hướng dồn đơn lên ít xe.">
                 <input className="input" type="number" min={0} max={1440} value={maxMinutes} onChange={e => setMaxMinutes(e.target.value)} />
               </Field>
-              <Button icon={Route} block onClick={compute} disabled={!orders.size || !vehicles.size}>Tính phương án</Button>
+              <Button icon={Route} block onClick={compute} loading={submitting} disabled={!orders.size || !vehicles.size}>Tính phương án</Button>
               <p className="caption muted">
                 {opt.defaults.matrixSource === 'mock' ? 'Dữ liệu thời gian ước lượng theo khoảng cách (chế độ chạy thử).'
                   : `Dữ liệu thời gian lấy từ TomTom có xét giao thông${opt.defaults.matrixSource === 'replay' ? ', dùng lại ma trận đã ghi khi có' : ''}.`}

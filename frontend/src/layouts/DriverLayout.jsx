@@ -143,7 +143,8 @@ export function DriverScreen({ title, subtitle, back, footer, children }) {
       <footer className="mobile-footer">
         {footer}
         <nav className="mobile-nav">
-          <NavLink to="/driver" end><Navigation size={20} />Chuyến hiện tại</NavLink>
+          {/* Các trang con của chuyến (ghi kết quả, báo về kho) vẫn thuộc mục Chuyến hiện tại */}
+          <NavLink to="/driver" className={({ isActive }) => (isActive && !window.location.pathname.startsWith('/driver/history') ? 'active' : undefined)}><Navigation size={20} />Chuyến hiện tại</NavLink>
           <NavLink to="/driver/history"><History size={20} />Lịch sử chuyến</NavLink>
         </nav>
       </footer>

@@ -85,7 +85,7 @@ function ProposalCard({ trip, now, onChanged }) {
   }))
   const routes = [
     { points: [depot, ...done.map(s => [s.order.lat, s.order.lon]), pos], color: '#94a3b8' },
-    { points: [pos, ...pts(p.currentStopIds), depot], color, dashed: true, opacity: 0.5 },
+    { points: [pos, ...pts(p.currentStopIds), depot], color: '#6b7280', dashed: true, opacity: 0.9, weight: 3 },
     ...(p.meetsThreshold ? [{ points: [pos, ...pts(p.proposedStopIds), depot], color, weight: 5 }] : []),
   ]
   const next = byId.get(p.nextStopId)
@@ -96,7 +96,7 @@ function ProposalCard({ trip, now, onChanged }) {
       {!p.valid ? <Alert tone="warning" title="Chưa lấy được dữ liệu tuyến">{p.reason}. Hệ thống đang giữ tuyến hiện tại và không tạo chặng có thời gian bằng 0.</Alert> : (
         <>
           <MapView height={320} depot={trip.depot} routes={routes} stops={stops} vehicles={[{ lat: pos[0], lon: pos[1], color, label: ago(p.position.observedAt, now) }]} fitKey={`p${p.eventId}`}>
-            <MapOverlay><Legend items={[{ color, label: 'Tuyến hiện tại', line: true, dashed: true, opacity: 0.5 }, ...(p.meetsThreshold ? [{ color, label: 'Tuyến đề xuất', line: true }] : []), { color: '#94a3b8', label: 'Đã đi qua', line: true }]} /></MapOverlay>
+            <MapOverlay><Legend items={[{ color: '#6b7280', label: 'Tuyến hiện tại', line: true, dashed: true }, ...(p.meetsThreshold ? [{ color, label: 'Tuyến đề xuất', line: true }] : []), { color: '#94a3b8', label: 'Đã đi qua', line: true }]} /></MapOverlay>
           </MapView>
           <div className="row top">
             <div className="tile grow"><span className="caption muted">Hiện tại</span><span className="h3">{duration(p.currentSeconds)}</span></div>

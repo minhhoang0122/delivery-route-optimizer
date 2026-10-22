@@ -7,6 +7,7 @@ import { badRequest, HttpError } from '../errors.js';
 import { text } from '../validate.js';
 
 const router = Router();
+const DUMMY_HASH = bcrypt.hashSync('khong-dung-de-dang-nhap', 10);
 
 router.post('/login', async (req, res) => {
   const username = text(req.body?.username, 'tên đăng nhập', { max: 50 });
@@ -16,7 +17,9 @@ router.post('/login', async (req, res) => {
     [username]);
   const user = rows[0];
   // Cùng một thông báo cho sai tên và sai mật khẩu để không lộ tài khoản nào tồn tại
-  if (!user || !(await bcrypt.compare(password, user.password_hash))) {
+  // Vẫn so mật khẩu với một chuỗi băm giả khi tài khoản không tồn tại, để thời gian phản hồi không lộ tên đăng nhập
+  const ok = await bcrypt.compare(password, user?.password_hash ?? DUMMY_HASH);
+  if (!user || !ok) {
     throw new HttpError(401, 'INVALID_CREDENTIALS', 'Tên đăng nhập hoặc mật khẩu không đúng');
   }
   if (user.status === 'locked') throw new HttpError(403, 'ACCOUNT_LOCKED', 'Tài khoản đã bị khóa. Liên hệ Administrator.');

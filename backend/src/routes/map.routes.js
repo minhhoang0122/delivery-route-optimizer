@@ -15,7 +15,7 @@ const CACHE = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '.cache'
 
 router.get('/tiles/:z/:x/:y.png', async (req, res) => {
   const [z, x, y] = ['z', 'x', 'y'].map(k => Number(req.params[k]));
-  if (![z, x, y].every(Number.isInteger) || z < 0 || z > 20) throw badRequest('Ô bản đồ không hợp lệ');
+  if (![z, x, y].every(Number.isInteger) || z < 0 || z > 20 || x < 0 || y < 0 || x >= 2 ** z || y >= 2 ** z) throw badRequest('Ô bản đồ không hợp lệ');
   if (!hasKey()) return res.redirect(302, `https://tile.openstreetmap.org/${z}/${x}/${y}.png`);
   const file = join(CACHE, String(z), String(x), `${y}.png`);
   let png = await readFile(file).catch(() => null);

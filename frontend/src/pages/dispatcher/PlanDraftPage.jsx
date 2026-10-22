@@ -57,7 +57,7 @@ export default function PlanDraftPage() {
   const matrixNote = !m ? '' : m.source === 'mock'
     ? 'Thời gian ước lượng theo khoảng cách (chạy thử, không phải TomTom)'
     : m.estimated ? `TomTom (ghi lúc ${dateTime(m.newest)}), ${m.estimated} chặng ước lượng do chưa có khóa`
-      : m.fetched ? `Thời gian di chuyển từ TomTom · lấy lúc ${time(m.newest)}` : `Ma trận TomTom đã ghi lúc ${dateTime(m.newest)}`
+      : m.fetched ? `Thời gian di chuyển từ TomTom · lấy lúc ${time(m.newest)}` : `Ma trận TomTom ghi sẵn, dữ liệu lấy lúc ${dateTime(m.newest)}`
 
   return (
     <>

@@ -127,7 +127,8 @@ export async function buildMatrix({ points, profiles, maxAgeSeconds = defaultMax
     travel: (profile, a, b) => lookup(profile, a, b, 'seconds'),
     distance: (profile, a, b) => lookup(profile, a, b, 'meters'),
     batchIds: [...batchIds],
-    stats: { ...stats, mode, source: useTomTom || mode === 'replay' ? 'tomtom' : 'mock', usedKey: useTomTom },
+    // Nguồn ghi theo dữ liệu thực dùng: toàn chặng ước lượng hoặc sự cố giả định thì không ghi là TomTom
+    stats: { ...stats, mode, source: mode === 'mock' || (!stats.fetched && stats.estimated && stats.reused === (stats.incident ?? 0)) ? 'mock' : 'tomtom', usedKey: useTomTom },
   };
 }
 

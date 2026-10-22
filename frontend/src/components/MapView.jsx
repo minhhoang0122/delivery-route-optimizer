@@ -100,7 +100,7 @@ export default function MapView({ height = 480, depot, routes = [], stops = [], 
 
 export function MapOverlay({ position = 'top-left', children }) {
   const pos = {
-    'top-left': { top: 12, left: 12 }, 'top-right': { top: 12, right: 12 },
+    'top-left': { top: 12, left: 52 }, 'top-right': { top: 12, right: 12 },
     'bottom-left': { bottom: 12, left: 12 }, 'bottom-right': { bottom: 24, right: 12 },
   }[position]
   return <div className="map-overlay" style={pos}>{children}</div>
