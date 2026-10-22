@@ -102,8 +102,16 @@ export async function batchRoutes(queries, { onProgress } = {}) {
 
 /** Đường đi qua các điểm theo đúng thứ tự đã chọn, trả về GeoJSON LineString (kinh độ, vĩ độ). */
 export async function routeGeometry(points, profile) {
+  // Hai điểm liền nhau trùng chỗ (xe đang đứng tại điểm kế tiếp) làm TomTom từ chối cả yêu cầu, nên bỏ điểm trùng
+  points = points.filter((p, i) => i === 0 || Math.abs(p.lat - points[i - 1].lat) + Math.abs(p.lon - points[i - 1].lon) > 1e-4);
   if (!hasKey() || points.length < 2) return null;
-  const { status, data } = await send(`/routing/1${routeQuery(points, profile, { routeRepresentation: 'polyline' })}`);
+  const path = `/routing/1${routeQuery(points, profile, { routeRepresentation: 'polyline' })}`;
+  let { status, data } = await send(path);
+  // Ngay sau một loạt yêu cầu ma trận, TomTom có thể từ chối vì gọi quá nhanh (429): chờ rồi thử lại hai lần
+  for (let i = 1; i <= 2 && (status === 429 || status >= 500 || status === 0); i++) {
+    await new Promise(r => setTimeout(r, 1500 * i));
+    ({ status, data } = await send(path));
+  }
   if (status !== 200 || !data.routes?.length) return null;
   const coords = [];
   for (const legPart of data.routes[0].legs) {

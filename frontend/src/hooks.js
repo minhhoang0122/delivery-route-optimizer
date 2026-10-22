@@ -5,6 +5,9 @@ import { useCallback, useEffect, useRef, useState } from 'react'
  * Tải dữ liệu bằng hàm loader. interval (ms) thì tự tải lại theo chu kỳ (HTTP theo chu kỳ, mục 2.5.4).
  * Kết quả đến muộn của lần tải cũ không ghi đè kết quả mới hơn.
  */
+/** Chu kỳ tải lại các màn hình theo dõi; đặt VITE_LIVE_POLL_MS nhỏ hơn khi chạy demo mô phỏng. */
+export const LIVE_MS = Number(import.meta.env.VITE_LIVE_POLL_MS) || 10_000
+
 export function useLoad(loader, deps = [], { interval } = {}) {
   const [data, setData] = useState(null)
   const [error, setError] = useState(null)

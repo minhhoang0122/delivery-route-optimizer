@@ -3,6 +3,7 @@
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { useEffect, useRef } from 'react'
+import { LIVE_MS } from '../hooks.js'
 
 const DA_NANG = [16.0544, 108.2022]
 let tileSource = null
@@ -21,7 +22,7 @@ const VEHICLE_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"
  * depot:    { lat, lon }
  * routes:   [{ points: [[lat, lon]], color, dashed, opacity, weight }]
  * stops:    [{ lat, lon, label, color, state }]  state done | failed thì đổi màu
- * vehicles: [{ lat, lon, color, label, stale }]
+ * vehicles: [{ key, lat, lon, color, label, stale, heading }]  xe cùng key trượt từ vị trí cũ sang vị trí mới
  * pin:      { lat, lon } điểm đang chọn (tạo đơn)
  * fitKey:   đổi giá trị này thì bản đồ căn lại khung nhìn; tải lại dữ liệu theo chu kỳ thì không căn lại
  */
@@ -29,6 +30,7 @@ export default function MapView({ height = 480, depot, routes = [], stops = [], 
   const box = useRef(null)
   const map = useRef(null)
   const layer = useRef(null)
+  const cars = useRef(new Map())
   const fitted = useRef(null)
   const click = useRef(onClick)
   useEffect(() => { click.current = onClick })
@@ -37,6 +39,8 @@ export default function MapView({ height = 480, depot, routes = [], stops = [], 
     const m = L.map(box.current, { zoomControl: true, attributionControl: true }).setView(DA_NANG, 13)
     map.current = m
     layer.current = L.layerGroup().addTo(m)
+    const carLayer = L.layerGroup().addTo(m)
+    cars.current.layer = carLayer
     m.on('click', e => click.current?.({ lat: e.latlng.lat, lon: e.latlng.lng }))
     const addTiles = src => {
       // Lần tải nguồn ô bản đồ có thể xong sau khi bản đồ đã bị gỡ (ví dụ khi chuyển trang)
@@ -48,7 +52,12 @@ export default function MapView({ height = 480, depot, routes = [], stops = [], 
     }
     if (tileSource) addTiles(tileSource)
     else fetch('/api/map/source').then(r => r.json()).then(d => { tileSource = d.tiles; addTiles(tileSource) }).catch(() => addTiles('openstreetmap'))
-    return () => { m.remove(); map.current = null }
+    const carMap = cars.current
+    return () => {
+      for (const c of carMap.values()) cancelAnimationFrame(c.frame)
+      carMap.clear()
+      m.remove(); map.current = null
+    }
   }, [])
 
   useEffect(() => {
@@ -73,10 +82,41 @@ export default function MapView({ height = 480, depot, routes = [], stops = [], 
         .addTo(g).bindTooltip(esc(depot.name || 'Kho'))
       bounds.push([depot.lat, depot.lon])
     }
-    for (const v of vehicles) {
-      L.marker([v.lat, v.lon], { icon: icon(`<div class="marker-vehicle${v.stale ? ' stale' : ''}" style="background:${v.color}">${VEHICLE_SVG}</div>`, 34), zIndexOffset: 1000 })
-        .addTo(g).bindTooltip(esc(v.label || 'Xe'), { permanent: Boolean(v.label), direction: 'top', offset: [0, -16] })
+    // Xe giữ nguyên marker giữa các lần tải lại và trượt tới vị trí mới, mũi tên xoay theo hướng chạy
+    const seen = new Set()
+    vehicles.forEach((v, i) => {
+      const key = v.key ?? i
+      seen.add(key)
+      // Mũi tên gốc chỉ hướng đông bắc (45°)
+      const html = `<div class="marker-vehicle${v.stale ? ' stale' : ''}" style="background:${v.color}"><span style="display:grid;transform:rotate(${(v.heading ?? 45) - 45}deg)">${VEHICLE_SVG}</span></div>`
+      const to = L.latLng(v.lat, v.lon)
+      let c = cars.current.get(key)
+      if (!c) {
+        const marker = L.marker(to, { icon: icon(html, 34), zIndexOffset: 1000 }).addTo(cars.current.layer)
+          .bindTooltip(esc(v.label || 'Xe'), { permanent: Boolean(v.label), direction: 'top', offset: [0, -16] })
+        c = { marker, html, frame: 0 }
+        cars.current.set(key, c)
+      } else {
+        if (c.html !== html) { c.marker.setIcon(icon(html, 34)); c.html = html }
+        c.marker.setTooltipContent(esc(v.label || 'Xe'))
+        cancelAnimationFrame(c.frame)
+        const from = c.marker.getLatLng()
+        const ms = Math.min(LIVE_MS, 3000)
+        const t0 = performance.now()
+        const step = now => {
+          const k = Math.min(1, (now - t0) / ms)
+          c.marker.setLatLng([from.lat + (to.lat - from.lat) * k, from.lng + (to.lng - from.lng) * k])
+          if (k < 1) c.frame = requestAnimationFrame(step)
+        }
+        c.frame = requestAnimationFrame(step)
+      }
       bounds.push([v.lat, v.lon])
+    })
+    for (const [key, c] of cars.current) {
+      if (key === 'layer' || seen.has(key)) continue
+      cancelAnimationFrame(c.frame)
+      c.marker.remove()
+      cars.current.delete(key)
     }
     if (pin) {
       L.marker([pin.lat, pin.lon], { icon: L.divIcon({ html: '<div class="marker-pin"></div>', className: '', iconSize: [28, 28], iconAnchor: [14, 28] }) }).addTo(g)

@@ -3,10 +3,10 @@ import { ChevronRight, LocateFixed, Navigation, Route, TriangleAlert } from 'luc
 import { Link, useSearchParams } from 'react-router'
 import { api } from '../../api.js'
 import MapView, { Legend, MapOverlay } from '../../components/MapView.jsx'
-import { isStale, tripLayers } from '../../components/tripMap.js'
+import { CONGESTION_HEX, isStale, tripLayers } from '../../components/tripMap.js'
 import { Card, Chips, Dot, Empty, ErrorBox, Loading, PageHeader, Progress, Stat, StatusBadge } from '../../components/ui.jsx'
 import { ago, dateTime, duration, routeHex, time, TRIP_STATUS, VEHICLE_TYPE } from '../../format.js'
-import { useLoad, useNow } from '../../hooks.js'
+import { LIVE_MS, useLoad, useNow } from '../../hooks.js'
 
 const FILTERS = [
   ['in_progress', 'Đang giao'], ['assigned', 'Đã giao chuyến'], ['awaiting_reconciliation', 'Chờ đối chiếu'], ['closed,revoked', 'Đã kết thúc'],
@@ -59,7 +59,7 @@ function TripCard({ t, now }) {
 export default function TrackingPage() {
   const [params, setParams] = useSearchParams()
   const filter = params.get('status') || 'in_progress'
-  const all = useLoad(() => api('/trips?status=active'), [], { interval: 10_000 })
+  const all = useLoad(() => api('/trips?status=active'), [], { interval: LIVE_MS })
   const ended = useLoad(() => (filter === 'closed,revoked' ? api('/trips?status=closed,revoked&limit=30') : Promise.resolve({ trips: [] })), [filter])
   const now = useNow()
   if (all.loading && !all.data) return <Loading />
@@ -89,7 +89,7 @@ export default function TrackingPage() {
         <MapView depot={active[0]?.depot ?? ended.data?.trips[0]?.depot} routes={layers.flatMap(l => l.routes)} stops={layers.flatMap(l => l.stops)}
           vehicles={layers.flatMap(l => l.vehicles)} fitKey={`${filter}:${onMap.map(t => t.id).join(',')}`}>
           {onMap.length > 0 && (
-            <MapOverlay><Legend items={[...onMap.map(t => ({ color: routeHex(t.vehicle.id), label: t.code })), { color: '#2b7a3b', label: 'Đã giao' }, { color: '#c0392b', label: 'Chưa giao được' }]} /></MapOverlay>
+            <MapOverlay><Legend items={[...onMap.map(t => ({ color: routeHex(t.vehicle.id), label: t.code })), { color: '#2b7a3b', label: 'Đã giao' }, { color: '#c0392b', label: 'Chưa giao được' }, ...(onMap.some(t => t.congestion?.length) ? [{ color: CONGESTION_HEX, label: 'Ùn tắc', line: true }] : [])]} /></MapOverlay>
           )}
           {staleTrip && (
             <MapOverlay position="bottom-left"><span className="map-chip warning"><TriangleAlert size={16} /> Xe {staleTrip.vehicle.plate}: vị trí cũ hơn 30 giây</span></MapOverlay>

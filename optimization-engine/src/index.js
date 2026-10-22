@@ -278,20 +278,23 @@ export function evaluateReroute({ depot, travel, profile, start, stops, minSavin
 /**
  * Phát hiện tăng thời gian giữa hai đợt dữ liệu (mục 3.4.5): chỉ so các chặng có cùng điểm đầu và điểm cuối,
  * bỏ chặng xuất phát từ vị trí xe. Kích hoạt khi tăng tương đối ≥ 10% hoặc tăng tuyệt đối ≥ 120 giây.
+ * slowLegs liệt kê các chặng chậm hẳn (gấp 1,5 lần và thêm ít nhất 60 giây) để vẽ đoạn ùn tắc trên bản đồ.
  */
 export function detectIncrease({ points, profile, oldTravel, newTravel, relative = 0.10, absolute = 120 }) {
   let before = 0;
   let after = 0;
   let legs = 0;
+  const slowLegs = [];
   for (let i = 0; i + 1 < points.length; i++) {
     const a = oldTravel(profile, points[i], points[i + 1]);
     const b = newTravel(profile, points[i], points[i + 1]);
     if (a == null || b == null) continue;
     before += a; after += b; legs++;
+    if (b - a >= 60 && b >= a * 1.5) slowLegs.push({ index: i, before: a, after: b });
   }
   const increase = after - before;
   return {
-    legs, before, after, increase,
+    legs, before, after, increase, slowLegs,
     triggered: legs > 0 && (increase >= absolute || (before > 0 && increase / before >= relative)),
   };
 }

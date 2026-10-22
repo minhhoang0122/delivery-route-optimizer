@@ -46,8 +46,10 @@ Mở http://localhost:5173. Màn hình Driver dùng trên điện thoại; khi t
 
 | Lệnh (trong `backend`) | Dùng để |
 |---|---|
-| `npm run simulate -- drive --trip 3` | Cho xe của chuyến 3 chạy theo tuyến, ghi vị trí mỗi 3 giây (nguồn `simulator`) |
-| `npm run simulate -- incident --trip 3 --factor 3` | Tạo "sự cố giả định" làm một chặng chậm đi, để thử đề xuất đổi tuyến; giao diện ghi rõ là giả định |
+| `npm run simulate -- drive --trip 3` | Cho xe của chuyến 3 chạy theo đường đi của tuyến, ghi vị trí mỗi giây (nguồn `simulator`); Driver tự ghi kết quả trên ứng dụng |
+| `npm run simulate -- incident --trip 3 --factor 3` | Tạo "sự cố giả định" làm chặng phía trước chậm đi, để thử đề xuất đổi tuyến |
+| `npm run simulate -- prepare` | Chuẩn bị một lượt demo mà không xóa dữ liệu: chốt chuyến đã về kho, tạo 12 đơn mới trên các địa chỉ mẫu, lập kế hoạch và giao chuyến |
+| `npm run simulate -- demo --trip active` | Chạy trọn các chuyến: xe chạy theo đường thật, giao từng điểm, chuyến nhiều điểm nhất gặp ùn tắc, hệ thống đề xuất và đổi tuyến, xe về kho |
 | `npm run test:flow` | Kiểm thử nghiệp vụ và phân quyền qua API (59 kiểm tra), chạy sau `npm run seed -- --reset` |
 | `npm test` (trong `optimization-engine`) | Kiểm thử thuật toán trên ma trận TomTom đã ghi |
 | `npm run experiments` (trong `optimization-engine`) | Thí nghiệm cho Chương 4 (mục 4.4), in bảng kết quả và ghi `experiments/ket_qua.json` |
@@ -55,3 +57,14 @@ Mở http://localhost:5173. Màn hình Driver dùng trên điện thoại; khi t
 Nguồn ma trận đặt bằng `MATRIX_SOURCE` trong `.env`: `replay` dùng lại ma trận đã ghi và chỉ lấy thêm chặng còn thiếu, `tomtom` lấy mới theo giao thông hiện tại, `mock` ước lượng theo khoảng cách. Hạn mức miễn phí của TomTom là 20.000 yêu cầu Routing mỗi tháng; một lần lập kế hoạch 20 đơn với hai loại xe tốn khoảng 840 yêu cầu nếu chưa có dữ liệu.
 
 Kiểm tra đổi tuyến tự động theo chu kỳ đặt bằng `REROUTE_CHECK_SECONDS` (mặc định 0 là tắt). Bật thì hệ thống tự đánh giá các chuyến đang giao và chỉ tạo đề xuất khi thời gian các chặng còn lại tăng ít nhất 10% hoặc 120 giây; Dispatcher vẫn phải duyệt.
+
+### Demo mô phỏng trên bản đồ
+
+Mở ba cửa sổ dòng lệnh:
+
+1. `backend`: `npm run start:demo` (như `npm start` nhưng kiểm tra đổi tuyến mỗi 10 giây, cấu hình ở `demo.env`).
+2. `frontend`: `npm run dev:demo` (màn hình theo dõi tải lại mỗi 1,5 giây, cấu hình ở `.env.demo`).
+3. `backend`: `npm run simulate -- prepare`, rồi `npm run simulate -- demo --trip active`.
+
+Mở chi tiết chuyến đứng đầu danh sách mà lệnh demo in ra. Xe chạy theo đường đi TomTom, vệt xám là quãng đã đi. Đến điểm có chặng phía sau dài nhất thì chặng đó bị ùn tắc (vẽ đỏ). Kiểm tra định kỳ tạo đề xuất, sau 8 giây công cụ duyệt thay Dispatcher, Driver xác nhận và xe chạy theo tuyến mới. `--approve-after 0` để tự bấm "Duyệt tuyến mới"; `--speed` đổi hệ số tua nhanh (mặc định 4). Mỗi lượt `prepare` tốn khoảng 300 yêu cầu Routing cho các đơn mới.
+

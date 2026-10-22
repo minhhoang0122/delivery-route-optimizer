@@ -3,10 +3,10 @@ import { ClipboardCheck, Clock, Navigation, Package, Route, TriangleAlert, Circl
 import { Link, useNavigate } from 'react-router'
 import { api } from '../../api.js'
 import MapView, { Legend, MapOverlay } from '../../components/MapView.jsx'
-import { isStale, tripLayers } from '../../components/tripMap.js'
+import { CONGESTION_HEX, isStale, tripLayers } from '../../components/tripMap.js'
 import { Badge, Button, Card, Dot, ErrorBox, Loading, Metric, PageHeader, Progress, StatusBadge } from '../../components/ui.jsx'
 import { ago, duration, longDate, routeHex, time, TRIP_STATUS } from '../../format.js'
-import { useLoad, useNow } from '../../hooks.js'
+import { LIVE_MS, useLoad, useNow } from '../../hooks.js'
 
 function TodoItem({ icon: Icon, tone, title, desc, action, to }) {
   const navigate = useNavigate()
@@ -23,7 +23,7 @@ function TodoItem({ icon: Icon, tone, title, desc, action, to }) {
 }
 
 export default function DashboardPage() {
-  const { data, error, loading, reload } = useLoad(() => api('/dashboard'), [], { interval: 10_000 })
+  const { data, error, loading, reload } = useLoad(() => api('/dashboard'), [], { interval: LIVE_MS })
   const now = useNow()
   if (loading && !data) return <Loading />
   const m = data?.metrics
@@ -82,7 +82,7 @@ export default function DashboardPage() {
             routes={layers.flatMap(l => l.routes)} stops={layers.flatMap(l => l.stops)} vehicles={layers.flatMap(l => l.vehicles)}
             fitKey={active.map(t => t.id).join(',')}>
             {active.length > 0 && (
-              <MapOverlay><Legend items={[...active.map(t => ({ color: routeHex(t.vehicle.id), label: t.code })), { color: '#2b7a3b', label: 'Đã giao' }, { color: '#c0392b', label: 'Chưa giao được' }]} /></MapOverlay>
+              <MapOverlay><Legend items={[...active.map(t => ({ color: routeHex(t.vehicle.id), label: t.code })), { color: '#2b7a3b', label: 'Đã giao' }, { color: '#c0392b', label: 'Chưa giao được' }, ...(active.some(t => t.congestion?.length) ? [{ color: CONGESTION_HEX, label: 'Ùn tắc', line: true }] : [])]} /></MapOverlay>
             )}
           </MapView>
         </div>

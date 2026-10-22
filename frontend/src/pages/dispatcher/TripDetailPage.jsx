@@ -4,10 +4,10 @@ import { useState } from 'react'
 import { Link, useParams } from 'react-router'
 import { api, newEventId } from '../../api.js'
 import MapView, { Legend, MapOverlay } from '../../components/MapView.jsx'
-import { isStale, stopState, tripLayers } from '../../components/tripMap.js'
+import { CONGESTION_HEX, congestionRoutes, geoToLatLngs, isStale, stopState, tripLayers } from '../../components/tripMap.js'
 import { Alert, Button, Card, Checkbox, Dialog, ErrorBox, KeyValue, Loading, PageHeader, Stat, StatusBadge, StopItem } from '../../components/ui.jsx'
 import { ago, dateTime, duration, kg, km, percent, routeHex, time, TRIP_STATUS, VEHICLE_TYPE } from '../../format.js'
-import { useAction, useLoad, useNow } from '../../hooks.js'
+import { LIVE_MS, useAction, useLoad, useNow } from '../../hooks.js'
 
 const EVENT_LABEL = {
   trip_assigned: 'Giao chuyến', trip_started: 'Bắt đầu chuyến', route_replanned: 'Duyệt tuyến mới', route_acknowledged: 'Driver xác nhận tuyến',
@@ -81,8 +81,9 @@ function ProposalCard({ trip, now, onChanged }) {
     state: s.status === 'delivered' ? 'done' : s.status === 'failed' ? 'failed' : 'pending', title: s.order.code,
   }))
   const routes = [
-    { points: [depot, ...done.map(s => [s.order.lat, s.order.lon]), pos], color: '#94a3b8' },
+    { points: trip.trail?.length > 1 ? geoToLatLngs({ coordinates: trip.trail }) : [depot, ...done.map(s => [s.order.lat, s.order.lon]), pos], color: '#94a3b8' },
     { points: [pos, ...pts(p.currentStopIds), depot], color: '#6b7280', dashed: true, opacity: 0.9, weight: 3 },
+    ...congestionRoutes(trip),
     ...(p.meetsThreshold ? [{ points: [pos, ...pts(p.proposedStopIds), depot], color, weight: 5 }] : []),
   ]
   const next = byId.get(p.nextStopId)
@@ -91,8 +92,8 @@ function ProposalCard({ trip, now, onChanged }) {
     <Card tone="brand" title={<div className="row"><span className="icon-wrap tone-info"><Route size={18} /></span><div className="col"><h3 className="h4">Đề xuất đổi tuyến</h3>{(p.auto || !p.meetsThreshold) && <span className="caption muted">{p.auto ? `Các chặng còn lại chậm thêm ${duration(p.increase.increase)}` : 'Không đủ ngưỡng, giữ tuyến hiện tại'}</span>}</div></div>}>
       {!p.valid ? <Alert tone="warning" title="Chưa lấy được dữ liệu tuyến">{p.reason}</Alert> : (
         <>
-          <MapView height={320} depot={trip.depot} routes={routes} stops={stops} vehicles={[{ lat: pos[0], lon: pos[1], color, label: ago(p.position.observedAt, now) }]} fitKey={`p${p.eventId}`}>
-            <MapOverlay><Legend items={[{ color: '#6b7280', label: 'Tuyến hiện tại', line: true, dashed: true }, ...(p.meetsThreshold ? [{ color, label: 'Tuyến đề xuất', line: true }] : []), { color: '#94a3b8', label: 'Đã đi qua', line: true }]} /></MapOverlay>
+          <MapView height={320} depot={trip.depot} routes={routes} stops={stops} vehicles={[{ key: 'p', lat: pos[0], lon: pos[1], color, label: ago(p.position.observedAt, now) }]} fitKey={`p${p.eventId}`}>
+            <MapOverlay><Legend items={[{ color: '#6b7280', label: 'Tuyến hiện tại', line: true, dashed: true }, ...(p.meetsThreshold ? [{ color, label: 'Tuyến đề xuất', line: true }] : []), { color: '#94a3b8', label: 'Đã đi qua', line: true }, ...(trip.congestion?.length ? [{ color: CONGESTION_HEX, label: 'Ùn tắc', line: true }] : [])]} /></MapOverlay>
           </MapView>
           <div className="row top">
             <div className="tile grow"><span className="caption muted">Hiện tại</span><span className="h3">{duration(p.currentSeconds)}</span></div>
@@ -123,7 +124,7 @@ function ProposalCard({ trip, now, onChanged }) {
 
 export default function TripDetailPage() {
   const { id } = useParams()
-  const { data, error, loading, reload } = useLoad(() => api(`/trips/${id}`), [id], { interval: 10_000 })
+  const { data, error, loading, reload } = useLoad(() => api(`/trips/${id}`), [id], { interval: LIVE_MS })
   const now = useNow()
   const [revoke, setRevoke] = useState(false)
   const [goodsBack, setGoodsBack] = useState(false)
@@ -181,7 +182,9 @@ export default function TripDetailPage() {
           </Card>
           {t.status === 'in_progress' && <ProposalCard trip={t} now={now} onChanged={reload} />}
           <Card compact title="Tuyến dự kiến" extra={<span className="caption muted">{duration(t.routeVersion?.objectiveSeconds)} · {km(t.routeVersion?.distanceM)}{t.etaReturn ? ` · về kho ${time(t.etaReturn)}` : ''}</span>}>
-            <MapView height={360} depot={t.depot} routes={layers.routes} stops={layers.stops} vehicles={layers.vehicles} fitKey={`${t.id}-${t.routeVersion?.id}`} />
+            <MapView height={360} depot={t.depot} routes={layers.routes} stops={layers.stops} vehicles={layers.vehicles} fitKey={`${t.id}-${t.routeVersion?.id}`}>
+              {t.congestion?.length > 0 && <MapOverlay><Legend items={[{ color: CONGESTION_HEX, label: 'Ùn tắc', line: true }]} /></MapOverlay>}
+            </MapView>
           </Card>
         </div>
       </div>

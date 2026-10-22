@@ -20,6 +20,43 @@ const stale = message => new HttpError(409, 'STALE', message);
 const orderKey = s => pointKey('o', s.order_id, s.latitude, s.longitude);
 const depotKey = t => pointKey('d', t.depot_id, t.depot_lat, t.depot_lon);
 
+/**
+ * Đoạn đường giữa hai điểm, cắt từ đường đi của một phiên bản tuyến (GeoJSON, kinh độ trước).
+ * Không có đường đi, hoặc hai điểm không nằm trên đường đi, thì nối thẳng.
+ */
+export function sliceLine(coords, a, b) {
+  const straight = [[a.lon, a.lat], [b.lon, b.lat]];
+  if (!coords?.length) return straight;
+  const nearest = (p, from) => {
+    let best = { i: -1, d: Infinity };
+    for (let i = from; i < coords.length; i++) {
+      const d = haversineM({ lat: coords[i][1], lon: coords[i][0] }, p);
+      if (d < best.d) best = { i, d };
+    }
+    return best;
+  };
+  const s = nearest(a, 0);
+  const e = nearest(b, s.i);
+  if (s.d > 300 || e.d > 300 || e.i <= s.i) return straight;
+  return [[a.lon, a.lat], ...coords.slice(s.i, e.i + 1), [b.lon, b.lat]];
+}
+
+/** Các chặng bị chậm hẳn theo lần đánh giá đổi tuyến gần nhất trong 30 phút, để vẽ đoạn ùn tắc. */
+async function congestionOf(t, stops, versions) {
+  const ev = (await query(
+    `SELECT payload FROM trip_events WHERE trip_id = $1 AND event_type = 'reroute_evaluated'
+        AND created_at > now() - interval '30 minutes' ORDER BY id DESC LIMIT 1`, [t.id])).rows[0];
+  const legs = ev?.payload.increase?.slowLegs ?? [];
+  if (!legs.length) return [];
+  const geom = versions.find(v => v.id === ev.payload.routeVersionId)?.geometry?.coordinates;
+  const at = new Map(stops.map(s => [s.id, { lat: s.latitude, lon: s.longitude }]));
+  const depot = { lat: t.depot_lat, lon: t.depot_lon };
+  return legs.filter(l => at.has(l.fromStopId)).map(l => ({
+    fromStopId: l.fromStopId, toStopId: l.toStopId, ratio: Math.round((l.after / l.before) * 10) / 10,
+    points: sliceLine(geom, at.get(l.fromStopId), l.toStopId ? at.get(l.toStopId) : depot),
+  }));
+}
+
 /** Đề xuất đổi tuyến gần nhất chưa được duyệt hoặc bỏ qua. */
 async function pendingProposal(trip) {
   const { rows } = await query(
@@ -73,6 +110,12 @@ export async function loadTrip(id, { withEvents = false } = {}) {
   const pos = (await query(
     `SELECT id, latitude, longitude, observed_at, received_at, accuracy_m, source
        FROM vehicle_positions WHERE trip_id = $1 ORDER BY observed_at DESC LIMIT 1`, [id])).rows[0] || null;
+
+  // Vệt di chuyển của xe, rút gọn còn tối đa khoảng 400 điểm
+  const trailRows = ['in_progress', 'awaiting_reconciliation'].includes(t.status) ? (await query(
+    'SELECT latitude, longitude FROM vehicle_positions WHERE trip_id = $1 ORDER BY observed_at', [id])).rows : [];
+  const every = Math.ceil(trailRows.length / 400) || 1;
+  const trail = trailRows.filter((_, i) => i % every === 0 || i === trailRows.length - 1).map(r => [r.longitude, r.latitude]);
 
   const reports = (await query(
     `SELECT event_type, payload, created_at FROM trip_events
@@ -143,6 +186,8 @@ export async function loadTrip(id, { withEvents = false } = {}) {
       id: pos.id, lat: pos.latitude, lon: pos.longitude, observedAt: pos.observed_at,
       receivedAt: pos.received_at, accuracyM: pos.accuracy_m, source: pos.source,
     },
+    trail,
+    congestion: t.status === 'in_progress' ? await congestionOf(t, stops, versions) : [],
     etaReturn,
     returnReport: last('trip_returned') && { ...last('trip_returned').payload, reportedAt: last('trip_returned').created_at },
     loadingMismatch: t.status === 'assigned' && last('loading_mismatch')
@@ -496,6 +541,9 @@ export async function evaluateTripReroute(tripId, user, { auto = false } = {}) {
   });
   const oldTravel = await loadBatches(await previousBatchIds(trip));
   const increase = detectIncrease({ points: [...remaining.map(key), dKey], profile, oldTravel, newTravel: matrix.travel });
+  increase.slowLegs = increase.slowLegs.map(l => ({
+    fromStopId: remaining[l.index].id, toStopId: remaining[l.index + 1]?.id ?? null, before: l.before, after: l.after,
+  }));
   // Chưa đủ ngưỡng, hoặc không còn chặng chung để so sánh: giữ tuyến hiện hành, không lưu đề xuất
   if (auto && !increase.triggered) return { skipped: true, increase };
 
