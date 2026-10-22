@@ -496,7 +496,8 @@ export async function evaluateTripReroute(tripId, user, { auto = false } = {}) {
   });
   const oldTravel = await loadBatches(await previousBatchIds(trip));
   const increase = detectIncrease({ points: [...remaining.map(key), dKey], profile, oldTravel, newTravel: matrix.travel });
-  if (auto && !increase.triggered) return null;
+  // Chưa đủ ngưỡng, hoặc không còn chặng chung để so sánh: giữ tuyến hiện hành, không lưu đề xuất
+  if (auto && !increase.triggered) return { skipped: true, increase };
 
   const payload = {
     stateVersion: trip.stateVersion,
@@ -607,7 +608,11 @@ export async function periodicRerouteCheck() {
       if (trip.stops.filter(s => s.status === 'pending').length < 3) continue;
       try {
         const ev = await evaluateTripReroute(id, null, { auto: true });
-        if (ev) console.log(`Kiểm tra định kỳ ${trip.code}: thời gian còn lại tăng ${ev.increase.increase} giây, đề xuất tiết kiệm ${ev.savingSeconds} giây`);
+        if (ev.skipped) {
+          if (!ev.increase.legs) console.log(`Kiểm tra định kỳ ${trip.code}: không còn chặng chung đủ dữ liệu để so sánh, giữ tuyến hiện hành`);
+          continue;
+        }
+        console.log(`Kiểm tra định kỳ ${trip.code}: thời gian còn lại tăng ${ev.increase.increase} giây, đề xuất tiết kiệm ${ev.savingSeconds} giây`);
       } catch (err) {
         if (!(err instanceof HttpError)) console.error(`Kiểm tra định kỳ ${trip.code} lỗi`, err.message);
       }
