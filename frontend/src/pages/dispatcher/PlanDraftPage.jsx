@@ -62,7 +62,7 @@ export default function PlanDraftPage() {
   return (
     <>
       <PageHeader title={`Bản nháp kế hoạch #${run.code}`} badge={<Badge tone={PLAN_STATUS[run.status][1]}>{PLAN_STATUS[run.status][0]}</Badge>}
-        subtitle={`Tạo lúc ${time(run.createdAt)} bởi ${run.createdBy}${run.status === 'draft' ? ' · chưa giữ chỗ đơn, xe và Driver' : ''}`}
+        subtitle={`Tạo lúc ${time(run.createdAt)} bởi ${run.createdBy}`}
         actions={<>
           <Button variant="secondary" icon={RefreshCw} onClick={() => navigate(`/dispatcher/planning?from=${run.id}`)}>Tính lại</Button>
           {run.status === 'draft' && <Button onClick={() => { action.setError(null); setConfirm(true) }} disabled={!routes.length}>Giao chuyến</Button>}
@@ -80,9 +80,9 @@ export default function PlanDraftPage() {
         <div className="stack" style={{ flex: '0 1 452px', minWidth: 320 }}>
           <Card compact>
             <div className="row top" style={{ gap: 16 }}>
-              <div style={{ flex: '1 1 170px' }}><Stat label="Tổng thời gian di chuyển" value={duration(total)} sub={saved > 0 ? `−${duration(saved)} sau cải thiện` : 'Không cải thiện thêm được'} subTone={saved > 0 ? 'success' : 'muted'} /></div>
-              <Stat sep label="Quãng đường" value={km(distance)} sub={`${routes.length} tuyến`} />
-              <Stat sep label="Đơn đã xếp" value={`${placed}/${snap.orders.length}`} sub={unassigned.length ? `${unassigned.length} chưa xếp` : 'Xếp hết'} subTone={unassigned.length ? 'warning' : 'success'} />
+              <div style={{ flex: '1 1 170px' }}><Stat label="Tổng thời gian di chuyển" value={duration(total)} /></div>
+              <Stat sep label="Quãng đường" value={km(distance)} />
+              <Stat sep label="Đơn đã xếp" value={`${placed}/${snap.orders.length}`} sub={unassigned.length ? `${unassigned.length} chưa xếp` : undefined} subTone="warning" />
             </div>
           </Card>
           <Card compact title="Tổng thời gian di chuyển" extra={saved > 0 && <Badge tone="success">−{duration(saved)}</Badge>}>
