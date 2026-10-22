@@ -117,6 +117,9 @@ const st2 = await api(drv[uA], 'POST', `/driver/trips/${tA.id}/start`, { clientE
 check(st2.status === 200, 'gửi lại lệnh bắt đầu với cùng mã vẫn trả kết quả đã lưu');
 const tAd = (await api(disp, 'GET', `/trips/${tA.id}`)).data.trip;
 check((await api(disp, 'POST', `/trips/${tA.id}/revoke`, { clientEventId: randomUUID(), stateVersion: tAd.stateVersion, goodsReturned: true })).status === 409, 'chuyến đã xuất phát không thu hồi được');
+check((await api(disp, 'PATCH', `/vehicles/${tA.vehicle.id}/status`, { status: 'inactive' })).status === 409, 'xe đang chạy chuyến không báo bảo trì được');
+const drvEdit = await api(disp, 'PUT', `/drivers/${tA.driver.id}`, { fullName: tA.driver.name, phone: tA.driver.phone, defaultVehicleId: tA.vehicle.id, status: 'inactive' });
+check(drvEdit.status === 409, 'Driver đang giữ chuyến không ngừng hoạt động được');
 
 console.log('Driver: vị trí và kết quả giao');
 const pos = (lat, lon, t = new Date()) => api(drv[uA], 'POST', `/driver/trips/${tA.id}/positions`, { clientEventId: randomUUID(), lat, lon, observedAt: t.toISOString(), accuracyM: 8, source: 'simulator' });
@@ -131,6 +134,8 @@ const a1 = await api(drv[uA], 'POST', `/driver/trips/${tA.id}/stops/${s1.id}/att
 check(a1.status === 201, 'giao thành công điểm 1');
 const a1b = await api(drv[uA], 'POST', `/driver/trips/${tA.id}/stops/${s1.id}/attempts`, { clientEventId: aId, result: 'delivered' });
 check(a1b.status === 200 && a1b.data.replayed, 'gửi lại cùng mã không tạo kết quả thứ hai');
+const a1other = await api(drv[uB], 'POST', `/driver/trips/${tA.id}/stops/${s1.id}/attempts`, { clientEventId: aId, result: 'delivered' });
+check(a1other.status === 403, 'Driver khác gửi lại mã thao tác của chuyến không phải của mình bị từ chối');
 const a1c = await api(drv[uA], 'POST', `/driver/trips/${tA.id}/stops/${s1.id}/attempts`, { clientEventId: aId, result: 'failed', reason: 'Vắng nhà' });
 check(a1c.status === 409, 'cùng mã khác nội dung bị báo xung đột');
 const a1d = await api(drv[uA], 'POST', `/driver/trips/${tA.id}/stops/${s1.id}/attempts`, { clientEventId: randomUUID(), result: 'failed', reason: 'Vắng nhà' });
@@ -172,7 +177,12 @@ if (stops.length - 2 >= 3) {
 
 console.log('Driver: hoàn tất và báo về kho');
 cur = (await api(drv[uA], 'GET', '/driver/current-trip')).data.trip;
-for (const s of cur.stops.filter(x => x.status === 'pending')) {
+const sDup = cur.stops.find(x => x.status === 'pending');
+const dupBody = { clientEventId: randomUUID(), result: 'delivered' };
+const dup = await Promise.all([1, 2, 3, 4].map(() => api(drv[uA], 'POST', `/driver/trips/${tA.id}/stops/${sDup.id}/attempts`, dupBody)));
+check(dup.every(x => x.status === 200 || x.status === 201) && dup.filter(x => !x.data.replayed).length === 1,
+  'nhiều lần gửi cùng mã đến đồng thời: một lần ghi, các lần sau nhận lại kết quả (' + dup.map(x => x.status).join(', ') + ')');
+for (const s of cur.stops.filter(x => x.status === 'pending' && x.id !== sDup.id)) {
   await api(drv[uA], 'POST', `/driver/trips/${tA.id}/stops/${s.id}/attempts`, { clientEventId: randomUUID(), result: 'delivered' });
 }
 const ret = await api(drv[uA], 'POST', `/driver/trips/${tA.id}/return`, { clientEventId: randomUUID(), returnedOrderIds: [stops[1].order.id] });
@@ -186,6 +196,8 @@ const noDec = await api(disp, 'POST', `/trips/${tA.id}/close`, { clientEventId: 
 check(noDec.status === 409, 'thiếu quyết định cho đơn chưa giao thì chưa chốt');
 const notMatched = await api(disp, 'POST', `/trips/${tA.id}/close`, { clientEventId: randomUUID(), stateVersion: tr.stateVersion, goodsMatched: false, decisions: [{ orderId: stops[1].order.id, decision: 'requeue' }] });
 check(notMatched.status === 409, 'hàng chưa khớp thì chưa chốt');
+const nullDec = await api(disp, 'POST', `/trips/${tA.id}/close`, { clientEventId: randomUUID(), stateVersion: tr.stateVersion, goodsMatched: true, decisions: [null] });
+check(nullDec.status === 409, 'quyết định rỗng bị báo thiếu, không lỗi máy chủ');
 const close = await api(disp, 'POST', `/trips/${tA.id}/close`, { clientEventId: randomUUID(), stateVersion: tr.stateVersion, goodsMatched: true, decisions: [{ orderId: stops[1].order.id, decision: 'requeue' }] });
 check(close.status === 200 && close.data.trip.status === 'closed', 'chốt chuyến');
 const o2 = (await api(disp, 'GET', `/orders/${stops[1].order.id}`)).data.order;

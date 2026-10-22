@@ -2,7 +2,7 @@
 // Thay đổi dữ liệu nền phải tôn trọng chuyến đang chạy: không sửa những gì làm mất điều kiện của chuyến đó.
 import { Router } from 'express';
 import { requireRole } from '../auth.js';
-import { query } from '../db.js';
+import { query, transaction } from '../db.js';
 import { badRequest, conflict, notFound } from '../errors.js';
 import { integer, number, oneOf, paramId, text } from '../validate.js';
 import { ACTIVE_STATUSES, tripCode } from '../services/trips.js';
@@ -84,13 +84,18 @@ router.put('/drivers/:id', async (req, res) => {
   const phone = text(req.body?.phone, 'số điện thoại', { required: false, max: 20 });
   const vehicleId = integer(req.body?.defaultVehicleId, 'xe thường dùng', { required: false });
   const status = oneOf(req.body?.status, 'trạng thái', ['active', 'inactive']);
-  const cur = await loadDriver(id);
-  if (cur.trip_id && (status !== 'active' || vehicleId !== cur.default_vehicle_id)) {
-    throw conflict(`Driver đang giữ chuyến ${tripCode(cur.trip_id)}, chưa thể ngừng hoạt động hoặc đổi xe`);
-  }
-  await checkVehicleFree(vehicleId, id);
-  await query('UPDATE drivers SET full_name = $2, phone = $3, default_vehicle_id = $4, status = $5 WHERE id = $1',
-    [id, fullName, phone, vehicleId, status]);
+  await transaction(async c => {
+    // Khóa dòng Driver như lúc giao chuyến (commitPlan), để sửa hồ sơ và giao chuyến đồng thời không cùng thành công
+    const cur = (await c.query('SELECT default_vehicle_id FROM drivers WHERE id = $1 FOR UPDATE', [id])).rows[0];
+    if (!cur) throw notFound('Không tìm thấy Driver');
+    const trip = (await c.query('SELECT id FROM trips WHERE driver_id = $1 AND status = ANY($2) LIMIT 1', [id, ACTIVE_STATUSES])).rows[0];
+    if (trip && (status !== 'active' || vehicleId !== cur.default_vehicle_id)) {
+      throw conflict(`Driver đang giữ chuyến ${tripCode(trip.id)}, chưa thể ngừng hoạt động hoặc đổi xe`);
+    }
+    await checkVehicleFree(vehicleId, id);
+    await c.query('UPDATE drivers SET full_name = $2, phone = $3, default_vehicle_id = $4, status = $5 WHERE id = $1',
+      [id, fullName, phone, vehicleId, status]);
+  });
   res.json({ driver: toDriver(await loadDriver(id)) });
 });
 
@@ -162,9 +167,13 @@ router.put('/vehicles/:id', async (req, res) => {
 router.patch('/vehicles/:id/status', async (req, res) => {
   const id = paramId(req);
   const status = oneOf(req.body?.status, 'trạng thái', ['active', 'inactive']);
-  const cur = await loadVehicle(id);
-  if (status === 'inactive' && cur.trip_id) throw conflict(`Xe đang chạy chuyến ${tripCode(cur.trip_id)}, chưa thể báo bảo trì`);
-  await query('UPDATE vehicles SET status = $2 WHERE id = $1', [id, status]);
+  await transaction(async c => {
+    // Khóa dòng xe như lúc giao chuyến (commitPlan), để báo bảo trì và giao chuyến đồng thời không cùng thành công
+    if (!(await c.query('SELECT id FROM vehicles WHERE id = $1 FOR UPDATE', [id])).rows[0]) throw notFound('Không tìm thấy phương tiện');
+    const trip = (await c.query('SELECT id FROM trips WHERE vehicle_id = $1 AND status = ANY($2) LIMIT 1', [id, ACTIVE_STATUSES])).rows[0];
+    if (status === 'inactive' && trip) throw conflict(`Xe đang chạy chuyến ${tripCode(trip.id)}, chưa thể báo bảo trì`);
+    await c.query('UPDATE vehicles SET status = $2 WHERE id = $1', [id, status]);
+  });
   res.json({ vehicle: toVehicle(await loadVehicle(id)) });
 });
 

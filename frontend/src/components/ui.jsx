@@ -5,7 +5,8 @@ import { initials } from '../format.js'
 export function Button({ variant = 'primary', size, block, icon: Icon, loading, children, className = '', ...rest }) {
   const cls = ['btn', variant, size === 'large' && 'large', block && 'block', !children && 'icon-only', className].filter(Boolean).join(' ')
   return (
-    <button type="button" className={cls} disabled={loading || rest.disabled} {...rest}>
+    // disabled đặt sau {...rest} để nút luôn khóa khi đang gửi, kể cả khi nơi gọi truyền disabled={false}
+    <button type="button" className={cls} {...rest} disabled={loading || rest.disabled}>
       {loading ? <LoaderCircle size={18} className="spin" /> : Icon && <Icon size={18} />}
       {children}
     </button>

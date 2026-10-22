@@ -48,7 +48,7 @@ Mở http://localhost:5173. Màn hình Driver dùng trên điện thoại; khi t
 |---|---|
 | `npm run simulate -- drive --trip 3` | Cho xe của chuyến 3 chạy theo tuyến, ghi vị trí mỗi 3 giây (nguồn `simulator`) |
 | `npm run simulate -- incident --trip 3 --factor 3` | Tạo "sự cố giả định" làm một chặng chậm đi, để thử đề xuất đổi tuyến; giao diện ghi rõ là giả định |
-| `npm run test:flow` | Kiểm thử nghiệp vụ và phân quyền qua API (54 kiểm tra), chạy sau `npm run seed -- --reset` |
+| `npm run test:flow` | Kiểm thử nghiệp vụ và phân quyền qua API (59 kiểm tra), chạy sau `npm run seed -- --reset` |
 | `npm test` (trong `optimization-engine`) | Kiểm thử thuật toán trên ma trận TomTom đã ghi |
 | `npm run experiments` (trong `optimization-engine`) | Thí nghiệm cho Chương 4 (mục 4.4), in bảng kết quả và ghi `experiments/ket_qua.json` |
 

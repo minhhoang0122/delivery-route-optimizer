@@ -73,6 +73,13 @@ function DriverProvider({ children }) {
     await reload()
   }, [refreshOutbox, reload])
 
+  // Nút Thử lại: gửi lại cả các kết quả máy chủ đã từ chối
+  const retry = useCallback(async () => {
+    await flush({ retryFailed: true })
+    await refreshOutbox()
+    await reload()
+  }, [refreshOutbox, reload])
+
   useEffect(() => {
     // reload và refreshOutbox chỉ đặt state sau khi chờ mạng hoặc IndexedDB, không gây render dây chuyền
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -89,10 +96,11 @@ function DriverProvider({ children }) {
 
   const location = useShareLocation(trip)
 
-  // Kết quả đã lưu trên máy nhưng chưa được máy chủ xác nhận: hiển thị tạm trên điểm dừng, kèm trạng thái chờ gửi
+  // Kết quả đã lưu trên máy nhưng chưa được máy chủ xác nhận: hiển thị tạm trên điểm dừng, kèm trạng thái chờ gửi.
+  // Kết quả máy chủ đã từ chối (failed) không được hiển thị như đã xử lý, để Driver ghi lại điểm đó
   const view = useMemo(() => {
     if (!trip) return trip
-    const queued = new Map(outbox.filter(x => x.kind === 'attempt' && x.tripId === trip.id).map(x => [x.stopId, x]))
+    const queued = new Map(outbox.filter(x => x.kind === 'attempt' && x.tripId === trip.id && x.state !== 'failed').map(x => [x.stopId, x]))
     if (!queued.size) return trip
     const stops = trip.stops.map(s => {
       const q = queued.get(s.id)
@@ -103,7 +111,7 @@ function DriverProvider({ children }) {
     return { ...trip, stops, nextStopId: trip.status === 'in_progress' ? next?.id ?? null : null }
   }, [trip, outbox])
 
-  const value = { trip: view, rawTrip: trip, reload, sync, outbox, online, fromCache, serverTime, location, error, setTrip }
+  const value = { trip: view, rawTrip: trip, reload, sync, retry, outbox, online, fromCache, serverTime, location, error, setTrip }
   return <DriverContext.Provider value={value}>{children}</DriverContext.Provider>
 }
 

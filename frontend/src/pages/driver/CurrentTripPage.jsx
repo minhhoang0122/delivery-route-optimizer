@@ -93,7 +93,7 @@ function AssignedScreen({ trip, vehicle, onStarted }) {
 }
 
 export default function CurrentTripPage() {
-  const { trip, setTrip, online, fromCache, outbox, location, reload, sync, error } = useDriver()
+  const { trip, setTrip, online, fromCache, outbox, location, reload, retry, error } = useDriver()
   const navigate = useNavigate()
   const now = useNow()
   const ack = useAction()
@@ -114,6 +114,8 @@ export default function CurrentTripPage() {
   const vehicle = `${VEHICLE_TYPE[trip.vehicle.type]} ${trip.vehicle.plate}`
   const queued = outbox.filter(x => x.tripId === trip.id && x.kind === 'attempt')
   const failedSync = queued.filter(x => x.state === 'failed')
+  // Kết quả bị máy chủ từ chối không chặn báo về kho; máy chủ vẫn kiểm tra mọi điểm đã có kết quả
+  const waiting = queued.length - failedSync.length
 
   if (trip.status === 'assigned') return <AssignedScreen trip={trip} vehicle={vehicle} onStarted={setTrip} />
 
@@ -152,7 +154,7 @@ export default function CurrentTripPage() {
     <DriverScreen title={`Chuyến ${trip.code}`} subtitle={`${vehicle} · ${trip.progress.done}/${total} điểm`}
       footer={<>
         {allDone
-          ? <Button size="large" block disabled={queued.length > 0} onClick={() => navigate('/driver/return')}>{queued.length ? 'Chờ gửi hết kết quả để báo về kho' : 'Báo về kho'}</Button>
+          ? <Button size="large" block disabled={waiting > 0} onClick={() => navigate('/driver/return')}>{waiting ? 'Chờ gửi hết kết quả để báo về kho' : 'Báo về kho'}</Button>
           : next && <Button size="large" block onClick={() => navigate(`/driver/stops/${next.id}`)}>Ghi kết quả giao</Button>}
         <span className={`row caption ${locTone}`} style={{ justifyContent: 'center', gap: 8 }}><LocIcon size={16} />{locText}</span>
       </>}>
@@ -171,13 +173,13 @@ export default function CurrentTripPage() {
         </div>
       )}
       {failedSync.length > 0 && (
-        <Alert tone="danger" title="Có kết quả không gửi được" action={<Button variant="secondary" onClick={sync}>Thử lại</Button>}>
+        <Alert tone="danger" title="Có kết quả không gửi được" action={<Button variant="secondary" onClick={retry}>Thử lại</Button>}>
           {failedSync.map(x => `${x.label}: ${x.error}`).join(' · ')}
         </Alert>
       )}
       {queued.filter(x => x.state !== 'failed').length > 0 && (
         <>
-          <div className="row between"><span className="h4">Kết quả chờ gửi</span><span className="caption muted">{queued.length} điểm</span></div>
+          <div className="row between"><span className="h4">Kết quả chờ gửi</span><span className="caption muted">{waiting} điểm</span></div>
           {queued.filter(x => x.state !== 'failed').map(x => {
             const s = trip.stops.find(y => y.id === x.stopId)
             return s && (

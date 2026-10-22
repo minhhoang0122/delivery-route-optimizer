@@ -325,13 +325,15 @@ export async function startTrip(tripId, user, { checkedOrderIds, clientEventId, 
 
 export async function recordAttempt(tripId, stopId, user, { result, reason, note, occurredAt, clientEventId, fp }) {
   return transaction(async c => {
+    // Khóa chuyến và kiểm tra quyền trước khi tìm yêu cầu gửi lặp: hai lần gửi cùng mã đến đồng thời
+    // thì lần sau chờ lần trước xong rồi nhận lại kết quả cũ, không bị báo "đã có kết quả cuối"
+    const t = await lockTrip(c, tripId);
+    ensureOwner(t, user);
     const prior = (await c.query('SELECT stop_id, request_fingerprint FROM delivery_attempts WHERE client_event_id = $1', [clientEventId])).rows[0];
     if (prior) {
       if (prior.stop_id === stopId && prior.request_fingerprint === fp) return { replayed: true };
       throw conflict('Mã thao tác đã được dùng cho một nội dung khác');
     }
-    const t = await lockTrip(c, tripId);
-    ensureOwner(t, user);
     if (t.status !== 'in_progress') throw conflict('Chuyến không ở trạng thái đang giao');
     const stop = (await c.query('SELECT * FROM trip_stops WHERE id = $1 AND trip_id = $2 FOR UPDATE', [stopId, tripId])).rows[0];
     if (!stop) throw notFound('Điểm dừng không thuộc chuyến này');
@@ -409,7 +411,7 @@ export async function closeTrip(tripId, user, { stateVersion, goodsMatched, deci
     const stops = (await c.query('SELECT order_id, status FROM trip_stops WHERE trip_id = $1', [tripId])).rows;
     if (stops.some(s => s.status === 'pending')) throw conflict('Còn điểm chưa có kết quả, chưa thể chốt chuyến');
     const failed = stops.filter(s => s.status === 'failed').map(s => s.order_id);
-    const byOrder = new Map(decisions.map(d => [Number(d.orderId), d.decision]));
+    const byOrder = new Map(decisions.map(d => [Number(d?.orderId), d?.decision]));
     const missing = failed.filter(id => !['requeue', 'cancel'].includes(byOrder.get(id)));
     if (missing.length) throw conflict(`Còn ${missing.length} đơn chưa có quyết định`, { orderIds: missing });
     if (goodsMatched !== true) throw conflict('Hàng thực tế tại kho chưa được xác nhận khớp với báo cáo');

@@ -24,7 +24,9 @@ createApp().listen(config.port, () => {
   console.log(`Backend chạy tại http://localhost:${config.port}`);
   console.log(`Nguồn ma trận: ${config.matrixSource}${config.tomtomKey ? ' (có khóa TomTom)' : ' (không có khóa TomTom, chặng thiếu sẽ được ước lượng)'}`);
   if (config.reroute.checkIntervalSeconds > 0) {
-    setInterval(periodicRerouteCheck, config.reroute.checkIntervalSeconds * 1000);
+    // Bắt lỗi của từng lần kiểm tra (ví dụ mất kết nối PostgreSQL), nếu không Node dừng cả Backend vì promise bị từ chối
+    setInterval(() => periodicRerouteCheck().catch(err => console.error('Kiểm tra đổi tuyến định kỳ lỗi', err.message)),
+      config.reroute.checkIntervalSeconds * 1000);
     console.log(`Kiểm tra đổi tuyến tự động mỗi ${config.reroute.checkIntervalSeconds} giây`);
   }
 });

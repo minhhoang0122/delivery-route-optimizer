@@ -61,19 +61,21 @@ let flushing = null
 /**
  * Gửi các thao tác chờ theo thứ tự. Mất mạng thì dừng và giữ nguyên hàng đợi.
  * Máy chủ trả lỗi nghiệp vụ (xung đột, sai dữ liệu) thì giữ lại thao tác với trạng thái lỗi để Driver xử lý.
+ * retryFailed: gửi lại cả các thao tác đã lỗi (nút Thử lại).
  */
-export function flush() {
+export function flush({ retryFailed = false } = {}) {
   flushing ??= (async () => {
     try {
       for (const item of await listOutbox()) {
-        if (item.state === 'failed') continue
+        if (item.state === 'failed' && !retryFailed) continue
         await update(item.clientEventId, { state: 'sending' })
         try {
           await api(item.path, { method: 'POST', body: item.body })
           await removeItem(item.clientEventId)
         } catch (e) {
-          // Mất mạng hoặc máy chủ tạm lỗi (5xx): giữ nguyên để gửi lại sau, theo đúng thứ tự
-          if (e.status === 0 || e.status >= 500) { await update(item.clientEventId, { state: 'pending' }); break }
+          // Mất mạng, máy chủ tạm lỗi (5xx) hoặc phiên hết hạn (401, gửi lại sau khi đăng nhập lại):
+          // giữ nguyên để gửi lại sau, theo đúng thứ tự
+          if (e.status === 0 || e.status === 401 || e.status >= 500) { await update(item.clientEventId, { state: 'pending' }); break }
           await update(item.clientEventId, { state: 'failed', error: e.message })
         }
       }

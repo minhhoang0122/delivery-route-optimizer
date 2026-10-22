@@ -23,7 +23,8 @@ export default function ReturnPage() {
   }
   const failed = trip.stops.filter(s => s.status === 'failed')
   const delivered = trip.stops.filter(s => s.status === 'delivered')
-  const waiting = outbox.filter(x => x.tripId === trip.id).length
+  // Kết quả máy chủ đã từ chối không còn chờ gửi; điểm đó vẫn được tính vào serverPending
+  const waiting = outbox.filter(x => x.tripId === trip.id && x.state !== 'failed').length
   const serverPending = rawTrip.stops.filter(s => s.status === 'pending').length
 
   async function send() {

@@ -10,6 +10,7 @@ let tileSource = null
 function icon(html, size) {
   return L.divIcon({ html, className: '', iconSize: [size, size], iconAnchor: [size / 2, size / 2] })
 }
+// Leaflet gán nội dung tooltip dạng chuỗi bằng innerHTML, nên tên người nhận, tên kho phải được thoát ký tự HTML
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
 
 const STOP_COLORS = { done: '#2b7a3b', failed: '#c0392b' }
@@ -64,17 +65,17 @@ export default function MapView({ height = 480, depot, routes = [], stops = [], 
     for (const s of stops) {
       const bg = STOP_COLORS[s.state] || s.color || '#1f5fae'
       L.marker([s.lat, s.lon], { icon: icon(`<div class="marker-stop" style="background:${bg}">${esc(s.label)}</div>`, 26), title: s.title })
-        .addTo(g).bindTooltip(s.title || String(s.label))
+        .addTo(g).bindTooltip(esc(s.title || s.label))
       bounds.push([s.lat, s.lon])
     }
     if (depot) {
       L.marker([depot.lat, depot.lon], { icon: icon(`<div class="marker-depot">${WAREHOUSE_SVG}</div>`, 30), zIndexOffset: 500 })
-        .addTo(g).bindTooltip(depot.name || 'Kho')
+        .addTo(g).bindTooltip(esc(depot.name || 'Kho'))
       bounds.push([depot.lat, depot.lon])
     }
     for (const v of vehicles) {
       L.marker([v.lat, v.lon], { icon: icon(`<div class="marker-vehicle${v.stale ? ' stale' : ''}" style="background:${v.color}">${VEHICLE_SVG}</div>`, 34), zIndexOffset: 1000 })
-        .addTo(g).bindTooltip(v.label || 'Xe', { permanent: Boolean(v.label), direction: 'top', offset: [0, -16] })
+        .addTo(g).bindTooltip(esc(v.label || 'Xe'), { permanent: Boolean(v.label), direction: 'top', offset: [0, -16] })
       bounds.push([v.lat, v.lon])
     }
     if (pin) {
