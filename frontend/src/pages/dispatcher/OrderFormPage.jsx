@@ -54,7 +54,7 @@ function OrderForm({ id, order, initial, depot: d }) {
 
   return (
     <form className="stack-lg" onSubmit={submit}>
-      <PageHeader title={id ? `Sửa đơn ${order?.code ?? ''}` : 'Tạo đơn hàng'} subtitle="Nhập thông tin người nhận và chọn vị trí giao trên bản đồ."
+      <PageHeader title={id ? `Sửa đơn ${order?.code ?? ''}` : 'Tạo đơn hàng'}
         actions={<>
           {id && !readOnly && <Button variant="secondary" onClick={cancelOrder} disabled={save.busy}>Hủy đơn</Button>}
           <Button variant="secondary" onClick={() => navigate('/dispatcher/orders')}>Quay lại</Button>

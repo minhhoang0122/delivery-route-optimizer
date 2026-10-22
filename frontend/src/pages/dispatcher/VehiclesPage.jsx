@@ -2,7 +2,7 @@
 import { Bike, Plus, Truck } from 'lucide-react'
 import { useState } from 'react'
 import { api } from '../../api.js'
-import { Alert, Badge, Button, Chips, Dialog, ErrorBox, Field, PageHeader, Table, TableSkeleton } from '../../components/ui.jsx'
+import { Badge, Button, Chips, Dialog, ErrorBox, Field, PageHeader, Table, TableSkeleton } from '../../components/ui.jsx'
 import { kg, VEHICLE_TYPE } from '../../format.js'
 import { useAction, useLoad } from '../../hooks.js'
 
@@ -53,7 +53,7 @@ export default function VehiclesPage() {
 
   return (
     <>
-      <PageHeader title="Phương tiện" subtitle="Xe của Kho Hải Châu và cấu hình định tuyến dùng khi lấy dữ liệu từ TomTom."
+      <PageHeader title="Phương tiện"
         actions={<Button icon={Plus} onClick={() => { action.setError(null); setEdit({ plate: '', type: 'motorcycle', capacityKg: '' }) }}>Thêm phương tiện</Button>} />
       <Chips value={filter} onChange={setFilter} items={[
         { value: 'all', label: 'Tất cả', count: vehicles.length },
@@ -62,9 +62,6 @@ export default function VehiclesPage() {
       ]} />
       <ErrorBox error={error || (!edit && action.error)} onRetry={reload} />
       {loading && !data ? <TableSkeleton columns={COLUMNS} /> : <Table columns={columns} rows={shown} />}
-      <Alert tone="info" title="Chế độ motorcycle của TomTom đang ở giai đoạn beta">
-        Thử nghiệm tại Đà Nẵng cho thời gian gần như trùng với ô tô. Xe tải nhỏ dùng cấu hình truck với thông số giả định 2,5 tấn, 4,5 × 1,7 × 2,0 m.
-      </Alert>
 
       {edit && (
         <Dialog title={edit.id ? `Sửa xe ${edit.plate}` : 'Thêm phương tiện'} confirmLabel="Lưu" busy={action.busy} onCancel={() => setEdit(null)} onConfirm={save}>

@@ -122,7 +122,7 @@ export default function CurrentTripPage() {
   if (trip.status === 'awaiting_reconciliation') {
     return (
       <DriverScreen title={`Chuyến ${trip.code}`} subtitle={`${vehicle} · ${trip.progress.done}/${total} điểm`}>
-        <Alert tone="info" title="Đã báo về kho">Dispatcher sẽ đối chiếu hàng và chốt chuyến. Báo về kho không tự chốt chuyến.</Alert>
+        <Alert tone="info" title="Đã báo về kho, chờ Dispatcher chốt chuyến" />
         <section className="card" style={{ gap: 8 }}>
           <div className="row between"><span className="h4">Kết quả chuyến</span><StatusBadge map={TRIP_STATUS} value={trip.status} large /></div>
           <span className="secondary">{trip.progress.delivered} giao thành công · {trip.progress.failed} chưa giao được · về kho lúc {time(trip.returnedAt)}</span>
@@ -196,7 +196,7 @@ export default function CurrentTripPage() {
         </>
       )}
       {next && <NextStopCard stop={next} total={total} actions={!trip.needsAck} />}
-      {allDone && <Alert tone="success" title="Đã xử lý hết các điểm">Quay về kho và gửi báo cáo về kho.</Alert>}
+      {allDone && <Alert tone="success" title="Đã xử lý hết các điểm" />}
       {rest.length > 0 && (
         <>
           <div className="row between"><span className="h4">Các điểm còn lại</span><span className="caption muted">{rest.length} điểm</span></div>

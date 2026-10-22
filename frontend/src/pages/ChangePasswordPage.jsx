@@ -41,7 +41,7 @@ export default function ChangePasswordPage() {
             <span className="caption muted">{user.username}</span>
           </div>
         </div>
-        {user.mustChangePassword && <Alert tone="info" title="Cần đổi mật khẩu ban đầu">Tài khoản mới phải đặt mật khẩu riêng trước khi sử dụng.</Alert>}
+        {user.mustChangePassword && <Alert tone="info" title="Đặt mật khẩu mới để tiếp tục" />}
         <Field label="Mật khẩu hiện tại">
           <input className="input" type="password" autoComplete="current-password" value={form.current} onChange={set('current')} required />
         </Field>

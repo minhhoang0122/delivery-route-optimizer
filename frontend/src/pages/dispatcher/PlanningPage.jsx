@@ -111,7 +111,7 @@ function PlanningForm({ opt, runs, initial }) {
 
   return (
     <>
-      <PageHeader title="Lập kế hoạch giao hàng" subtitle="Chọn đơn chờ, xe và Driver tham gia, hệ thống sẽ phân công và sắp thứ tự giao."
+      <PageHeader title="Lập kế hoạch giao hàng"
         actions={draft && <Link className="btn secondary" to={`/dispatcher/planning/runs/${draft.id}`}>Mở bản nháp {draft.code}</Link>} />
       <ErrorBox error={error} />
       {validOrders.length === 0 ? (
@@ -166,7 +166,6 @@ function PlanningForm({ opt, runs, initial }) {
                 )
               })}
             </div>
-            <p className="caption muted">Xe đang bảo trì không thể tham gia kế hoạch. Mỗi xe đi cùng Driver thường dùng.</p>
           </Card>
 
           {!computing ? (
@@ -184,14 +183,10 @@ function PlanningForm({ opt, runs, initial }) {
                 <div className="row between"><span className="caption muted">Khối lượng so với tổng tải</span><span className="caption strong secondary">{selected.capacity ? Math.round((selected.weight / selected.capacity) * 100) : 0}%</span></div>
                 <Progress value={selected.capacity ? selected.weight / selected.capacity : 0} width="100%" />
               </div>
-              <Field label="Giới hạn thời lượng mỗi chuyến (phút)" helper="0 là không giới hạn. Không có giới hạn thì thuật toán có xu hướng dồn đơn lên ít xe.">
+              <Field label="Giới hạn thời lượng mỗi chuyến (phút)" helper="0 là không giới hạn">
                 <input className="input" type="number" min={0} max={1440} value={maxMinutes} onChange={e => setMaxMinutes(e.target.value)} />
               </Field>
               <Button icon={Route} block onClick={compute} loading={submitting} disabled={!orders.size || !vehicles.size}>Tính phương án</Button>
-              <p className="caption muted">
-                {opt.defaults.matrixSource === 'mock' ? 'Dữ liệu thời gian ước lượng theo khoảng cách (chế độ chạy thử).'
-                  : `Dữ liệu thời gian lấy từ TomTom có xét giao thông${opt.defaults.matrixSource === 'replay' ? ', dùng lại ma trận đã ghi khi có' : ''}.`}
-              </p>
             </Card>
           ) : (
             <Card style={{ flex: '0 1 280px' }}>
@@ -211,7 +206,6 @@ function PlanningForm({ opt, runs, initial }) {
                 {STEPS.map(([key, label], i) => <StepLine key={key} label={label} state={i < stepIndex ? 'done' : i === stepIndex ? 'active' : 'todo'} />)}
               </div>
               <Button variant="secondary" block disabled>Đang tính…</Button>
-              <p className="caption muted">Lựa chọn đơn và xe được giữ nguyên trong lúc tính.</p>
             </Card>
           )}
         </div>

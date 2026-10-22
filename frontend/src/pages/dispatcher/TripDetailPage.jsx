@@ -1,5 +1,5 @@
 // D11 Chi tiết chuyến và đề xuất đổi tuyến (UC06, UC07), E09 Thu hồi chuyến (UC16), nhật ký thao tác (NFR08).
-import { ClipboardCheck, Clock, Lock, Phone, Route, Undo2 } from 'lucide-react'
+import { ClipboardCheck, Lock, Phone, Route, Undo2 } from 'lucide-react'
 import { useState } from 'react'
 import { Link, useParams } from 'react-router'
 import { api, newEventId } from '../../api.js'
@@ -51,11 +51,9 @@ function ProposalCard({ trip, now, onChanged }) {
 
   if (trip.needsAck) {
     return (
-      <Card title="Chuyến đang chờ Driver xác nhận tuyến">
-        <Alert tone="info" title="Tuyến mới đang chờ Driver xác nhận">Hệ thống chưa đề xuất thêm phiên bản tuyến cho chuyến này cho đến khi Driver xác nhận.</Alert>
+      <Card title="Chờ Driver xác nhận tuyến mới">
         <div className="row between">
-          <div className="col"><span className="medium secondary">Phiên bản tuyến {trip.routeVersion.versionNo} · gửi lúc {time(trip.routeVersion.createdAt)} · Driver chưa xác nhận</span>
-            <span className="caption muted">Nút đánh giá đổi tuyến mở lại sau khi Driver xác nhận.</span></div>
+          <span className="medium secondary">Phiên bản {trip.routeVersion.versionNo} · gửi lúc {time(trip.routeVersion.createdAt)}</span>
           <Button variant="secondary" disabled>Đánh giá đổi tuyến</Button>
         </div>
       </Card>
@@ -64,9 +62,8 @@ function ProposalCard({ trip, now, onChanged }) {
 
   if (!p) {
     return (
-      <Card title={<div className="row"><span className="icon-wrap tone-info"><Route size={18} /></span><div className="col"><h3 className="h4">Điều chỉnh tuyến còn lại</h3><span className="caption muted">So sánh thứ tự hiện tại với phương án mới trên cùng ma trận thời gian vừa cập nhật.</span></div></div>}>
-        <p className="secondary">Chỉ đổi thứ tự các điểm sau điểm kế tiếp; xe, các điểm đã xử lý và điểm kế tiếp được giữ nguyên. Phương án mới chỉ được đề xuất khi tiết kiệm ít nhất max(60 giây, 5%).</p>
-        {isStale(trip.position, now) && <Alert tone="warning" title="Vị trí xe cũ hơn 30 giây">Cần vị trí mới để đánh giá đổi tuyến.</Alert>}
+      <Card title={<div className="row"><span className="icon-wrap tone-info"><Route size={18} /></span><h3 className="h4">Điều chỉnh tuyến còn lại</h3></div>}>
+        {isStale(trip.position, now) && <Alert tone="warning" title="Vị trí xe cũ hơn 30 giây" />}
         <ErrorBox error={evaluate.error} />
         <div className="row end"><Button icon={Route} onClick={runEvaluate} loading={evaluate.busy} disabled={isStale(trip.position, now)}>Đánh giá đổi tuyến</Button></div>
       </Card>
@@ -89,11 +86,10 @@ function ProposalCard({ trip, now, onChanged }) {
     ...(p.meetsThreshold ? [{ points: [pos, ...pts(p.proposedStopIds), depot], color, weight: 5 }] : []),
   ]
   const next = byId.get(p.nextStopId)
-  const incident = p.matrix?.incident
 
   return (
-    <Card tone="brand" title={<div className="row"><span className="icon-wrap tone-info"><Route size={18} /></span><div className="col"><h3 className="h4">Đề xuất đổi tuyến</h3><span className="caption muted">{p.auto ? `Kiểm tra định kỳ: thời gian các chặng còn lại tăng ${duration(p.increase.increase)} so với lúc lập tuyến. ` : ''}{p.meetsThreshold ? 'Hệ thống đề xuất thứ tự giao mới cho các điểm còn lại.' : 'Phương án mới không tiết kiệm đủ, hệ thống giữ tuyến hiện tại.'}</span></div></div>}>
-      {!p.valid ? <Alert tone="warning" title="Chưa lấy được dữ liệu tuyến">{p.reason}. Hệ thống đang giữ tuyến hiện tại và không tạo chặng có thời gian bằng 0.</Alert> : (
+    <Card tone="brand" title={<div className="row"><span className="icon-wrap tone-info"><Route size={18} /></span><div className="col"><h3 className="h4">Đề xuất đổi tuyến</h3>{(p.auto || !p.meetsThreshold) && <span className="caption muted">{p.auto ? `Các chặng còn lại chậm thêm ${duration(p.increase.increase)}` : 'Không đủ ngưỡng, giữ tuyến hiện tại'}</span>}</div></div>}>
+      {!p.valid ? <Alert tone="warning" title="Chưa lấy được dữ liệu tuyến">{p.reason}</Alert> : (
         <>
           <MapView height={320} depot={trip.depot} routes={routes} stops={stops} vehicles={[{ lat: pos[0], lon: pos[1], color, label: ago(p.position.observedAt, now) }]} fitKey={`p${p.eventId}`}>
             <MapOverlay><Legend items={[{ color: '#6b7280', label: 'Tuyến hiện tại', line: true, dashed: true }, ...(p.meetsThreshold ? [{ color, label: 'Tuyến đề xuất', line: true }] : []), { color: '#94a3b8', label: 'Đã đi qua', line: true }]} /></MapOverlay>
@@ -104,18 +100,12 @@ function ProposalCard({ trip, now, onChanged }) {
             <div className={`tile grow ${p.savingSeconds > 0 ? 'success' : ''}`}><span className="caption secondary">Tiết kiệm</span><span className={`h3 ${p.savingSeconds > 0 ? 'success' : ''}`}>{duration(p.savingSeconds)} ({percent(p.savingRatio)})</span></div>
           </div>
           <div className="stack-sm">
-            <div className="row" style={{ gap: 8 }}><Lock size={16} className="muted" /><span>Giữ nguyên: {done.length ? `điểm 1–${done.length} đã xử lý, ` : ''}điểm {next?.seq} ({next?.order.code}) kế tiếp đang khóa. Chỉ đổi thứ tự {p.currentStopIds.length - 1} điểm còn lại.</span></div>
-            <div className="row" style={{ gap: 8 }}><Clock size={16} className="muted" /><span className="caption muted">
-              Tính trên cùng ma trận thời gian lúc {time(p.createdAt)} · {p.evaluations} phép đánh giá
-              {p.increase?.legs > 0 && ` · thời gian các chặng chung ${p.increase.increase >= 0 ? 'tăng' : 'giảm'} ${duration(Math.abs(p.increase.increase))}`}
-            </span></div>
-            {incident > 0 && <Alert tone="warning" title="Dữ liệu có sự cố giả định">Ma trận dùng một đợt "sự cố giả định" do công cụ mô phỏng tạo, không phải giao thông thật.</Alert>}
+            <div className="row" style={{ gap: 8 }}><Lock size={16} className="muted" /><span>Giữ nguyên điểm {next?.seq > 1 ? `1–${next?.seq}` : next?.seq}</span></div>
           </div>
         </>
       )}
       <ErrorBox error={err && err.code !== 'STALE' ? err : null} />
-      <div className="row between">
-        <span className="caption muted">{p.meetsThreshold ? 'Driver sẽ xác nhận tuyến mới trên ứng dụng.' : 'Ngưỡng áp dụng: tiết kiệm ít nhất max(60 giây, 5%).'}</span>
+      <div className="row end">
         <div className="row">
           <Button variant="secondary" onClick={dismiss} disabled={decide.busy}>{p.meetsThreshold ? 'Bỏ qua' : 'Đóng'}</Button>
           {p.meetsThreshold && <Button onClick={approve} loading={decide.busy}>Duyệt tuyến mới</Button>}
@@ -124,7 +114,7 @@ function ProposalCard({ trip, now, onChanged }) {
       {staleError && (
         <Dialog title="Dữ liệu đã thay đổi" confirmLabel="Đánh giá lại" cancelLabel="Đóng" onCancel={() => decide.setError(null)}
           onConfirm={async () => { decide.setError(null); await dismiss(); await runEvaluate() }}>
-          <p>Chuyến {trip.code} vừa được cập nhật (phiên bản tuyến {trip.routeVersion.versionNo}). {staleError.message}.</p>
+          <p>{staleError.message}.</p>
         </Dialog>
       )}
     </Card>
@@ -160,10 +150,10 @@ export default function TripDetailPage() {
           {t.status === 'awaiting_reconciliation' && <Link className="btn primary" to={`/dispatcher/trips/${t.id}/reconcile`}><ClipboardCheck size={18} /> Đối chiếu và chốt chuyến</Link>}
         </>} />
       <ErrorBox error={error} onRetry={reload} />
-      {t.status === 'assigned' && !t.loadingMismatch && <Alert tone="info" title="Driver chưa bắt đầu chuyến">Chuyến được giao lúc {time(t.createdAt)}, chưa có điểm nào được giao. Hàng cần bàn giao tại kho: {t.stops.length} kiện.</Alert>}
+      {t.status === 'assigned' && !t.loadingMismatch && <Alert tone="info" title={`Driver chưa bắt đầu chuyến · ${t.stops.length} kiện chờ bàn giao`} />}
       {t.loadingMismatch && (
         <Alert tone="danger" title="Hàng thực nhận không khớp danh sách">
-          Driver báo thiếu {t.loadingMismatch.missingOrderIds.map(oid => t.stops.find(s => s.order.id === oid)?.order.code).join(', ')} lúc {time(t.loadingMismatch.reportedAt)}. Kiểm tra lại hàng tại kho hoặc thu hồi chuyến.
+          Driver báo thiếu {t.loadingMismatch.missingOrderIds.map(oid => t.stops.find(s => s.order.id === oid)?.order.code).join(', ')} lúc {time(t.loadingMismatch.reportedAt)}.
         </Alert>
       )}
       {stale && <Alert tone="warning" title={`Vị trí xe ${t.vehicle.plate} cũ hơn 30 giây`}>Cập nhật lần cuối {ago(t.position?.observedAt, now)}.</Alert>}
@@ -196,7 +186,7 @@ export default function TripDetailPage() {
         </div>
       </div>
 
-      <Card title="Nhật ký thao tác" extra={<span className="caption muted">Người thực hiện, thời điểm và nội dung</span>}>
+      <Card title="Nhật ký thao tác">
         <div className="stack-sm">
           {t.events.map(e => (
             <div key={e.id} className="row top" style={{ gap: 16 }}>
@@ -212,15 +202,14 @@ export default function TripDetailPage() {
       {revoke && (
         <Dialog tone="danger" title={`Thu hồi chuyến ${t.code}?`} confirmLabel="Thu hồi chuyến" busy={action.busy} confirmDisabled={!goodsBack}
           onCancel={() => setRevoke(false)} onConfirm={doRevoke}>
-          <p>Đơn, xe và Driver của chuyến sẽ được giải phóng. Hàng đã bàn giao phải được đối chiếu lại tại kho trước khi thu hồi.</p>
-          <div className="stack-sm">
+                    <div className="stack-sm">
             <KeyValue label="Hàng đã bàn giao" value={`${t.stops.length} kiện · ${kg(t.loadKg)}`} />
             <Checkbox label="Đã nhận lại đủ hàng tại kho" checked={goodsBack} onChange={setGoodsBack} />
           </div>
           <ErrorBox error={action.error} />
         </Dialog>
       )}
-      {t.status === 'revoked' && <Alert tone="info" title="Chuyến đã thu hồi">Các đơn của chuyến đã trở về danh sách chờ xếp.</Alert>}
+      {t.status === 'revoked' && <Alert tone="info" title="Chuyến đã thu hồi" />}
     </>
   )
 }

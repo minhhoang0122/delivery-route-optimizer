@@ -1,6 +1,6 @@
 // R06 Báo về kho (UC14): Driver khai báo hàng còn lại. Báo cáo chỉ được nhận khi mọi kết quả đã được máy chủ xác nhận,
 // và không tự chốt chuyến; Dispatcher đối chiếu rồi mới chốt.
-import { ChevronLeft, Info, Warehouse } from 'lucide-react'
+import { ChevronLeft, Warehouse } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { api, newEventId } from '../../api.js'
@@ -44,7 +44,7 @@ export default function ReturnPage() {
         <span className="row caption muted" style={{ gap: 8 }}><Warehouse size={16} /> {trip.depot.name} · bây giờ {time(new Date())}</span>
       </section>
       {(waiting > 0 || serverPending > 0) && (
-        <Alert tone="warning" title="Còn kết quả chưa được máy chủ xác nhận">Chờ gửi hết kết quả giao trước khi báo về kho.</Alert>
+        <Alert tone="warning" title="Còn kết quả chưa gửi xong" />
       )}
       {failed.length > 0 && (
         <section className="card" style={{ gap: 8 }}>
@@ -68,10 +68,6 @@ export default function ReturnPage() {
         </section>
       )}
       <ErrorBox error={action.error} />
-      <div className="row top" style={{ gap: 8, padding: '0 4px' }}>
-        <Info size={18} className="muted" />
-        <span className="secondary">Dispatcher sẽ đối chiếu hàng và chốt chuyến. Báo về kho không tự chốt chuyến.</span>
-      </div>
     </DriverScreen>
   )
 }

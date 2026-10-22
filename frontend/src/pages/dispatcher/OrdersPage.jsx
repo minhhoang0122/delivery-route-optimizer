@@ -69,7 +69,6 @@ export default function OrdersPage() {
         <Table columns={columns} rows={shown} empty="Không có đơn phù hợp"
           onRowClick={o => (o.status === 'pending' ? navigate(`/dispatcher/orders/${o.id}/edit`) : o.trip && navigate(`/dispatcher/trips/${o.trip.id}`))} />
       )}
-      <p className="caption muted">Chỉ sửa được đơn đang chờ xếp. Bấm vào đơn đã vào chuyến để mở chuyến tương ứng.</p>
     </>
   )
 }

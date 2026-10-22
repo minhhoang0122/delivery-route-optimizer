@@ -48,7 +48,6 @@ export default function LoginPage() {
         </div>
         {error && <Alert tone="danger" title={error} />}
         <Button type="submit" block loading={busy}>Đăng nhập</Button>
-        <p className="caption muted" style={{ textAlign: 'center' }}>Tài khoản do Administrator cấp. Liên hệ quản trị nếu quên mật khẩu.</p>
       </form>
     </div>
   )

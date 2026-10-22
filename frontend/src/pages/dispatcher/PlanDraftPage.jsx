@@ -85,13 +85,12 @@ export default function PlanDraftPage() {
               <Stat sep label="Đơn đã xếp" value={`${placed}/${snap.orders.length}`} sub={unassigned.length ? `${unassigned.length} chưa xếp` : 'Xếp hết'} subTone={unassigned.length ? 'warning' : 'success'} />
             </div>
           </Card>
-          <Card compact title="So sánh trước và sau cải thiện" extra={saved > 0 && <Badge tone="success">−{duration(saved)}</Badge>}>
+          <Card compact title="Tổng thời gian di chuyển" extra={saved > 0 && <Badge tone="success">−{duration(saved)}</Badge>}>
             <div className="row">
-              <div className="tile grow" style={{ border: '1px solid var(--line)' }}><span className="caption muted">Insertion Heuristic</span><span className="body-large strong secondary">{duration(result?.stats?.insertionSeconds)}</span></div>
+              <div className="tile grow" style={{ border: '1px solid var(--line)' }}><span className="caption muted">Ban đầu</span><span className="body-large strong secondary">{duration(result?.stats?.insertionSeconds)}</span></div>
               <ChevronRight size={20} className="muted" />
-              <div className="tile success grow"><span className="caption secondary">Sau Relocate và Swap</span><span className="body-large strong success">{duration(total)}</span></div>
+              <div className="tile success grow"><span className="caption secondary">Sau tối ưu</span><span className="body-large strong success">{duration(total)}</span></div>
             </div>
-            <span className="caption muted">{result?.stats?.evaluations?.toLocaleString('vi-VN')} phép đánh giá · {result?.stats?.stopReason} · tính trong {Math.round(result?.stats?.ms ?? 0)} ms</span>
           </Card>
           <Card compact title="Tuyến theo xe" extra={<span className="caption muted">{routes.length} xe · {placed} điểm</span>}>
             <div>
@@ -114,8 +113,7 @@ export default function PlanDraftPage() {
             </div>
           </Card>
           {unassigned.length > 0 && (
-            <Card compact tone="warning" title={<span className="row" style={{ gap: 8 }}><TriangleAlert size={18} className="warning" /><span className="h4">Đơn chưa xếp ({unassigned.length})</span></span>}
-              extra={<span className="caption muted">Vẫn ở trạng thái Chờ xếp</span>}>
+            <Card compact tone="warning" title={<span className="row" style={{ gap: 8 }}><TriangleAlert size={18} className="warning" /><span className="h4">Đơn chưa xếp ({unassigned.length})</span></span>}>
               {unassigned.map(u => {
                 const o = byOrder.get(u.orderId)
                 return (

@@ -65,7 +65,7 @@ export default function AccountsPage() {
 
   return (
     <>
-      <PageHeader title="Tài khoản người dùng" subtitle="Quản lý tài khoản đăng nhập, vai trò và trạng thái của người dùng trong hệ thống."
+      <PageHeader title="Tài khoản người dùng"
         actions={<Link className="btn primary" to="/admin/accounts/new"><Plus size={18} /> Cấp tài khoản</Link>} />
       <div className="row between wrap" style={{ alignItems: 'flex-end' }}>
         <div className="row wrap" style={{ alignItems: 'flex-end' }}>
@@ -113,7 +113,6 @@ export default function AccountsPage() {
               {Object.entries(ROLE).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
             </select>
           </Field>
-          <p className="caption muted">Vai trò mới có hiệu lực ngay ở yêu cầu tiếp theo của người dùng.</p>
           <ErrorBox error={action.error} />
         </Dialog>
       )}

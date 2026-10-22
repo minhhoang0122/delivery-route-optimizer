@@ -52,7 +52,7 @@ export default function DriversPage() {
   const takenBy = new Map(drivers.filter(d => d.defaultVehicle).map(d => [d.defaultVehicle.id, d.id]))
   return (
     <>
-      <PageHeader title="Driver" subtitle="Hồ sơ Driver và phương tiện thường dùng. Tài khoản đăng nhập do Administrator cấp."
+      <PageHeader title="Driver"
         actions={<Button icon={Plus} disabled={!data?.availableAccounts.length}
           title={data?.availableAccounts.length ? '' : 'Không còn tài khoản Driver nào chưa có hồ sơ'}
           onClick={() => { action.setError(null); setEdit({ userId: data.availableAccounts[0].id, fullName: data.availableAccounts[0].fullName ?? '', phone: '', defaultVehicleId: '', status: 'active' }) }}>Thêm Driver</Button>} />
@@ -64,7 +64,6 @@ export default function DriversPage() {
       ]} />
       <ErrorBox error={error} onRetry={reload} />
       {loading && !data ? <TableSkeleton columns={COLUMNS} /> : <Table columns={columns} rows={shown} />}
-      <p className="caption muted">Driver ngừng hoạt động không xuất hiện trong danh sách chọn khi lập kế hoạch.</p>
 
       {edit && (
         <Dialog title={edit.id ? 'Sửa hồ sơ Driver' : 'Thêm Driver'} confirmLabel="Lưu" busy={action.busy} onCancel={() => setEdit(null)} onConfirm={save}>

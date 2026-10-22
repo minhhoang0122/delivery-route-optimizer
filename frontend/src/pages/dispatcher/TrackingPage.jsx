@@ -74,7 +74,7 @@ export default function TrackingPage() {
   return (
     <>
       <div className="stack-sm">
-        <PageHeader title="Theo dõi chuyến giao" subtitle="Vị trí cập nhật theo chu kỳ, kèm thời điểm ghi nhận." />
+        <PageHeader title="Theo dõi chuyến giao" />
         <Chips value={filter} onChange={v => setParams({ status: v })} items={FILTERS.map(([v, l]) => ({
           value: v, label: l, count: v === 'closed,revoked' ? undefined : active.filter(t => t.status === v).length,
         }))} />

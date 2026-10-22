@@ -28,14 +28,14 @@ export default function DepotPage() {
   ]
   return (
     <>
-      <PageHeader title="Kho" subtitle="Kho xuất phát dùng làm điểm đầu và điểm cuối của mọi chuyến giao." />
+      <PageHeader title="Kho" />
       <ErrorBox error={error} onRetry={reload} />
       {d && (
         <div className="grid-2">
           <Card>
             <div className="row">
               <span className="icon-wrap tone-info"><Warehouse size={18} /></span>
-              <div className="col"><h3 className="h3">{d.name}</h3><span className="caption muted">Kho duy nhất của hệ thống</span></div>
+              <h3 className="h3">{d.name}</h3>
             </div>
             {!edit ? (
               <>
@@ -47,7 +47,6 @@ export default function DepotPage() {
                     </div>
                   ))}
                 </div>
-                <p className="caption muted">Toạ độ kho là điểm xuất phát khi lấy ma trận thời gian từ TomTom. Đổi toạ độ sẽ áp dụng cho các kế hoạch tạo sau đó.</p>
                 <div><Button variant="secondary" onClick={() => { action.setError(null); setEdit({ name: d.name, address: d.address, lat: d.lat, lon: d.lon, openingHours: d.openingHours ?? '' }) }}>Sửa thông tin</Button></div>
               </>
             ) : (
@@ -55,7 +54,7 @@ export default function DepotPage() {
                 <Field label="Tên kho"><input className="input" value={edit.name} onChange={e => setEdit({ ...edit, name: e.target.value })} /></Field>
                 <Field label="Địa chỉ"><input className="input" value={edit.address} onChange={e => setEdit({ ...edit, address: e.target.value })} /></Field>
                 <Field label="Giờ mở cửa"><input className="input" value={edit.openingHours} onChange={e => setEdit({ ...edit, openingHours: e.target.value })} /></Field>
-                <p className="caption muted">Bấm vào bản đồ để đổi toạ độ: {edit.lat.toFixed(5)}, {edit.lon.toFixed(5)}</p>
+                <p className="caption muted">Toạ độ: {edit.lat.toFixed(5)}, {edit.lon.toFixed(5)}</p>
                 <ErrorBox error={action.error} />
                 <div className="row end">
                   <Button variant="secondary" onClick={() => setEdit(null)}>Hủy</Button>

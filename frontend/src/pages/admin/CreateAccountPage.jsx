@@ -25,7 +25,7 @@ export default function CreateAccountPage() {
 
   return (
     <>
-      <PageHeader title="Cấp tài khoản" subtitle="Tạo tài khoản đăng nhập và gán vai trò cho người dùng mới." />
+      <PageHeader title="Cấp tài khoản" />
       <div className="row top wrap" style={{ gap: 24 }}>
         <form className="card" style={{ width: 640, maxWidth: '100%', gap: 20 }} onSubmit={submit}>
           <h3 className="h4">Thông tin tài khoản</h3>

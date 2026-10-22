@@ -40,16 +40,16 @@ export default function FailedOrdersPage() {
       status: () => <Badge tone="warning">Cần xử lý</Badge>,
       actions: o => o.trip.status === 'awaiting_reconciliation'
         ? <Button variant="ghost" onClick={() => navigate(`/dispatcher/trips/${o.trip.id}/reconcile`)}>Đối chiếu chuyến</Button>
-        : <span className="caption muted">Hàng còn trên xe, chờ Driver về kho</span>,
+        : <span className="caption muted">Chờ Driver về kho</span>,
     }[c.key],
   }))
 
   return (
     <>
-      <PageHeader title="Đơn chưa giao được" subtitle="Đơn chỉ quay về danh sách chờ hoặc bị hủy sau khi đối chiếu và chốt chuyến." />
+      <PageHeader title="Đơn chưa giao được" />
       {orders.length > 0 && (
         <Alert tone="info" title={`${orders.length} đơn đang chờ quyết định`}>
-          Thuộc chuyến {trips.join(', ')}. Mở đối chiếu chuyến để chọn chuyển sang kế hoạch sau hoặc hủy đơn.
+          Chuyến {trips.join(', ')}
         </Alert>
       )}
       <ErrorBox error={error} onRetry={reload} />

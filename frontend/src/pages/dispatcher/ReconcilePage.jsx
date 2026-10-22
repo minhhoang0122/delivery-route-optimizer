@@ -52,7 +52,7 @@ export default function ReconcilePage() {
     return (
       <>
         <PageHeader title={`Đối chiếu chuyến ${t.code}`} badge={<StatusBadge map={TRIP_STATUS} value={t.status} />} subtitle={`Chốt lúc ${time(t.closedAt)}`} />
-        <Alert tone="success" title="Chuyến đã được chốt">Đơn, xe và Driver đã được giải phóng. <Link to={`/dispatcher/trips/${t.id}`}>Xem chi tiết chuyến</Link></Alert>
+        <Alert tone="success" title="Chuyến đã được chốt"><Link to={`/dispatcher/trips/${t.id}`}>Xem chi tiết chuyến</Link></Alert>
       </>
     )
   }
@@ -69,13 +69,12 @@ export default function ReconcilePage() {
       </div>
       <div className="row top wrap" style={{ gap: 16 }}>
         <div className="stack-sm" style={{ flex: '1 1 560px', minWidth: 0 }}>
-          <div className="section-title"><h3 className="h4">Kết quả từng điểm</h3><span className="caption muted">Theo dữ liệu đồng bộ từ ứng dụng Driver</span></div>
+          <div className="section-title"><h3 className="h4">Kết quả từng điểm</h3></div>
           <Table columns={columns} rows={t.stops} />
         </div>
         <div className="stack" style={{ flex: '0 1 472px', minWidth: 320 }}>
           {failed.length > 0 ? (
             <Card title="Quyết định cho đơn chưa giao được">
-              <p className="caption muted">Đơn chuyển sang kế hoạch sau sẽ về lại danh sách chờ xếp khi chuyến được chốt.</p>
               {failed.map(s => {
                 const d = decisions[s.order.id]
                 return (
@@ -93,7 +92,7 @@ export default function ReconcilePage() {
               })}
             </Card>
           ) : (
-            <Card title="Không có đơn chưa giao được"><p className="secondary">Mọi điểm đều giao thành công và không có hàng mang về.</p></Card>
+            <Card title="Không có đơn chưa giao được" />
           )}
           <Card title="Kiểm hàng mang về">
             <p className="caption muted">
@@ -101,7 +100,7 @@ export default function ReconcilePage() {
             </p>
             {failed.some(s => !returned.has(s.order.id)) && (
               <Alert tone="warning" title="Báo cáo của Driver thiếu kiện">
-                {failed.filter(s => !returned.has(s.order.id)).map(s => `${s.order.code} (${kg(s.order.weightKg)})`).join(', ')} chưa được Driver đánh dấu mang về. Kiểm tra hàng thực tế trước khi chốt.
+                {failed.filter(s => !returned.has(s.order.id)).map(s => `${s.order.code} (${kg(s.order.weightKg)})`).join(', ')} chưa được Driver đánh dấu mang về.
               </Alert>
             )}
             <Checkbox label={failed.length ? 'Hàng thực tế tại kho khớp với báo cáo của Driver' : 'Xác nhận không có sai lệch'} checked={matched} onChange={setMatched} />
@@ -117,7 +116,7 @@ export default function ReconcilePage() {
       <div className="row">
         <div className="grow">{blockers.length > 0
           ? <Alert tone="danger" title="Chưa thể chốt chuyến">{blockers.join(' ')}</Alert>
-          : <Alert tone="success" title="Đủ điều kiện chốt chuyến">Chốt chuyến sẽ cập nhật đơn, giải phóng xe và Driver trong cùng một giao dịch.</Alert>}</div>
+          : <Alert tone="success" title="Đủ điều kiện chốt chuyến" />}</div>
         <Button onClick={close} disabled={blockers.length > 0} loading={action.busy}>Chốt chuyến</Button>
       </div>
     </>
