@@ -153,13 +153,18 @@ router.post('/vehicles', async (req, res) => {
 router.put('/vehicles/:id', async (req, res) => {
   const id = paramId(req);
   const v = readVehicle(req.body);
-  const cur = await loadVehicle(id);
-  const changed = cur.vehicle_type !== v.type || cur.capacity_kg !== v.capacityKg || cur.plate !== v.plate;
-  if (cur.trip_id && changed) throw conflict(`Xe đang chạy chuyến ${tripCode(cur.trip_id)}, chưa thể sửa cấu hình`);
-  const dup = await query('SELECT 1 FROM vehicles WHERE plate = $1 AND id <> $2', [v.plate, id]);
-  if (dup.rows.length) throw conflict('Biển số đã tồn tại');
-  await query('UPDATE vehicles SET plate = $2, vehicle_type = $3, capacity_kg = $4, routing_profile = $5 WHERE id = $1',
-    [id, v.plate, v.type, v.capacityKg, v.routingProfile]);
+  await transaction(async c => {
+    // Khóa dòng xe như lúc giao chuyến (commitPlan), để sửa cấu hình và giao chuyến đồng thời không xen kẽ nhau
+    const cur = (await c.query('SELECT * FROM vehicles WHERE id = $1 FOR UPDATE', [id])).rows[0];
+    if (!cur) throw notFound('Không tìm thấy phương tiện');
+    const trip = (await c.query('SELECT id FROM trips WHERE vehicle_id = $1 AND status = ANY($2) LIMIT 1', [id, ACTIVE_STATUSES])).rows[0];
+    const changed = cur.vehicle_type !== v.type || cur.capacity_kg !== v.capacityKg || cur.plate !== v.plate;
+    if (trip && changed) throw conflict(`Xe đang chạy chuyến ${tripCode(trip.id)}, chưa thể sửa cấu hình`);
+    const dup = await c.query('SELECT 1 FROM vehicles WHERE plate = $1 AND id <> $2', [v.plate, id]);
+    if (dup.rows.length) throw conflict('Biển số đã tồn tại');
+    await c.query('UPDATE vehicles SET plate = $2, vehicle_type = $3, capacity_kg = $4, routing_profile = $5 WHERE id = $1',
+      [id, v.plate, v.type, v.capacityKg, v.routingProfile]);
+  });
   res.json({ vehicle: toVehicle(await loadVehicle(id)) });
 });
 

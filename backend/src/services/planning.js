@@ -2,7 +2,7 @@
 // Bản nháp chỉ là đề xuất, chưa giữ chỗ đơn, xe hay Driver (planning_runs, mục 3.2.4).
 import { plan } from 'optimization-engine';
 import { config } from '../config.js';
-import { query } from '../db.js';
+import { query, transaction } from '../db.js';
 import { badRequest } from '../errors.js';
 import { buildMatrix, pointKey } from './matrix.js';
 import { routeGeometry } from './tomtom.js';
@@ -134,8 +134,12 @@ export async function runPlanning(runId, snapshot) {
       if (!r.orderIds.length) continue;
       const v = snapshot.vehicles.find(x => x.id === r.vehicleId);
       const seq = [P.depot, ...r.orderIds.map(id => orderKey(orderById.get(id))), P.depot];
+      // Thiếu quãng đường của một chặng (ví dụ đợt sự cố giả định không ghi quãng đường) thì để trống, không cộng 0
       let distanceM = 0;
-      for (let i = 0; i + 1 < seq.length; i++) distanceM += matrix.distance(v.profile, seq[i], seq[i + 1]) ?? 0;
+      for (let i = 0; i + 1 < seq.length && distanceM != null; i++) {
+        const d = matrix.distance(v.profile, seq[i], seq[i + 1]);
+        distanceM = d == null ? null : distanceM + d;
+      }
       routes.push({ vehicleId: v.id, driverId: v.driverId, orderIds: r.orderIds, seconds: r.seconds, distanceM, loadKg: r.loadKg, geometry: null });
     }
 
@@ -161,12 +165,20 @@ export async function runPlanning(runId, snapshot) {
       stats: { ...out.stats, matrixMs: Math.round(matrixMs) },
       matrix: { batchIds: matrix.batchIds, ...matrix.stats },
     };
-    await query(`UPDATE planning_runs SET status = 'draft', result = $2 WHERE id = $1`, [runId, result]);
-    await query(
-      `INSERT INTO planning_run_matrices (planning_run_id, matrix_batch_id) SELECT $1, unnest($2::int[]) ON CONFLICT DO NOTHING`,
-      [runId, matrix.batchIds]);
-    // Chỉ bản nháp mới nhất còn hiệu lực
-    await query(`UPDATE planning_runs SET status = 'superseded' WHERE status = 'draft' AND id <> $1`, [runId]);
+    await transaction(async c => {
+      // Chỉ bản nháp mới nhất còn hiệu lực. Khóa để hai lần tính xong cùng lúc không cùng thành bản nháp;
+      // lần tính cũ xong sau lần tính mới thì tự thành bản đã thay thế, không thay bản nháp mới hơn
+      await c.query(`SELECT pg_advisory_xact_lock(hashtext('planning_runs_draft'))`);
+      await c.query(
+        `UPDATE planning_runs SET result = $2,
+                status = CASE WHEN EXISTS (SELECT 1 FROM planning_runs n WHERE n.id > $1 AND n.status = 'draft')
+                              THEN 'superseded' ELSE 'draft' END
+          WHERE id = $1`, [runId, result]);
+      await c.query(
+        `INSERT INTO planning_run_matrices (planning_run_id, matrix_batch_id) SELECT $1, unnest($2::int[]) ON CONFLICT DO NOTHING`,
+        [runId, matrix.batchIds]);
+      await c.query(`UPDATE planning_runs SET status = 'superseded' WHERE status = 'draft' AND id < $1`, [runId]);
+    });
   } catch (err) {
     console.error('Lập kế hoạch lỗi', err);
     await query(`UPDATE planning_runs SET status = 'failed', result = $2 WHERE id = $1`,

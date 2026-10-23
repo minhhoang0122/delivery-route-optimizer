@@ -2,11 +2,19 @@
 // Chạy trên cơ sở dữ liệu vừa nạp mẫu (npm run seed -- --reset) khi Backend đang chạy:
 //   npm run test:flow
 // Biến API_BASE đổi địa chỉ Backend (mặc định http://localhost:3000/api).
-// Kịch bản ghi dữ liệu thật vào cơ sở dữ liệu, chỉ chạy trên máy phát triển.
+// Kịch bản ghi dữ liệu thật vào cơ sở dữ liệu, chỉ chạy trên cơ sở dữ liệu thử: phải đặt FLOW_TEST_ALLOW=1
+// cùng PGDATABASE/PGPORT của cơ sở dữ liệu thử (biến đặt sẵn trong môi trường được ưu tiên hơn file .env).
 import { execFileSync } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+// Kịch bản tạo tài khoản, giao chuyến và gọi công cụ mô phỏng ghi thẳng vào PostgreSQL theo cấu hình hiện tại,
+// nên không chạy nếu chưa xác nhận đang dùng cơ sở dữ liệu thử
+if (process.env.FLOW_TEST_ALLOW !== '1') {
+  console.error('Kịch bản ghi dữ liệu vào cơ sở dữ liệu. Chỉ chạy trên cơ sở dữ liệu thử: đặt FLOW_TEST_ALLOW=1 và PGDATABASE/PGPORT của cơ sở dữ liệu thử (xem README).');
+  process.exit(1);
+}
 const BASE = process.env.API_BASE || `http://localhost:${process.env.PORT || 3000}/api`;
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PW = process.env.SEED_PASSWORD;

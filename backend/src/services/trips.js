@@ -6,7 +6,7 @@ import { detectIncrease, evaluateReroute } from 'optimization-engine';
 import { config } from '../config.js';
 import { query, transaction } from '../db.js';
 import { badRequest, conflict, forbidden, HttpError, notFound } from '../errors.js';
-import { buildMatrix, cachedTravel, haversineM, loadBatches, pointKey } from './matrix.js';
+import { buildMatrix, cachedTravel, combineMatrices, haversineM, loadBatches, pointKey } from './matrix.js';
 import { routeGeometry } from './tomtom.js';
 
 export const ACTIVE_STATUSES = ['assigned', 'in_progress', 'awaiting_reconciliation'];
@@ -281,7 +281,13 @@ export async function commitPlan(runId, user, { clientEventId, fp }) {
       else if (snapOrder && snapOrder.version !== o.version) problems.push(`${o.code} đã bị sửa sau khi lập kế hoạch`);
     }
     const vehicles = (await c.query('SELECT * FROM vehicles WHERE id = ANY($1) ORDER BY id FOR UPDATE', [vehicleIds])).rows;
-    for (const v of vehicles) if (v.status !== 'active') problems.push(`Xe ${v.plate} đang bảo trì`);
+    for (const v of vehicles) {
+      const snapVehicle = snap.vehicles.find(x => x.id === v.id);
+      if (v.status !== 'active') problems.push(`Xe ${v.plate} đang bảo trì`);
+      // Loại xe, tải trọng hay cấu hình định tuyến đổi thì tuyến trong bản nháp có thể không còn hợp lệ
+      else if (snapVehicle && (snapVehicle.type !== v.vehicle_type || Number(snapVehicle.capacityKg) !== Number(v.capacity_kg)
+        || snapVehicle.profile !== v.routing_profile)) problems.push(`Xe ${v.plate} đã bị sửa cấu hình sau khi lập kế hoạch`);
+    }
     const drivers = (await c.query(
       `SELECT d.*, u.status AS account_status FROM drivers d JOIN users u ON u.id = d.user_id
         WHERE d.id = ANY($1) ORDER BY d.id FOR UPDATE OF d`, [driverIds])).rows;
@@ -503,7 +509,8 @@ async function previousBatchIds(trip) {
 
 /**
  * Đánh giá đổi thứ tự các điểm còn lại. Dispatcher bấm nút thì luôn lưu kết quả để trình duyệt;
- * kiểm tra tự động theo chu kỳ (auto) chỉ lưu đề xuất khi thời gian các chặng chung tăng vượt ngưỡng (mục 3.4.5).
+ * kiểm tra tự động theo chu kỳ (auto) chỉ lấy chặng từ vị trí xe khi thời gian các chặng chung tăng vượt ngưỡng
+ * (mục 3.4.5), và chỉ lưu đề xuất khi phương án mới hợp lệ và đạt ngưỡng tiết kiệm.
  */
 export async function evaluateTripReroute(tripId, user, { auto = false } = {}) {
   const trip = await loadTrip(tripId);
@@ -521,16 +528,28 @@ export async function evaluateTripReroute(tripId, user, { auto = false } = {}) {
   const posKey = pointKey('p', trip.position.id, trip.position.lat, trip.position.lon);
   const dKey = pointKey('d', trip.depot.id, trip.depot.lat, trip.depot.lon);
   const key = s => pointKey('o', s.order.id, s.order.lat, s.order.lon);
-  const points = [
-    { key: posKey, lat: trip.position.lat, lon: trip.position.lon },
-    { key: dKey, lat: trip.depot.lat, lon: trip.depot.lon },
-    ...remaining.map(s => ({ key: key(s), lat: s.order.lat, lon: s.order.lon })),
-  ];
+  const stopPoints = remaining.map(s => ({ key: key(s), lat: s.order.lat, lon: s.order.lon }));
+  const maxAgeSeconds = config.matrixSource === 'tomtom' ? config.reroute.maxEvaluationAgeSeconds : null;
   const t0 = performance.now();
-  const matrix = await buildMatrix({
-    points, profiles: [profile],
-    maxAgeSeconds: config.matrixSource === 'tomtom' ? config.reroute.maxEvaluationAgeSeconds : null,
+  // Bước 1: ma trận giữa kho và các điểm còn lại (thường dùng lại được), đủ để phát hiện tăng thời gian
+  const stopMatrix = await buildMatrix({
+    points: [{ key: dKey, lat: trip.depot.lat, lon: trip.depot.lon }, ...stopPoints], profiles: [profile], maxAgeSeconds,
   });
+  const oldTravel = await loadBatches(await previousBatchIds(trip));
+  const increase = detectIncrease({ points: [...remaining.map(key), dKey], profile, oldTravel, newTravel: stopMatrix.travel });
+  increase.slowLegs = increase.slowLegs.map(l => ({
+    fromStopId: remaining[l.index].id, toStopId: remaining[l.index + 1]?.id ?? null, before: l.before, after: l.after,
+  }));
+  // Chưa đủ ngưỡng, hoặc không còn chặng chung để so sánh: giữ tuyến hiện hành, không gọi thêm TomTom
+  if (auto && !increase.triggered) return { skipped: true, increase };
+
+  // Bước 2: chặng từ vị trí xe tới các điểm còn lại. Optimization Engine chỉ đi từ vị trí xe ra,
+  // không bao giờ quay về vị trí xe, nên không lấy chiều ngược lại
+  const posMatrix = await buildMatrix({
+    points: [{ key: posKey, lat: trip.position.lat, lon: trip.position.lon }, ...stopPoints], profiles: [profile], maxAgeSeconds,
+    pairs: remaining.map(s => [posKey, key(s)]),
+  });
+  const matrix = combineMatrices(stopMatrix, posMatrix);
   const matrixMs = performance.now() - t0;
 
   const ev = evaluateReroute({
@@ -539,13 +558,8 @@ export async function evaluateTripReroute(tripId, user, { auto = false } = {}) {
     minSavingSeconds: config.reroute.minSavingSeconds, minSavingRatio: config.reroute.minSavingRatio,
     maxEvaluations: config.maxEvaluations, maxMs: config.maxSearchMs,
   });
-  const oldTravel = await loadBatches(await previousBatchIds(trip));
-  const increase = detectIncrease({ points: [...remaining.map(key), dKey], profile, oldTravel, newTravel: matrix.travel });
-  increase.slowLegs = increase.slowLegs.map(l => ({
-    fromStopId: remaining[l.index].id, toStopId: remaining[l.index + 1]?.id ?? null, before: l.before, after: l.after,
-  }));
-  // Chưa đủ ngưỡng, hoặc không còn chặng chung để so sánh: giữ tuyến hiện hành, không lưu đề xuất
-  if (auto && !increase.triggered) return { skipped: true, increase };
+  // Kiểm tra tự động chỉ lưu đề xuất hợp lệ và đạt ngưỡng tiết kiệm; Dispatcher bấm nút thì luôn lưu để xem
+  if (auto && !(ev.valid && ev.meetsThreshold)) return { skipped: true, increase, ...ev };
 
   const payload = {
     stateVersion: trip.stateVersion,
@@ -641,8 +655,8 @@ export async function dismissReroute(tripId, eventId, user) {
 let checking = false;
 
 /**
- * Mỗi chu kỳ xét các chuyến đang giao: bỏ qua chuyến đang chờ Driver xác nhận, chuyến đã có đề xuất chưa xử lý
- * hoặc vị trí đã cũ. Đề xuất chỉ được lưu để Dispatcher duyệt, hệ thống không tự áp dụng tuyến mới.
+ * Mỗi chu kỳ xét các chuyến đang giao: bỏ qua chuyến đang chờ Driver xác nhận, chuyến đã có đề xuất đạt ngưỡng
+ * chưa xử lý và chưa quá hạn, hoặc vị trí đã cũ. Đề xuất chỉ được lưu để Dispatcher duyệt, hệ thống không tự áp dụng tuyến mới.
  */
 export async function periodicRerouteCheck() {
   if (checking) return;
@@ -651,13 +665,20 @@ export async function periodicRerouteCheck() {
     const { rows } = await query(`SELECT id FROM trips WHERE status = 'in_progress' ORDER BY id`);
     for (const { id } of rows) {
       const trip = await loadTrip(id);
-      if (trip.needsAck || (trip.proposal && !trip.proposal.outdated)) continue;
+      if (trip.needsAck) continue;
+      // Chỉ bỏ qua khi đề xuất đang chờ duyệt còn dùng được: đúng phiên bản, đạt ngưỡng và chưa quá hạn
+      const p = trip.proposal;
+      if (p && !p.outdated && p.valid && p.meetsThreshold && ageSeconds(p.createdAt) <= config.reroute.maxEvaluationAgeSeconds) continue;
       if (!trip.position || ageSeconds(trip.position.observedAt) > config.reroute.maxPositionAgeSeconds) continue;
       if (trip.stops.filter(s => s.status === 'pending').length < 3) continue;
       try {
         const ev = await evaluateTripReroute(id, null, { auto: true });
         if (ev.skipped) {
           if (!ev.increase.legs) console.log(`Kiểm tra định kỳ ${trip.code}: không còn chặng chung đủ dữ liệu để so sánh, giữ tuyến hiện hành`);
+          else if (ev.increase.triggered && ev.valid === false) console.log(`Kiểm tra định kỳ ${trip.code}: ${ev.reason}, giữ tuyến hiện hành`);
+          else if (ev.increase.triggered) {
+            console.log(`Kiểm tra định kỳ ${trip.code}: thời gian còn lại tăng ${ev.increase.increase} giây nhưng thứ tự mới chỉ tiết kiệm ${ev.savingSeconds} giây, chưa đạt ngưỡng, giữ tuyến hiện hành`);
+          }
           continue;
         }
         console.log(`Kiểm tra định kỳ ${trip.code}: thời gian còn lại tăng ${ev.increase.increase} giây, đề xuất tiết kiệm ${ev.savingSeconds} giây`);

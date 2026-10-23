@@ -50,13 +50,15 @@ Mở http://localhost:5173. Màn hình Driver dùng trên điện thoại; khi t
 | `npm run simulate -- incident --trip 3 --factor 3` | Tạo "sự cố giả định" làm chặng phía trước chậm đi, để thử đề xuất đổi tuyến |
 | `npm run simulate -- prepare` | Chuẩn bị một lượt demo mà không xóa dữ liệu: chốt chuyến đã về kho, tạo 12 đơn mới trên các địa chỉ mẫu, lập kế hoạch và giao chuyến |
 | `npm run simulate -- demo --trip active` | Chạy trọn các chuyến: xe chạy theo đường thật, giao từng điểm, chuyến nhiều điểm nhất gặp ùn tắc, hệ thống đề xuất và đổi tuyến, xe về kho |
-| `npm run test:flow` | Kiểm thử nghiệp vụ và phân quyền qua API (59 kiểm tra), chạy sau `npm run seed -- --reset` |
+| `npm run test:flow` | Kiểm thử nghiệp vụ và phân quyền qua API (59 kiểm tra), chạy sau `npm run seed -- --reset`, chỉ trên cơ sở dữ liệu thử (xem dưới) |
 | `npm test` (trong `optimization-engine`) | Kiểm thử thuật toán trên ma trận TomTom đã ghi |
 | `npm run experiments` (trong `optimization-engine`) | Thí nghiệm cho Chương 4 (mục 4.4), in bảng kết quả và ghi `experiments/ket_qua.json` |
 
 Nguồn ma trận đặt bằng `MATRIX_SOURCE` trong `.env`: `replay` dùng lại ma trận đã ghi và chỉ lấy thêm chặng còn thiếu, `tomtom` lấy mới theo giao thông hiện tại, `mock` ước lượng theo khoảng cách. Hạn mức miễn phí của TomTom là 20.000 yêu cầu Routing mỗi tháng; một lần lập kế hoạch 20 đơn với hai loại xe tốn khoảng 840 yêu cầu nếu chưa có dữ liệu.
 
-Kiểm tra đổi tuyến tự động theo chu kỳ đặt bằng `REROUTE_CHECK_SECONDS` (mặc định 0 là tắt). Bật thì hệ thống tự đánh giá các chuyến đang giao và chỉ tạo đề xuất khi thời gian các chặng còn lại tăng ít nhất 10% hoặc 120 giây; Dispatcher vẫn phải duyệt.
+Kiểm tra đổi tuyến tự động theo chu kỳ đặt bằng `REROUTE_CHECK_SECONDS` (mặc định 120 giây, 0 là tắt). Mỗi chu kỳ hệ thống so thời gian các chặng còn lại của chuyến đang giao với lúc lập tuyến; chỉ khi tăng ít nhất 10% hoặc 120 giây mới lấy thêm các chặng từ vị trí xe và đánh giá thứ tự mới, và chỉ lưu đề xuất khi tiết kiệm đạt ngưỡng. Dispatcher vẫn phải duyệt.
+
+`npm run test:flow` nạp `.env` như các lệnh khác, nên không chạy được nếu chưa đặt `FLOW_TEST_ALLOW=1`. Chạy trên một cơ sở dữ liệu thử riêng: tạo cơ sở dữ liệu thử, đặt `PGDATABASE` (và `PGPORT` nếu khác) của nó trong môi trường của terminal (biến trong môi trường được ưu tiên hơn `.env`), chạy `npm run seed -- --reset` và `npm start` với cùng biến đó, rồi ở terminal khác cũng đặt các biến ấy cùng `FLOW_TEST_ALLOW=1` và chạy `npm run test:flow`. Ví dụ trong PowerShell: `$env:PGDATABASE='lastmile_test'; $env:FLOW_TEST_ALLOW='1'; npm run test:flow`. Không đặt `FLOW_TEST_ALLOW` trong `.env`.
 
 ### Demo mô phỏng trên bản đồ
 

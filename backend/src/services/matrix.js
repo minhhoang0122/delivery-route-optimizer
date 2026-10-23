@@ -44,14 +44,17 @@ async function saveEntries(batchId, entries) {
  *  points:        [{ key, lat, lon }]
  *  profiles:      ['motorcycle', 'truck']
  *  maxAgeSeconds: chỉ dùng lại chặng mới hơn mức này (null là dùng lại mọi chặng đã ghi)
+ *  pairs:         [[khóa đầu, khóa cuối]] chỉ lấy các chặng có hướng này (mặc định mọi cặp điểm)
  *  onProgress:    (done, total) khi đang gọi TomTom
  */
-export async function buildMatrix({ points, profiles, maxAgeSeconds = defaultMaxAge(), onProgress }) {
+export async function buildMatrix({ points, profiles, maxAgeSeconds = defaultMaxAge(), pairs = null, onProgress }) {
   const mode = config.matrixSource;
   const keys = [...new Set(points.map(p => p.key))];
   const byKey = new Map(points.map(p => [p.key, p]));
   const known = new Map();
   const id = (profile, a, b) => `${profile}|${a}|${b}`;
+  const wanted = pairs && new Set(pairs.map(([a, b]) => `${a}|${b}`));
+  const needed = (a, b) => a !== b && (!wanted || wanted.has(`${a}|${b}`));
   const batchIds = new Set();
   const stats = { reused: 0, fetched: 0, estimated: 0, failed: 0, oldest: null, newest: null };
   const seen = t => {
@@ -75,7 +78,7 @@ export async function buildMatrix({ points, profiles, maxAgeSeconds = defaultMax
     [source, profiles, keys, maxAgeSeconds]);
   for (const r of rows) {
     const k = id(r.profile, r.origin_key, r.destination_key);
-    if (known.has(k)) continue;
+    if (known.has(k) || !needed(r.origin_key, r.destination_key)) continue;
     known.set(k, { seconds: r.travel_seconds, meters: r.distance_m, status: r.status });
     batchIds.add(r.batch_id);
     seen(r.fetched_at);
@@ -87,7 +90,7 @@ export async function buildMatrix({ points, profiles, maxAgeSeconds = defaultMax
   const missing = [];
   for (const profile of profiles) {
     for (const a of keys) for (const b of keys) {
-      if (a !== b && !known.has(id(profile, a, b))) missing.push({ profile, from: a, to: b });
+      if (needed(a, b) && !known.has(id(profile, a, b))) missing.push({ profile, from: a, to: b });
     }
   }
   const useTomTom = mode !== 'mock' && hasKey();
@@ -127,8 +130,31 @@ export async function buildMatrix({ points, profiles, maxAgeSeconds = defaultMax
     travel: (profile, a, b) => lookup(profile, a, b, 'seconds'),
     distance: (profile, a, b) => lookup(profile, a, b, 'meters'),
     batchIds: [...batchIds],
-    // Nguồn ghi theo dữ liệu thực dùng: toàn chặng ước lượng hoặc sự cố giả định thì không ghi là TomTom
-    stats: { ...stats, mode, source: mode === 'mock' || (!stats.fetched && stats.estimated && stats.reused === (stats.incident ?? 0)) ? 'mock' : 'tomtom', usedKey: useTomTom },
+    stats: { ...stats, mode, source: sourceOf(mode, stats), usedKey: useTomTom },
+  };
+}
+
+// Nguồn ghi theo dữ liệu thực dùng: chặng ước lượng nhiều bằng hoặc hơn chặng TomTom (lấy mới hoặc dùng lại,
+// không kể đợt sự cố giả định) thì ghi là ước lượng; ít hơn thì vẫn là TomTom và giao diện ghi số chặng ước lượng
+const sourceOf = (mode, s) => {
+  const tomtomLegs = s.fetched + s.reused - (s.incident ?? 0);
+  return mode === 'mock' || (s.estimated > 0 && s.estimated >= tomtomLegs) ? 'mock' : 'tomtom';
+};
+
+/** Gộp hai ma trận lấy cho hai nhóm chặng khác nhau: chặng nào có dữ liệu ở ma trận a thì dùng a, nếu không thì dùng b. */
+export function combineMatrices(a, b) {
+  const pick = field => (profile, x, y) => a[field](profile, x, y) ?? b[field](profile, x, y);
+  const s = { reused: 0, fetched: 0, estimated: 0, failed: 0 };
+  for (const k of Object.keys(s)) s[k] = a.stats[k] + b.stats[k];
+  if (a.stats.incident || b.stats.incident) s.incident = (a.stats.incident ?? 0) + (b.stats.incident ?? 0);
+  const times = [a.stats.oldest, a.stats.newest, b.stats.oldest, b.stats.newest].filter(Boolean).map(t => new Date(t));
+  s.oldest = times.length ? new Date(Math.min(...times)) : null;
+  s.newest = times.length ? new Date(Math.max(...times)) : null;
+  return {
+    travel: pick('travel'),
+    distance: pick('distance'),
+    batchIds: [...new Set([...a.batchIds, ...b.batchIds])],
+    stats: { ...s, mode: a.stats.mode, source: sourceOf(a.stats.mode, s), usedKey: a.stats.usedKey || b.stats.usedKey },
   };
 }
 
@@ -137,8 +163,11 @@ function defaultMaxAge() {
   return null;
 }
 
-/** Thời gian đã lưu gần nhất giữa các điểm (mọi nguồn), chỉ dùng để hiển thị giờ dự kiến, không gọi TomTom. */
-export async function cachedTravel(keys, profile) {
+/**
+ * Thời gian đã lưu gần nhất giữa các điểm (mọi nguồn), chỉ dùng để hiển thị giờ dự kiến, không gọi TomTom.
+ * withIncident = false bỏ qua các đợt "sự cố giả định", để công cụ mô phỏng tạo sự cố từ dữ liệu gốc.
+ */
+export async function cachedTravel(keys, profile, { withIncident = true } = {}) {
   const known = new Map();
   if (keys.length) {
     const { rows } = await query(
@@ -146,7 +175,8 @@ export async function cachedTravel(keys, profile) {
          FROM matrix_entries e JOIN matrix_batches b ON b.id = e.batch_id
         WHERE b.profile_snapshot->>'profile' = $1 AND e.status = 'ok'
           AND e.origin_key = ANY($2) AND e.destination_key = ANY($2)
-        ORDER BY e.origin_key, e.destination_key, e.fetched_at DESC`, [profile, keys]);
+          AND ($3::boolean OR b.profile_snapshot->>'scenario' IS DISTINCT FROM 'incident')
+        ORDER BY e.origin_key, e.destination_key, e.fetched_at DESC`, [profile, keys, withIncident]);
     for (const r of rows) known.set(`${r.origin_key}|${r.destination_key}`, r.travel_seconds);
   }
   return (a, b) => (a === b ? 0 : known.get(`${a}|${b}`) ?? null);

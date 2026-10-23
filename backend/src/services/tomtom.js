@@ -81,6 +81,11 @@ export async function batchRoutes(queries, { onProgress } = {}) {
         if (!retryable(status)) pending = [];
         continue;
       }
+      // Trả 200 nhưng nội dung không đúng dạng (ví dụ bị cắt giữa chừng) thì coi là lỗi tạm thời và gửi lại
+      if (!Array.isArray(data?.batchItems) || data.batchItems.length !== pending.length) {
+        for (const i of pending) out[i] = { ok: false, noRoute: false, error: `Phản hồi Batch Routing không hợp lệ ${errorText(data)}`.trim() };
+        continue;
+      }
       const again = [];
       data.batchItems.forEach((item, k) => {
         const i = pending[k];

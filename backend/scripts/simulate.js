@@ -23,7 +23,8 @@ import { readFileSync } from 'node:fs';
 import { pool, query } from '../src/db.js';
 import { cachedTravel, haversineM, pointKey } from '../src/services/matrix.js';
 import { loadVehicles, prepareSnapshot, runPlanning, vehicleProblem } from '../src/services/planning.js';
-import { routeGeometry } from '../src/services/tomtom.js';
+import { config } from '../src/config.js';
+import { hasKey, routeGeometry } from '../src/services/tomtom.js';
 import {
   acknowledgeRoute, approveReroute, closeTrip, commitPlan, evaluateTripReroute, loadTrip, recordAttempt, returnTrip, startTrip,
 } from '../src/services/trips.js';
@@ -118,7 +119,8 @@ async function createIncident(tripId, factor) {
   const key = s => pointKey('o', s.order.id, s.order.lat, s.order.lon);
   const profile = trip.vehicle.profile;
   const keys = [pointKey('d', trip.depot.id, trip.depot.lat, trip.depot.lon), ...remaining.map(key)];
-  const travel = await cachedTravel(keys, profile);
+  // Lấy thời gian gốc, bỏ qua các đợt sự cố trước để tạo sự cố nhiều lần không bị nhân dồn
+  const travel = await cachedTravel(keys, profile, { withIncident: false });
   const from = key(remaining[0]);
   const slow = key(remaining[1]);
   const { rows } = await query(
@@ -306,7 +308,11 @@ async function demo() {
     if (!tripIds.length) throw new Error('Không có chuyến nào đang chờ xuất phát hoặc đang giao, chạy prepare trước');
   }
   console.log(`Demo chuyến ${tripIds.join(', ')}, tua nhanh ${settings.speed} lần, chuyến ${tripIds[0]} sẽ gặp ùn tắc. Ctrl + C để dừng.`);
-  await Promise.all(tripIds.map((id, i) => runTrip(id, { ...settings, lead: i === 0 })));
+  // Chờ mọi chuyến chạy xong (kể cả khi một chuyến lỗi) rồi mới đóng kết nối cơ sở dữ liệu
+  const outcomes = await Promise.allSettled(tripIds.map((id, i) => runTrip(id, { ...settings, lead: i === 0 })));
+  const failed = outcomes.map((o, i) => [tripIds[i], o]).filter(([, o]) => o.status === 'rejected');
+  for (const [id, o] of failed) console.error(`Chuyến ${id} dừng do lỗi: ${o.reason?.message ?? o.reason}`);
+  if (failed.length) process.exitCode = 1;
 }
 
 async function prepare() {
@@ -349,7 +355,8 @@ async function prepare() {
   const run = (await query(
     `INSERT INTO planning_runs (created_by, input_snapshot, status, client_event_id, request_fingerprint)
      VALUES ($1, $2, 'running', $3, 'simulator') RETURNING id`, [dispatcher.id, snapshot, randomUUID()])).rows[0];
-  console.log(`Lập kế hoạch với ${vehicleIds.length} xe, lấy các chặng còn thiếu từ TomTom…`);
+  console.log(`Lập kế hoạch với ${vehicleIds.length} xe, ${hasKey() && config.matrixSource !== 'mock'
+    ? 'lấy các chặng còn thiếu từ TomTom…' : 'chưa có khóa TomTom (hoặc nguồn mock), các chặng còn thiếu được ước lượng…'}`);
   await runPlanning(run.id, snapshot);
   const done = (await query('SELECT status, result FROM planning_runs WHERE id = $1', [run.id])).rows[0];
   if (done.status !== 'draft') throw new Error(`Lập kế hoạch không thành công: ${done.result?.error ?? done.status}`);
