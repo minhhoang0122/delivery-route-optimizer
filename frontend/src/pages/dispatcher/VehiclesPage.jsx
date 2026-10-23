@@ -10,7 +10,6 @@ const COLUMNS = [
   { key: 'plate', title: 'Biển số', width: 180 },
   { key: 'type', title: 'Loại xe', width: 170 },
   { key: 'capacity', title: 'Tải trọng', width: 120 },
-  { key: 'profile', title: 'Cấu hình định tuyến', width: 190 },
   { key: 'status', title: 'Trạng thái', width: 200 },
   { key: 'actions', title: 'Thao tác', width: 268 },
 ]
@@ -38,7 +37,6 @@ export default function VehiclesPage() {
       plate: v => <div className="col"><span className="strong">{v.plate}</span><span className="caption muted">{v.driver?.name ?? 'Chưa có Driver'}</span></div>,
       type: v => <div className="row" style={{ gap: 8 }}>{v.type === 'motorcycle' ? <Bike size={18} /> : <Truck size={18} />}{VEHICLE_TYPE[v.type]}</div>,
       capacity: v => kg(v.capacityKg),
-      profile: v => <code>{v.routingProfile}</code>,
       status: v => v.status !== 'active' ? <Badge tone="warning">Bảo trì</Badge> : v.activeTrip ? <Badge tone="purple">Đang chạy chuyến</Badge> : <Badge tone="success">Sẵn sàng</Badge>,
       actions: v => (
         <div className="row" style={{ gap: 4 }}>
@@ -61,12 +59,12 @@ export default function VehiclesPage() {
         { value: 'small_truck', label: 'Xe tải nhỏ', count: vehicles.filter(v => v.type === 'small_truck').length },
       ]} />
       <ErrorBox error={error || (!edit && action.error)} onRetry={reload} />
-      {loading && !data ? <TableSkeleton columns={COLUMNS} /> : <Table columns={columns} rows={shown} />}
+      {loading && !data ? <TableSkeleton columns={COLUMNS} /> : <Table columns={columns} rows={shown} empty="Chưa có phương tiện" />}
 
       {edit && (
         <Dialog title={edit.id ? `Sửa xe ${edit.plate}` : 'Thêm phương tiện'} confirmLabel="Lưu" busy={action.busy} onCancel={() => setEdit(null)} onConfirm={save}>
           <Field label="Biển số"><input className="input" value={edit.plate} onChange={e => setEdit({ ...edit, plate: e.target.value })} maxLength={20} /></Field>
-          <Field label="Loại xe" helper="Xe máy dùng cấu hình motorcycle, xe tải nhỏ dùng cấu hình truck">
+          <Field label="Loại xe">
             <select className="select" value={edit.type} onChange={e => setEdit({ ...edit, type: e.target.value })}>
               <option value="motorcycle">Xe máy</option>
               <option value="small_truck">Xe tải nhỏ</option>

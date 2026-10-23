@@ -97,11 +97,8 @@ export default function AccountsPage() {
           confirmLabel={lockTarget.status === 'locked' ? 'Mở lại' : 'Khóa tài khoản'} busy={action.busy}
           onCancel={() => setLockTarget(null)} onConfirm={toggleLock}>
           {lockTarget.status === 'locked'
-            ? <p>{lockTarget.fullName || lockTarget.username} sẽ đăng nhập được trở lại.</p>
-            : <p>
-              {lockTarget.fullName || lockTarget.username} sẽ không đăng nhập được nữa.
-              {lockTarget.activeTrip && ` Khóa tài khoản không tự giải phóng chuyến đang giữ, Dispatcher cần xử lý chuyến ${lockTarget.activeTrip.code} trước.`}
-            </p>}
+            ? <p>{lockTarget.fullName || lockTarget.username} sẽ đăng nhập lại được.</p>
+            : <p>{lockTarget.fullName || lockTarget.username} sẽ không đăng nhập được{lockTarget.activeTrip ? ` · đang giữ chuyến ${lockTarget.activeTrip.code}` : ''}.</p>}
           <ErrorBox error={action.error} />
         </Dialog>
       )}

@@ -1,11 +1,12 @@
 // Khung ứng dụng Driver trên điện thoại. Giữ chuyến hiện tại, hàng đợi thao tác chờ gửi và việc chia sẻ vị trí
 // ở một chỗ để mọi màn hình Driver dùng chung (React Context).
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { History, LogOut, Navigation } from 'lucide-react'
-import { NavLink, Outlet } from 'react-router'
+import { History, KeyRound, LogOut, Navigation } from 'lucide-react'
+import { NavLink, Outlet, useLocation } from 'react-router'
 import { api, newEventId } from '../api.js'
 import { useAuth } from '../auth.jsx'
-import { cacheGet, cacheSet, flush, listOutbox, subscribe } from '../offline.js'
+import ErrorBoundary from '../components/ErrorBoundary.jsx'
+import { cacheGet, cacheSet, dropSettled, flush, listOwnOutbox, subscribe } from '../offline.js'
 import { DriverContext, useDriver } from './driverContext.js'
 
 
@@ -41,6 +42,7 @@ function useShareLocation(trip) {
 }
 
 function DriverProvider({ children }) {
+  const userId = useAuth().user.id
   const [trip, setTrip] = useState(undefined)
   const [serverTime, setServerTime] = useState(null)
   const [fromCache, setFromCache] = useState(false)
@@ -56,29 +58,32 @@ function DriverProvider({ children }) {
       setFromCache(false)
       setError(null)
       cacheSet('currentTrip', d.trip ?? null).catch(() => {})
+      dropSettled(d.trip, userId).catch(() => {})
     } catch (e) {
-      // Mất mạng: dùng chuyến đã tải trước đó để Driver vẫn xem được điểm kế tiếp
+      // Mất mạng: dùng chuyến đã tải trước đó để Driver vẫn xem được điểm kế tiếp.
+      // Không có bản đã lưu, hoặc máy chủ từ chối (403…): báo lỗi thay vì để màn hình chờ mãi
       if (e.status === 0 || e.status >= 500) {
         const cached = await cacheGet('currentTrip').catch(() => undefined)
-        if (cached !== undefined) { setTrip(t => (t === undefined ? cached : t)); setFromCache(true) }
+        if (cached !== undefined) { setTrip(t => (t === undefined ? cached : t)); setFromCache(true); setError(null) }
+        else setError(e)
       } else setError(e)
     }
-  }, [])
+  }, [userId])
 
-  const refreshOutbox = useCallback(() => listOutbox().then(setOutbox).catch(() => {}), [])
+  const refreshOutbox = useCallback(() => listOwnOutbox(userId).then(setOutbox).catch(() => {}), [userId])
 
   const sync = useCallback(async () => {
-    await flush()
+    await flush({ userId })
     await refreshOutbox()
     await reload()
-  }, [refreshOutbox, reload])
+  }, [userId, refreshOutbox, reload])
 
   // Nút Thử lại: gửi lại cả các kết quả máy chủ đã từ chối
   const retry = useCallback(async () => {
-    await flush({ retryFailed: true })
+    await flush({ userId, retryFailed: true })
     await refreshOutbox()
     await reload()
-  }, [refreshOutbox, reload])
+  }, [userId, refreshOutbox, reload])
 
   useEffect(() => {
     // reload và refreshOutbox chỉ đặt state sau khi chờ mạng hoặc IndexedDB, không gây render dây chuyền
@@ -111,7 +116,7 @@ function DriverProvider({ children }) {
     return { ...trip, stops, nextStopId: trip.status === 'in_progress' ? next?.id ?? null : null }
   }, [trip, outbox])
 
-  const value = { trip: view, rawTrip: trip, reload, sync, retry, outbox, online, fromCache, serverTime, location, error, setTrip }
+  const value = { trip: view, rawTrip: trip, userId, reload, sync, retry, outbox, online, fromCache, serverTime, location, error, setTrip }
   return <DriverContext.Provider value={value}>{children}</DriverContext.Provider>
 }
 
@@ -137,6 +142,7 @@ export function DriverScreen({ title, subtitle, back, footer, children }) {
           {subtitle && <span className="caption muted">{subtitle}</span>}
         </div>
         <SyncIndicator />
+        <NavLink to="/account/password" className="btn ghost icon-only" title="Đổi mật khẩu"><KeyRound size={18} /></NavLink>
         <button type="button" className="btn ghost icon-only" title="Đăng xuất" onClick={logout}><LogOut size={18} /></button>
       </header>
       <main className="mobile-body">{children}</main>
@@ -153,9 +159,10 @@ export function DriverScreen({ title, subtitle, back, footer, children }) {
 }
 
 export default function DriverLayout() {
+  const { pathname } = useLocation()
   return (
     <DriverProvider>
-      <div className="mobile"><Outlet /></div>
+      <div className="mobile"><ErrorBoundary resetKey={pathname}><Outlet /></ErrorBoundary></div>
     </DriverProvider>
   )
 }

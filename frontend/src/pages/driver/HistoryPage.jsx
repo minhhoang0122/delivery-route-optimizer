@@ -5,7 +5,7 @@ import { Link, useNavigate, useParams } from 'react-router'
 import { api } from '../../api.js'
 import { useAuth } from '../../auth.jsx'
 import { DriverScreen } from '../../layouts/DriverLayout.jsx'
-import { Chips, Empty, ErrorBox, Loading, StatusBadge, StopItem } from '../../components/ui.jsx'
+import { Chips, Empty, ErrorBox, Loading, LoadError, StatusBadge, StopItem } from '../../components/ui.jsx'
 import { stopState } from '../../components/tripMap.js'
 import { kg, longDate, time, TRIP_STATUS, VEHICLE_TYPE } from '../../format.js'
 import { useLoad } from '../../hooks.js'
@@ -42,12 +42,12 @@ export default function HistoryPage() {
 export function HistoryDetailPage() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { data, error, loading } = useLoad(() => api(`/driver/trips/${id}`), [id])
+  const { data, error, loading, reload } = useLoad(() => api(`/driver/trips/${id}`), [id])
   const t = data?.trip
   const back = <button type="button" className="btn ghost icon-only" onClick={() => navigate('/driver/history')} title="Quay lại"><ChevronLeft size={22} /></button>
   return (
     <DriverScreen title={t ? `Chuyến ${t.code}` : 'Chuyến'} subtitle={t && `${VEHICLE_TYPE[t.vehicle.type]} ${t.vehicle.plate} · ${t.progress.done}/${t.progress.total} điểm`} back={back}>
-      <ErrorBox error={error} />
+      <LoadError error={error} onRetry={reload} notFound="Không tìm thấy chuyến" back="/driver/history" backLabel="Về lịch sử chuyến" />
       {loading && !t && <Loading />}
       {t && (
         <>

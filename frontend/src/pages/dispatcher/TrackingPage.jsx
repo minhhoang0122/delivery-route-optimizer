@@ -82,7 +82,7 @@ export default function TrackingPage() {
       <ErrorBox error={all.error} onRetry={all.reload} />
       <div className="console">
         <div className="panel-col">
-          {trips.length === 0 && <Card><Empty icon={Navigation} title="Không có chuyến nào">Chưa có chuyến ở trạng thái này.</Empty></Card>}
+          {trips.length === 0 && <Card><Empty icon={Navigation} title="Không có chuyến" /></Card>}
           {trips.map(t => <TripCard key={t.id} t={t} now={now} />)}
         </div>
         <div className="map-col">

@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { api } from '../../api.js'
 import { Chips, ErrorBox, Field, PageHeader, StatusBadge, Table, TableSkeleton } from '../../components/ui.jsx'
-import { kg, ORDER_STATUS, time, truckOnly, vehicleTypes } from '../../format.js'
+import { kg, ORDER_STATUS, truckOnly, vehicleTypes } from '../../format.js'
 import { useLoad } from '../../hooks.js'
 
 const COLUMNS = [
@@ -52,7 +52,7 @@ export default function OrdersPage() {
 
   return (
     <>
-      <PageHeader title="Đơn hàng" subtitle={`Đơn giao tại Kho Hải Châu · cập nhật lúc ${time(new Date())}`}
+      <PageHeader title="Đơn hàng"
         actions={<Link className="btn primary" to="/dispatcher/orders/new"><Plus size={18} /> Tạo đơn</Link>} />
       <div className="row between wrap" style={{ alignItems: 'flex-end' }}>
         <Chips value={filter} onChange={setFilter}

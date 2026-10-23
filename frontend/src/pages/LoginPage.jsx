@@ -36,7 +36,6 @@ export default function LoginPage() {
         <div className="col" style={{ alignItems: 'center', gap: 12, textAlign: 'center' }}>
           <span className="brand-logo" style={{ width: 40, height: 40 }}><Truck size={22} /></span>
           <h1 className="h2">Điều hành giao hàng</h1>
-          <p className="secondary">Đăng nhập để tiếp tục</p>
         </div>
         <div className="stack">
           <Field label="Tên đăng nhập">

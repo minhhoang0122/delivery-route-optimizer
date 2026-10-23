@@ -1,12 +1,12 @@
 // D12 Đối chiếu và chốt chuyến (UC08, UC09). Báo về kho của Driver không tự chốt chuyến;
 // chỉ đối chiếu hợp lệ mới giải phóng đơn, xe và Driver.
 import { CircleCheck, Package, TriangleAlert } from 'lucide-react'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router'
 import { api, newEventId } from '../../api.js'
-import { Alert, Badge, Button, Card, Checkbox, ErrorBox, Loading, Metric, PageHeader, Radio, StatusBadge, StopItem, Table } from '../../components/ui.jsx'
+import { Alert, Badge, Button, Card, Checkbox, ErrorBox, Loading, LoadError, Metric, PageHeader, Radio, StatusBadge, StopItem, Table } from '../../components/ui.jsx'
 import { kg, time, TRIP_STATUS } from '../../format.js'
-import { useAction, useLoad } from '../../hooks.js'
+import { LIVE_MS, useAction, useLoad } from '../../hooks.js'
 
 export default function ReconcilePage() {
   const { id } = useParams()
@@ -16,20 +16,27 @@ export default function ReconcilePage() {
   const [matched, setMatched] = useState(false)
   const action = useAction()
   const closeId = useRef(newEventId())
+  // Chờ đối chiếu thì tải lại theo chu kỳ để thấy kết quả Driver gửi muộn; lựa chọn đang làm dở được giữ nguyên
+  const live = data?.trip?.status === 'awaiting_reconciliation'
+  useEffect(() => {
+    if (!live) return undefined
+    const timer = setInterval(reload, LIVE_MS)
+    return () => clearInterval(timer)
+  }, [live, reload])
   if (loading && !data) return <Loading />
   const t = data?.trip
-  if (!t) return <ErrorBox error={error} onRetry={reload} />
+  if (!t) return <LoadError error={error} onRetry={reload} notFound="Không tìm thấy chuyến" back="/dispatcher/trips" />
 
   const failed = t.stops.filter(s => s.status === 'failed')
   const pending = t.stops.filter(s => s.status === 'pending')
   const returned = new Set(t.returnReport?.returnedOrderIds ?? [])
   const undecided = failed.filter(s => !decisions[s.order.id])
   const blockers = [
-    t.status !== 'awaiting_reconciliation' && (t.status === 'closed' ? null : 'Driver chưa báo về kho, chuyến chưa ở trạng thái chờ đối chiếu.'),
-    pending.length > 0 && `Điểm ${pending.map(s => `${s.seq} (${s.order.code})`).join(', ')} chưa có kết quả giao. Driver cần đồng bộ kết quả trước khi đối chiếu.`,
-    undecided.length > 0 && `Còn ${undecided.length} đơn chưa có quyết định (${undecided.map(s => s.order.code).join(', ')}).`,
-    !matched && failed.length > 0 && 'Chưa xác nhận hàng thực tế tại kho khớp với báo cáo của Driver.',
-    !matched && failed.length === 0 && 'Chưa xác nhận không có sai lệch.',
+    t.status !== 'awaiting_reconciliation' && (t.status === 'closed' ? null : 'Driver chưa báo về kho'),
+    pending.length > 0 && `Còn ${pending.length} điểm chưa có kết quả`,
+    undecided.length > 0 && `Chưa chọn xử lý cho ${undecided.length} đơn`,
+    !matched && failed.length > 0 && 'Chưa xác nhận hàng khớp',
+    !matched && failed.length === 0 && 'Chưa xác nhận không có sai lệch',
   ].filter(Boolean)
 
   async function close() {
@@ -63,7 +70,7 @@ export default function ReconcilePage() {
         subtitle={`${t.driver.name}${t.returnedAt ? ` · về kho lúc ${time(t.returnedAt)}` : ''}`} />
       <ErrorBox error={error} onRetry={reload} />
       <div className="grid-metrics">
-        <Metric label="Đã giao" value={t.progress.delivered} hint={`${t.progress.delivered}/${t.progress.total} điểm giao thành công`} icon={CircleCheck} />
+        <Metric label="Đã giao" value={t.progress.delivered} icon={CircleCheck} />
         <Metric label="Chưa giao được" value={failed.length} hint={[...new Set(failed.map(s => s.attempt?.reason))].join(', ') || 'Không có'} icon={TriangleAlert} tone={failed.length ? 'warning' : undefined} />
         <Metric label="Hàng mang về" value={`${returned.size} kiện`} hint={t.returnedAt ? `Driver báo về kho lúc ${time(t.returnedAt)}` : 'Chưa có báo cáo về kho'} icon={Package} />
       </div>
@@ -95,13 +102,8 @@ export default function ReconcilePage() {
             <Card title="Không có đơn chưa giao được" />
           )}
           <Card title="Kiểm hàng mang về">
-            <p className="caption muted">
-              {failed.length ? `${returned.size} kiện theo báo cáo của Driver: ${[...returned].map(oid => t.stops.find(s => s.order.id === oid)?.order.code).join(', ') || 'không có'}.` : 'Không có kiện nào phải mang về.'}
-            </p>
             {failed.some(s => !returned.has(s.order.id)) && (
-              <Alert tone="warning" title="Báo cáo của Driver thiếu kiện">
-                {failed.filter(s => !returned.has(s.order.id)).map(s => `${s.order.code} (${kg(s.order.weightKg)})`).join(', ')} chưa được Driver đánh dấu mang về.
-              </Alert>
+              <Alert tone="warning" title={`Báo cáo về kho thiếu kiện ${failed.filter(s => !returned.has(s.order.id)).map(s => s.order.code).join(', ')}`} />
             )}
             <Checkbox label={failed.length ? 'Hàng thực tế tại kho khớp với báo cáo của Driver' : 'Xác nhận không có sai lệch'} checked={matched} onChange={setMatched} />
           </Card>
@@ -115,7 +117,7 @@ export default function ReconcilePage() {
       <ErrorBox error={action.error} />
       <div className="row">
         <div className="grow">{blockers.length > 0
-          ? <Alert tone="danger" title="Chưa thể chốt chuyến">{blockers.join(' ')}</Alert>
+          ? <Alert tone="danger" title="Chưa thể chốt chuyến">{blockers.join(' · ')}</Alert>
           : <Alert tone="success" title="Đủ điều kiện chốt chuyến" />}</div>
         <Button onClick={close} disabled={blockers.length > 0} loading={action.busy}>Chốt chuyến</Button>
       </div>

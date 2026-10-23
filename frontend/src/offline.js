@@ -37,7 +37,10 @@ export const subscribe = fn => { listeners.add(fn); return () => listeners.delet
 export const listOutbox = async () =>
   ((await tx('outbox', 'readonly', s => s.getAll())) || []).sort((a, b) => a.createdAt.localeCompare(b.createdAt))
 
-/** Thêm thao tác vào hàng đợi. item: { clientEventId, path, body, tripId, stopId, kind, label } */
+/**
+ * Thêm thao tác vào hàng đợi. item: { clientEventId, userId, path, body, tripId, stopId, kind, label }
+ * userId: người tạo thao tác; đăng xuất rồi người khác đăng nhập trên cùng máy thì thao tác vẫn được giữ nhưng không gửi.
+ */
 export async function enqueue(item) {
   await tx('outbox', 'readwrite', s => s.put({ ...item, createdAt: new Date().toISOString(), state: 'pending', error: null }))
   notify()
@@ -56,27 +59,47 @@ export async function removeItem(id) {
   notify()
 }
 
+// Thao tác ghi trước khi có userId (bản cũ) được coi là của người đang đăng nhập
+const ownedBy = (item, userId) => (item.userId ?? userId) === userId
+
+/** Hàng đợi của một người dùng. */
+export const listOwnOutbox = async userId => (await listOutbox()).filter(x => ownedBy(x, userId))
+
+/**
+ * Bỏ các kết quả máy chủ đã từ chối (409) cho điểm dừng mà máy chủ đã có kết quả cuối:
+ * không còn gì để gửi nên không để Driver phải tự xóa.
+ */
+export async function dropSettled(trip, userId) {
+  if (!trip) return
+  const settled = new Set(trip.stops.filter(s => s.status !== 'pending').map(s => s.id))
+  for (const x of await listOwnOutbox(userId)) {
+    if (x.kind === 'attempt' && x.state === 'failed' && x.errorStatus === 409 && x.tripId === trip.id && settled.has(x.stopId)) {
+      await removeItem(x.clientEventId)
+    }
+  }
+}
+
 let flushing = null
 
 /**
  * Gửi các thao tác chờ theo thứ tự. Mất mạng thì dừng và giữ nguyên hàng đợi.
  * Máy chủ trả lỗi nghiệp vụ (xung đột, sai dữ liệu) thì giữ lại thao tác với trạng thái lỗi để Driver xử lý.
- * retryFailed: gửi lại cả các thao tác đã lỗi (nút Thử lại).
+ * Chỉ gửi thao tác của userId (người đang đăng nhập). retryFailed: gửi lại cả các thao tác đã lỗi (nút Thử lại).
  */
-export function flush({ retryFailed = false } = {}) {
+export function flush({ userId, retryFailed = false } = {}) {
   flushing ??= (async () => {
     try {
-      for (const item of await listOutbox()) {
+      for (const item of await listOwnOutbox(userId)) {
         if (item.state === 'failed' && !retryFailed) continue
         await update(item.clientEventId, { state: 'sending' })
         try {
           await api(item.path, { method: 'POST', body: item.body })
           await removeItem(item.clientEventId)
         } catch (e) {
-          // Mất mạng, máy chủ tạm lỗi (5xx) hoặc phiên hết hạn (401, gửi lại sau khi đăng nhập lại):
+          // Mất mạng, máy chủ tạm lỗi (5xx), phiên hết hạn (401) hoặc tài khoản bị khóa (gửi lại sau khi đăng nhập lại):
           // giữ nguyên để gửi lại sau, theo đúng thứ tự
-          if (e.status === 0 || e.status === 401 || e.status >= 500) { await update(item.clientEventId, { state: 'pending' }); break }
-          await update(item.clientEventId, { state: 'failed', error: e.message })
+          if (e.status === 0 || e.status === 401 || e.status >= 500 || e.code === 'ACCOUNT_LOCKED') { await update(item.clientEventId, { state: 'pending' }); break }
+          await update(item.clientEventId, { state: 'failed', error: e.message, errorStatus: e.status })
         }
       }
     } finally {
@@ -88,3 +111,4 @@ export function flush({ retryFailed = false } = {}) {
 
 export const cacheSet = (key, value) => tx('cache', 'readwrite', s => s.put(value, key))
 export const cacheGet = key => tx('cache', 'readonly', s => s.get(key))
+export const cacheDelete = key => tx('cache', 'readwrite', s => s.delete(key))

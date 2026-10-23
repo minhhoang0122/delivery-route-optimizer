@@ -1,6 +1,7 @@
 // Trạng thái đăng nhập dùng chung cho toàn ứng dụng (React Context).
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { api, getToken, setToken, setUnauthorizedHandler } from './api.js'
+import { cacheDelete } from './offline.js'
 
 const AuthContext = createContext(null)
 const USER_KEY = 'lastmile.user'
@@ -16,6 +17,9 @@ export function AuthProvider({ children }) {
   const setUser = useCallback(u => { cacheUser(u); setUserState(u) }, [])
 
   const logout = useCallback(() => {
+    // Xóa chuyến đã lưu trên máy của Driver để người đăng nhập sau không xem được.
+    // Hàng đợi kết quả chờ gửi vẫn giữ (mỗi thao tác ghi userId), chỉ gửi khi đúng Driver đó đăng nhập lại
+    if (cachedUser()?.role === 'driver') cacheDelete('currentTrip').catch(() => {})
     setToken(null)
     setUser(null)
   }, [setUser])

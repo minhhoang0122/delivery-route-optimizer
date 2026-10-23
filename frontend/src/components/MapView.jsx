@@ -30,8 +30,12 @@ export default function MapView({ height = 480, depot, routes = [], stops = [], 
   const box = useRef(null)
   const map = useRef(null)
   const layer = useRef(null)
+  const carLayer = useRef(null)
   const cars = useRef(new Map())
   const fitted = useRef(null)
+  // Chữ ký của lớp tĩnh (tuyến, điểm dừng, kho, ghim) đã vẽ: trang vẽ lại mỗi giây (đồng hồ "x giây trước")
+  // nhưng dữ liệu không đổi thì không xóa và vẽ lại
+  const drawn = useRef(null)
   const click = useRef(onClick)
   useEffect(() => { click.current = onClick })
 
@@ -39,8 +43,7 @@ export default function MapView({ height = 480, depot, routes = [], stops = [], 
     const m = L.map(box.current, { zoomControl: true, attributionControl: true }).setView(DA_NANG, 13)
     map.current = m
     layer.current = L.layerGroup().addTo(m)
-    const carLayer = L.layerGroup().addTo(m)
-    cars.current.layer = carLayer
+    carLayer.current = L.layerGroup().addTo(m)
     m.on('click', e => click.current?.({ lat: e.latlng.lat, lon: e.latlng.lng }))
     const addTiles = src => {
       // Lần tải nguồn ô bản đồ có thể xong sau khi bản đồ đã bị gỡ (ví dụ khi chuyển trang)
@@ -56,7 +59,11 @@ export default function MapView({ height = 480, depot, routes = [], stops = [], 
     return () => {
       for (const c of carMap.values()) cancelAnimationFrame(c.frame)
       carMap.clear()
-      m.remove(); map.current = null
+      // Dừng hiệu ứng zoom đang chạy trước khi gỡ, nếu không Leaflet báo lỗi _leaflet_pos khi rời trang giữa lúc căn khung
+      m.stop(); m.remove(); map.current = null
+      // StrictMode gắn lại bản đồ mới: phải vẽ và căn khung nhìn lại từ đầu
+      fitted.current = null
+      drawn.current = null
     }
   }, [])
 
@@ -64,23 +71,35 @@ export default function MapView({ height = 480, depot, routes = [], stops = [], 
     // Effect tạo bản đồ ở trên chạy trước effect này trong cùng lần gắn, nên map.current đã có
     if (!map.current) return
     const g = layer.current
-    g.clearLayers()
     const bounds = []
-    for (const r of routes) {
-      if (!r.points?.length) continue
-      L.polyline(r.points, { color: r.color, weight: r.weight ?? 4, opacity: r.opacity ?? 0.9, dashArray: r.dashed ? '8 8' : null }).addTo(g)
-      bounds.push(...r.points)
-    }
-    for (const s of stops) {
-      const bg = STOP_COLORS[s.state] || s.color || '#1f5fae'
-      L.marker([s.lat, s.lon], { icon: icon(`<div class="marker-stop" style="background:${bg}">${esc(s.label)}</div>`, 26), title: s.title })
-        .addTo(g).bindTooltip(esc(s.title || s.label))
-      bounds.push([s.lat, s.lon])
-    }
-    if (depot) {
-      L.marker([depot.lat, depot.lon], { icon: icon(`<div class="marker-depot">${WAREHOUSE_SVG}</div>`, 30), zIndexOffset: 500 })
-        .addTo(g).bindTooltip(esc(depot.name || 'Kho'))
-      bounds.push([depot.lat, depot.lon])
+    for (const r of routes) if (r.points?.length) bounds.push(...r.points)
+    for (const s of stops) bounds.push([s.lat, s.lon])
+    if (depot) bounds.push([depot.lat, depot.lon])
+    const sig = JSON.stringify([
+      routes.map(r => [r.points, r.color, r.weight, r.opacity, r.dashed]),
+      stops.map(s => [s.lat, s.lon, s.label, s.title, s.color, s.state]),
+      depot && [depot.lat, depot.lon, depot.name],
+      pin && [pin.lat, pin.lon],
+    ])
+    if (drawn.current !== sig) {
+      drawn.current = sig
+      g.clearLayers()
+      for (const r of routes) {
+        if (!r.points?.length) continue
+        L.polyline(r.points, { color: r.color, weight: r.weight ?? 4, opacity: r.opacity ?? 0.9, dashArray: r.dashed ? '8 8' : null }).addTo(g)
+      }
+      for (const s of stops) {
+        const bg = STOP_COLORS[s.state] || s.color || '#1f5fae'
+        L.marker([s.lat, s.lon], { icon: icon(`<div class="marker-stop" style="background:${bg}">${esc(s.label)}</div>`, 26), title: s.title })
+          .addTo(g).bindTooltip(esc(s.title || s.label))
+      }
+      if (depot) {
+        L.marker([depot.lat, depot.lon], { icon: icon(`<div class="marker-depot">${WAREHOUSE_SVG}</div>`, 30), zIndexOffset: 500 })
+          .addTo(g).bindTooltip(esc(depot.name || 'Kho'))
+      }
+      if (pin) {
+        L.marker([pin.lat, pin.lon], { icon: L.divIcon({ html: '<div class="marker-pin"></div>', className: '', iconSize: [28, 28], iconAnchor: [14, 28] }) }).addTo(g)
+      }
     }
     // Xe giữ nguyên marker giữa các lần tải lại và trượt tới vị trí mới, mũi tên xoay theo hướng chạy
     const seen = new Set()
@@ -92,13 +111,16 @@ export default function MapView({ height = 480, depot, routes = [], stops = [], 
       const to = L.latLng(v.lat, v.lon)
       let c = cars.current.get(key)
       if (!c) {
-        const marker = L.marker(to, { icon: icon(html, 34), zIndexOffset: 1000 }).addTo(cars.current.layer)
+        const marker = L.marker(to, { icon: icon(html, 34), zIndexOffset: 1000 }).addTo(carLayer.current)
           .bindTooltip(esc(v.label || 'Xe'), { permanent: Boolean(v.label), direction: 'top', offset: [0, -16] })
-        c = { marker, html, frame: 0 }
+        c = { marker, html, frame: 0, target: to }
         cars.current.set(key, c)
       } else {
         if (c.html !== html) { c.marker.setIcon(icon(html, 34)); c.html = html }
         c.marker.setTooltipContent(esc(v.label || 'Xe'))
+        // Vị trí không đổi (chỉ đồng hồ trên trang chạy): để xe trượt tiếp tới đích cũ, không bắt đầu lại
+        if (c.target.equals(to)) { bounds.push([v.lat, v.lon]); return }
+        c.target = to
         cancelAnimationFrame(c.frame)
         const from = c.marker.getLatLng()
         const ms = Math.min(LIVE_MS, 3000)
@@ -113,15 +135,12 @@ export default function MapView({ height = 480, depot, routes = [], stops = [], 
       bounds.push([v.lat, v.lon])
     })
     for (const [key, c] of cars.current) {
-      if (key === 'layer' || seen.has(key)) continue
+      if (seen.has(key)) continue
       cancelAnimationFrame(c.frame)
       c.marker.remove()
       cars.current.delete(key)
     }
-    if (pin) {
-      L.marker([pin.lat, pin.lon], { icon: L.divIcon({ html: '<div class="marker-pin"></div>', className: '', iconSize: [28, 28], iconAnchor: [14, 28] }) }).addTo(g)
-      bounds.push([pin.lat, pin.lon])
-    }
+    if (pin) bounds.push([pin.lat, pin.lon])
     const key = fitKey ?? 'once'
     if (fitted.current !== key && bounds.length) {
       fitted.current = key

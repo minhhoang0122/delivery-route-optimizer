@@ -12,9 +12,7 @@ export default function ForbiddenPage({ needRole }) {
         <span className="icon-wrap tone-neutral-bg" style={{ width: 80, height: 80 }}><Lock size={40} /></span>
         <div className="stack-sm">
           <h1 className="h3">Bạn không có quyền truy cập trang này</h1>
-          <p className="secondary">
-            Trang này dành cho {needRole ? ROLE[needRole] : 'vai trò khác'}. Tài khoản {user.username} đang đăng nhập với vai trò {ROLE[user.role]}.
-          </p>
+          <p className="secondary">{user.username} · {ROLE[user.role]}{needRole ? ` · trang dành cho ${ROLE[needRole]}` : ''}</p>
         </div>
         <Link className="btn primary" to={HOME[user.role]}>Về trang của tôi</Link>
       </div>

@@ -63,12 +63,12 @@ export default function DriversPage() {
         { value: 'inactive', label: 'Ngừng hoạt động', count: drivers.filter(d => driverState(d) === 'inactive').length },
       ]} />
       <ErrorBox error={error} onRetry={reload} />
-      {loading && !data ? <TableSkeleton columns={COLUMNS} /> : <Table columns={columns} rows={shown} />}
+      {loading && !data ? <TableSkeleton columns={COLUMNS} /> : <Table columns={columns} rows={shown} empty="Chưa có Driver" />}
 
       {edit && (
         <Dialog title={edit.id ? 'Sửa hồ sơ Driver' : 'Thêm Driver'} confirmLabel="Lưu" busy={action.busy} onCancel={() => setEdit(null)} onConfirm={save}>
           {!edit.id && (
-            <Field label="Tài khoản Driver" helper="Tài khoản vai trò Driver chưa có hồ sơ">
+            <Field label="Tài khoản Driver">
               <select className="select" value={edit.userId} onChange={e => {
                 const a = data.availableAccounts.find(x => x.id === Number(e.target.value))
                 setEdit({ ...edit, userId: e.target.value, fullName: a?.fullName ?? edit.fullName })
@@ -79,7 +79,7 @@ export default function DriversPage() {
           )}
           <Field label="Họ tên"><input className="input" value={edit.fullName} onChange={e => setEdit({ ...edit, fullName: e.target.value })} /></Field>
           <Field label="Số điện thoại"><input className="input" value={edit.phone} onChange={e => setEdit({ ...edit, phone: e.target.value })} inputMode="tel" /></Field>
-          <Field label="Phương tiện thường dùng" helper="Khi lập kế hoạch, mỗi xe đi cùng Driver thường dùng của xe đó">
+          <Field label="Phương tiện thường dùng">
             <select className="select" value={edit.defaultVehicleId} onChange={e => setEdit({ ...edit, defaultVehicleId: e.target.value })}>
               <option value="">Chưa gán</option>
               {data.vehicles.map(v => (

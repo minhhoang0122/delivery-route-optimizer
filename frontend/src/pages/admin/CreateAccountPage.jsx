@@ -1,16 +1,9 @@
 // A03 Cấp tài khoản (UC01.1).
-import { Info, Route, Shield, Bike } from 'lucide-react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import { api } from '../../api.js'
-import { Button, Card, ErrorBox, Field, PageHeader } from '../../components/ui.jsx'
+import { Button, ErrorBox, Field, PageHeader } from '../../components/ui.jsx'
 import { useAction } from '../../hooks.js'
-
-const ROLE_NOTES = [
-  ['Administrator', Shield, 'tone-neutral-bg', 'Cấp tài khoản, gán hoặc đổi vai trò, khóa và mở lại tài khoản. Không tham gia điều phối giao hàng.'],
-  ['Dispatcher', Route, 'tone-info', 'Quản lý đơn, Driver, phương tiện và kho. Lập kế hoạch, giao chuyến, duyệt đổi tuyến, đối chiếu và chốt chuyến.'],
-  ['Driver', Bike, 'tone-success-bg', 'Chỉ xem chuyến được giao cho mình. Kiểm hàng, ghi kết quả từng điểm và báo về kho khi kết thúc chuyến.'],
-]
 
 export default function CreateAccountPage() {
   const navigate = useNavigate()
@@ -43,15 +36,10 @@ export default function CreateAccountPage() {
                 <option value="administrator">Administrator</option>
               </select>
             </Field>
-            <Field label="Mật khẩu ban đầu" helper="Người dùng sẽ được yêu cầu đổi mật khẩu ở lần đăng nhập đầu">
+            <Field label="Mật khẩu ban đầu" helper="Ít nhất 8 ký tự">
               <input className="input" type="password" autoComplete="new-password" value={form.password} onChange={set('password')} required minLength={8} />
             </Field>
           </div>
-          {form.role === 'driver' && (
-            <div className="alert info"><Info size={18} className="alert-icon" />
-              <span className="alert-message">Driver mới cần được Dispatcher khai báo hồ sơ và phương tiện trước khi nhận chuyến.</span>
-            </div>
-          )}
           <ErrorBox error={action.error} />
           <hr className="divider" />
           <div className="row end">
@@ -59,20 +47,6 @@ export default function CreateAccountPage() {
             <Button type="submit" loading={action.busy}>Cấp tài khoản</Button>
           </div>
         </form>
-        <Card title="Quyền theo vai trò" style={{ width: 440, maxWidth: '100%' }}>
-          {ROLE_NOTES.map(([name, Icon, tone, desc], i) => (
-            <div key={name} className="stack">
-              {i > 0 && <hr className="divider" />}
-              <div className="row top">
-                <span className={`icon-wrap ${tone}`} style={{ borderRadius: 3 }}><Icon size={20} /></span>
-                <div className="col">
-                  <span className="strong">{name}</span>
-                  <span className="secondary">{desc}</span>
-                </div>
-              </div>
-            </div>
-          ))}
-        </Card>
       </div>
     </>
   )

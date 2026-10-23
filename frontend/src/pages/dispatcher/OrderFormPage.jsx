@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
 import { api } from '../../api.js'
 import MapView from '../../components/MapView.jsx'
-import { Button, Card, Checkbox, ErrorBox, Field, Loading, PageHeader } from '../../components/ui.jsx'
+import { Alert, Button, Card, Checkbox, Dialog, ErrorBox, Field, Loading, LoadError, PageHeader } from '../../components/ui.jsx'
 import { useAction, useLoad } from '../../hooks.js'
 
 const EMPTY = { code: '', recipientName: '', phone: '', address: '', weightKg: '', note: '', lat: null, lon: null, vehicleTypes: ['motorcycle', 'small_truck'] }
@@ -13,7 +13,9 @@ export default function OrderFormPage() {
   const { id } = useParams()
   const depot = useLoad(() => api('/depots'))
   const existing = useLoad(() => (id ? api(`/orders/${id}`) : Promise.resolve(null)), [id])
-  if (id && (existing.loading || !existing.data)) return existing.error ? <ErrorBox error={existing.error} /> : <Loading />
+  if (id && (existing.loading || !existing.data)) {
+    return existing.error ? <LoadError error={existing.error} onRetry={existing.reload} notFound="Không tìm thấy đơn" back="/dispatcher/orders" /> : <Loading />
+  }
   const order = existing.data?.order
   const initial = order ? { ...order, weightKg: String(order.weightKg).replace('.', ','), note: order.note ?? '' } : EMPTY
   return <OrderForm key={id ?? 'new'} id={id} order={order} initial={initial} depot={depot.data?.depots[0]} />
@@ -24,6 +26,7 @@ function OrderForm({ id, order, initial, depot: d }) {
   const [form, setForm] = useState(initial)
   const [touched, setTouched] = useState(false)
   const [results, setResults] = useState(null)
+  const [confirmCancel, setConfirmCancel] = useState(false)
   const save = useAction()
   const search = useAction()
   const readOnly = order && order.status !== 'pending'
@@ -56,11 +59,11 @@ function OrderForm({ id, order, initial, depot: d }) {
     <form className="stack-lg" onSubmit={submit}>
       <PageHeader title={id ? `Sửa đơn ${order?.code ?? ''}` : 'Tạo đơn hàng'}
         actions={<>
-          {id && !readOnly && <Button variant="secondary" onClick={cancelOrder} disabled={save.busy}>Hủy đơn</Button>}
+          {id && !readOnly && <Button variant="secondary" onClick={() => { save.setError(null); setConfirmCancel(true) }} disabled={save.busy}>Hủy đơn</Button>}
           <Button variant="secondary" onClick={() => navigate('/dispatcher/orders')}>Quay lại</Button>
           {!readOnly && <Button type="submit" loading={save.busy}>Lưu đơn</Button>}
         </>} />
-      {readOnly && <ErrorBox error={{ message: 'Đơn đã vào kế hoạch nên không sửa được. Chỉ sửa đơn đang chờ xếp.' }} />}
+      {readOnly && <Alert tone="warning" title="Đơn đã vào kế hoạch, không sửa được" />}
       <ErrorBox error={save.error} />
       <div className="grid-2">
         <Card title="Thông tin đơn">
@@ -68,9 +71,9 @@ function OrderForm({ id, order, initial, depot: d }) {
             <Field label="Mã đơn"><input className="input" value={form.code} onChange={set('code')} required maxLength={20} placeholder="DH-1050" /></Field>
             <Field label="Người nhận"><input className="input" value={form.recipientName} onChange={set('recipientName')} required maxLength={100} /></Field>
             <Field label="Số điện thoại"><input className="input" value={form.phone} onChange={set('phone')} required maxLength={20} inputMode="tel" /></Field>
-            <Field label="Địa chỉ" helper="Ghi số nhà, đường và phường để tìm vị trí chính xác">
+            <Field label="Địa chỉ">
               <div className="row" style={{ gap: 8 }}>
-                <input className="input" value={form.address} onChange={set('address')} required maxLength={255} />
+                <input className="input" value={form.address} onChange={set('address')} required maxLength={255} placeholder="Số nhà, đường, phường" />
                 <Button variant="secondary" icon={Search} onClick={geocode} loading={search.busy} disabled={form.address.trim().length < 3} title="Tìm vị trí theo địa chỉ" />
               </div>
             </Field>
@@ -98,7 +101,7 @@ function OrderForm({ id, order, initial, depot: d }) {
             <Field label="Ghi chú cho Driver"><textarea className="textarea" value={form.note} onChange={set('note')} maxLength={255} placeholder="Ví dụ: gọi trước 10 phút" /></Field>
           </fieldset>
         </Card>
-        <Card title={<div className="col"><h3 className="h4">Vị trí giao hàng</h3><span className="secondary">Bấm vào bản đồ để chọn toạ độ</span></div>}>
+        <Card title="Vị trí giao hàng">
           <MapView height={520} depot={d && { ...d, name: d.name }} pin={form.lat != null ? { lat: form.lat, lon: form.lon } : null}
             onClick={readOnly ? undefined : p => setForm(f => ({ ...f, lat: Number(p.lat.toFixed(6)), lon: Number(p.lon.toFixed(6)) }))}
             fitKey={form.lat != null ? `${form.lat}` : 'depot'} />
@@ -110,6 +113,12 @@ function OrderForm({ id, order, initial, depot: d }) {
           {pinError && <span className="field-error">{pinError}</span>}
         </Card>
       </div>
+      {confirmCancel && (
+        <Dialog tone="danger" title={`Hủy đơn ${order?.code ?? ''}?`} confirmLabel="Hủy đơn" cancelLabel="Không" busy={save.busy}
+          onCancel={() => setConfirmCancel(false)} onConfirm={cancelOrder}>
+          <ErrorBox error={save.error} />
+        </Dialog>
+      )}
     </form>
   )
 }

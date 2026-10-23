@@ -10,9 +10,9 @@ import { useLoad } from '../../hooks.js'
 
 const STEPS = [
   ['validate', 'Kiểm tra dữ liệu đơn'],
-  ['matrix', 'Lập ma trận thời gian'],
-  ['optimize', 'Insertion Heuristic, Relocate và Swap'],
-  ['geometry', 'Lấy đường đi để vẽ bản đồ'],
+  ['matrix', 'Lấy thời gian di chuyển'],
+  ['optimize', 'Xếp đơn và sắp thứ tự'],
+  ['geometry', 'Lấy đường đi'],
 ]
 
 function StepLine({ state, label }) {
@@ -54,8 +54,13 @@ function PlanningForm({ opt, runs, initial }) {
   // Chặn bấm đúp: mỗi lần bấm tạo một lần tính và tốn hạn mức TomTom
   const [submitting, setSubmitting] = useState(false)
   const timer = useRef(null)
+  // Trang đã đóng thì dừng hỏi trạng thái và không chuyển trang nữa
+  const alive = useRef(true)
 
-  useEffect(() => () => clearTimeout(timer.current), [])
+  useEffect(() => {
+    alive.current = true
+    return () => { alive.current = false; clearTimeout(timer.current) }
+  }, [])
 
   const selected = useMemo(() => {
     const os = opt.orders.filter(o => orders.has(o.id))
@@ -70,18 +75,27 @@ function PlanningForm({ opt, runs, initial }) {
 
   const computing = run?.status === 'running'
 
-  function poll(id) {
+  const orderCode = id => opt.orders.find(o => o.id === id)?.code ?? id
+
+  // Hỏi trạng thái lần tính. Mất mạng hoặc máy chủ tạm lỗi thì hỏi lại, giãn dần tới 10 giây
+  function poll(id, delay = 700) {
     timer.current = setTimeout(async () => {
+      if (!alive.current) return
       try {
         const d = await api(`/planning/runs/${id}`)
+        if (!alive.current) return
         setRun(d.run)
+        setError(null)
         if (d.run.status === 'running') poll(id)
         else if (d.run.status === 'draft') navigate(`/dispatcher/planning/runs/${id}`)
-        else setError({ message: d.run.result?.error || 'Không lập được phương án', details: (d.run.result?.unassigned || []).map(u => ({ id: u.orderId, reason: u.reason })) })
+        else setError({ message: d.run.result?.error || 'Không lập được phương án', details: (d.run.result?.unassigned || []).map(u => ({ code: orderCode(u.orderId), reason: u.reason })) })
       } catch (e) {
+        if (!alive.current) return
         setError(e)
+        if (e.status === 0 || e.status >= 500) poll(id, Math.min(delay * 2, 10_000))
+        else setRun(null)
       }
-    }, 700)
+    }, delay)
   }
 
   async function compute() {
@@ -115,7 +129,7 @@ function PlanningForm({ opt, runs, initial }) {
         actions={draft && <Link className="btn secondary" to={`/dispatcher/planning/runs/${draft.id}`}>Mở bản nháp {draft.code}</Link>} />
       <ErrorBox error={error} />
       {validOrders.length === 0 ? (
-        <Card><Empty icon={Package} title="Chưa có đơn chờ xếp" action={<Link className="btn primary" to="/dispatcher/orders/new">Tạo đơn</Link>}>Đơn mới sẽ xuất hiện ở đây sau khi tạo.</Empty></Card>
+        <Card><Empty icon={Package} title="Chưa có đơn chờ xếp" action={<Link className="btn primary" to="/dispatcher/orders/new">Tạo đơn</Link>} /></Card>
       ) : (
         <div className="row top wrap" style={{ gap: 16 }}>
           <Card title={`Đơn chờ xếp (${validOrders.length})`} style={{ flex: '1 1 456px', maxWidth: 560 }}

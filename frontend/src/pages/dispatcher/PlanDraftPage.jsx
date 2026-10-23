@@ -6,7 +6,7 @@ import { Link, useNavigate, useParams } from 'react-router'
 import { api, newEventId } from '../../api.js'
 import MapView, { Legend, MapOverlay } from '../../components/MapView.jsx'
 import { geoToLatLngs } from '../../components/tripMap.js'
-import { Badge, Button, Card, Dialog, Dot, ErrorBox, Loading, PageHeader, Progress, Stat } from '../../components/ui.jsx'
+import { Alert, Badge, Button, Card, Dialog, Dot, ErrorBox, Loading, LoadError, PageHeader, Progress, Stat } from '../../components/ui.jsx'
 import { dateTime, duration, kg, km, PLAN_STATUS, routeHex, time, VEHICLE_TYPE } from '../../format.js'
 import { useAction, useLoad } from '../../hooks.js'
 
@@ -39,7 +39,7 @@ export default function PlanDraftPage() {
   }, [result, snap, byOrder])
 
   if (loading && !data) return <Loading />
-  if (!run) return <ErrorBox error={error} onRetry={reload} />
+  if (!run) return <LoadError error={error} onRetry={reload} notFound="Không tìm thấy bản nháp" back="/dispatcher/planning" />
   if (run.status === 'running') return <Loading label="Đang tính phương án…" />
 
   async function commit() {
@@ -54,10 +54,11 @@ export default function PlanDraftPage() {
   const saved = (result?.stats?.insertionSeconds ?? total) - total
   const placed = routes.reduce((s, r) => s + r.orderIds.length, 0)
   const m = result?.matrix
+  // Lấy trong ngày thì chỉ ghi giờ, dữ liệu cũ hơn thì ghi cả ngày
+  const at = t => (new Date(t).toDateString() === new Date().toDateString() ? time(t) : dateTime(t))
   const matrixNote = !m ? '' : m.source === 'mock'
-    ? 'Thời gian ước lượng theo khoảng cách (chạy thử, không phải TomTom)'
-    : m.estimated ? `TomTom (ghi lúc ${dateTime(m.newest)}), ${m.estimated} chặng ước lượng do chưa có khóa`
-      : m.fetched ? `Thời gian di chuyển từ TomTom · lấy lúc ${time(m.newest)}` : `Ma trận TomTom ghi sẵn, dữ liệu lấy lúc ${dateTime(m.newest)}`
+    ? 'Thời gian ước lượng, chưa có TomTom'
+    : `Thời gian từ TomTom · lấy lúc ${at(m.newest)}${m.estimated ? ` · ${m.estimated} chặng ước lượng` : ''}`
 
   return (
     <>
@@ -69,7 +70,10 @@ export default function PlanDraftPage() {
           {run.status === 'committed' && <Link className="btn primary" to="/dispatcher/trips">Xem chuyến đã giao</Link>}
         </>} />
       {run.status === 'failed' && <ErrorBox error={{ message: result?.error || 'Lần tính thất bại' }} />}
-      {run.status === 'superseded' && <ErrorBox error={{ message: 'Bản nháp này đã hết hiệu lực vì đã có bản nháp mới hơn. Hãy tính lại nếu muốn dùng.' }} />}
+      {run.status === 'superseded' && (
+        <Alert tone="warning" title="Bản nháp đã có bản mới hơn"
+          action={<Link className="btn secondary" to="/dispatcher/planning">Về lập kế hoạch</Link>} />
+      )}
       <div className="row top wrap" style={{ gap: 24 }}>
         <div style={{ flex: '1 1 560px', minWidth: 0 }}>
           <MapView height={720} depot={{ ...snap.depot }} routes={layers.routes} stops={layers.stops} fitKey={run.id}>
@@ -129,8 +133,7 @@ export default function PlanDraftPage() {
       </div>
       {confirm && (
         <Dialog title={`Giao ${routes.length} chuyến cho Driver?`} confirmLabel="Giao chuyến" busy={action.busy} onCancel={() => setConfirm(false)} onConfirm={commit}>
-          <p>Hệ thống kiểm tra lại đơn, xe và Driver rồi ghi chuyến, điểm dừng và tuyến đầu tiên trong một giao dịch. Nếu có thay đổi so với bản nháp thì không chuyến nào được lưu.</p>
-          {unassigned.length > 0 && <p>{unassigned.length} đơn chưa xếp vẫn ở trạng thái Chờ xếp.</p>}
+          {unassigned.length > 0 && <p>{unassigned.length} đơn chưa xếp vẫn chờ xếp.</p>}
           <ErrorBox error={action.error} />
         </Dialog>
       )}

@@ -35,7 +35,8 @@ export async function api(path, { method = 'GET', body, signal } = {}) {
   const data = await res.json().catch(() => null);
   if (!res.ok) {
     const e = data?.error || {};
-    if (res.status === 401 && path !== '/auth/login') onUnauthorized();
+    // Phiên hết hạn hoặc tài khoản vừa bị khóa: đưa về trang đăng nhập
+    if ((res.status === 401 || (res.status === 403 && e.code === 'ACCOUNT_LOCKED')) && path !== '/auth/login') onUnauthorized();
     throw new ApiError(res.status, e.code || 'ERROR', e.message || `Lỗi ${res.status}`, e.details);
   }
   return data;

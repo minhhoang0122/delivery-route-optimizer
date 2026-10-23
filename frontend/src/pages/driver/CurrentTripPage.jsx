@@ -1,5 +1,5 @@
 // R01 Chuyến hiện tại, R02 Bắt đầu chuyến (kiểm hàng), R02b Hàng không khớp, R05 Mất mạng (UC10, UC10.1, UC11, UC12).
-import { CircleCheck, Info, LocateFixed, Navigation, Package, Phone, RefreshCw, WifiOff } from 'lucide-react'
+import { CircleCheck, LocateFixed, Navigation, Package, Phone, RefreshCw, WifiOff } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { api, newEventId } from '../../api.js'
@@ -7,8 +7,9 @@ import { DriverScreen } from '../../layouts/DriverLayout.jsx'
 import { useDriver } from '../../layouts/driverContext.js'
 import { Alert, Button, Empty, ErrorBox, Loading, StatusBadge, StopItem } from '../../components/ui.jsx'
 import { stopState } from '../../components/tripMap.js'
-import { ago, duration, kg, time, TRIP_STATUS, VEHICLE_TYPE } from '../../format.js'
+import { ago, kg, time, TRIP_STATUS, VEHICLE_TYPE } from '../../format.js'
 import { useAction, useNow } from '../../hooks.js'
+import { removeItem } from '../../offline.js'
 
 const mapsLink = o => `https://www.google.com/maps/dir/?api=1&destination=${o.lat},${o.lon}`
 
@@ -39,7 +40,8 @@ function AssignedScreen({ trip, vehicle, onStarted }) {
   const startId = useRef(null)
   const all = trip.stops.length
   const ok = checked.size === all
-  const missing = action.error?.details?.missingOrderIds
+  // Kiện thiếu theo lần bấm vừa rồi; mở lại ứng dụng thì lấy theo lần báo thiếu đã lưu trên máy chủ
+  const missing = action.error?.details?.missingOrderIds ?? trip.loadingMismatch?.missingOrderIds
 
   async function start() {
     const ids = [...checked].sort((a, b) => a - b)
@@ -58,7 +60,6 @@ function AssignedScreen({ trip, vehicle, onStarted }) {
   return (
     <DriverScreen title={`Chuyến ${trip.code}`} subtitle={`${vehicle} · ${all} điểm`}
       footer={<Button size="large" block icon={Navigation} disabled={!ok} loading={action.busy} onClick={start}>Bắt đầu chuyến</Button>}>
-      <div className="alert info"><Info size={18} className="alert-icon" /><span className="alert-message">Chuyến được giao lúc {time(trip.createdAt)}. Kiểm hàng rồi bấm Bắt đầu chuyến khi xuất phát.</span></div>
       <section className="card" style={{ gap: 8 }}>
         <div className="row between">
           <span className="h4">Kiểm hàng tại kho</span>
@@ -82,9 +83,9 @@ function AssignedScreen({ trip, vehicle, onStarted }) {
       {!ok && checked.size > 0 && (
         <Button variant="secondary" block onClick={start} loading={action.busy}>Báo thiếu hàng cho Dispatcher</Button>
       )}
-      {missing && (
+      {missing?.some(id => !checked.has(id)) && (
         <Alert tone="danger" title="Hàng không khớp danh sách">
-          Thiếu kiện {missing.map(id => trip.stops.find(s => s.order.id === id)?.order.code).join(', ')}. Đã báo cho Dispatcher, liên hệ trước khi xuất phát.
+          Thiếu kiện {missing.map(id => trip.stops.find(s => s.order.id === id)?.order.code).join(', ')} · đã báo Dispatcher
         </Alert>
       )}
       {action.error && !missing && <ErrorBox error={action.error} />}
@@ -93,19 +94,17 @@ function AssignedScreen({ trip, vehicle, onStarted }) {
 }
 
 export default function CurrentTripPage() {
-  const { trip, setTrip, online, fromCache, outbox, location, reload, retry, error } = useDriver()
+  const { trip, setTrip, online, outbox, location, reload, retry, error } = useDriver()
   const navigate = useNavigate()
   const now = useNow()
   const ack = useAction()
 
-  if (trip === undefined) return <DriverScreen title="Chuyến hiện tại"><Loading /></DriverScreen>
+  if (trip === undefined) return <DriverScreen title="Chuyến hiện tại">{error ? <ErrorBox error={error} onRetry={reload} /> : <Loading />}</DriverScreen>
   if (!trip) {
     return (
       <DriverScreen title="Chuyến hiện tại" subtitle="Chưa có chuyến">
         <ErrorBox error={error} />
-        <Empty icon={Navigation} title="Chưa có chuyến được giao" action={<Button variant="secondary" icon={RefreshCw} onClick={reload}>Tải lại</Button>}>
-          Khi Dispatcher giao chuyến, nhiệm vụ sẽ hiện ở đây.
-        </Empty>
+        <Empty icon={Navigation} title="Chưa có chuyến được giao" action={<Button variant="secondary" icon={RefreshCw} onClick={reload}>Tải lại</Button>} />
       </DriverScreen>
     )
   }
@@ -113,9 +112,10 @@ export default function CurrentTripPage() {
   const total = trip.stops.length
   const vehicle = `${VEHICLE_TYPE[trip.vehicle.type]} ${trip.vehicle.plate}`
   const queued = outbox.filter(x => x.tripId === trip.id && x.kind === 'attempt')
-  const failedSync = queued.filter(x => x.state === 'failed')
+  // Kết quả bị từ chối của mọi chuyến (kể cả chuyến cũ) đều hiện ở đây để Driver gửi lại hoặc bỏ
+  const failedSync = outbox.filter(x => x.kind === 'attempt' && x.state === 'failed')
   // Kết quả bị máy chủ từ chối không chặn báo về kho; máy chủ vẫn kiểm tra mọi điểm đã có kết quả
-  const waiting = queued.length - failedSync.length
+  const waiting = queued.filter(x => x.state !== 'failed').length
 
   if (trip.status === 'assigned') return <AssignedScreen trip={trip} vehicle={vehicle} onStarted={setTrip} />
 
@@ -134,7 +134,6 @@ export default function CurrentTripPage() {
   const next = trip.stops.find(s => s.id === trip.nextStopId)
   const rest = trip.stops.filter(s => s.status === 'pending' && s.id !== trip.nextStopId)
   const allDone = !trip.stops.some(s => s.status === 'pending')
-  const lastReplan = trip.routeVersion
 
   async function acknowledge() {
     const res = await ack.run(() => api(`/driver/trips/${trip.id}/route-ack`, { method: 'POST', body: { clientEventId: newEventId(), routeVersionId: trip.routeVersion.id } }))
@@ -143,7 +142,7 @@ export default function CurrentTripPage() {
 
   const locationNote = {
     sharing: [LocateFixed, 'success', `Đang chia sẻ vị trí · cập nhật ${ago(location.lastSentAt, now)}`],
-    denied: [LocateFixed, 'warning', 'Chưa được phép lấy vị trí. Bật quyền vị trí cho trình duyệt.'],
+    denied: [LocateFixed, 'warning', 'Bật quyền vị trí cho trình duyệt'],
     unavailable: [LocateFixed, 'warning', 'Thiết bị không lấy được vị trí'],
     failed: [WifiOff, 'warning', `Chưa gửi được vị trí${location.lastSentAt ? ` · lần cuối lúc ${time(location.lastSentAt)}` : ''}`],
     idle: [LocateFixed, 'muted', trip.position ? `Vị trí gần nhất ${ago(trip.position.observedAt, now)}` : 'Đang chờ vị trí'],
@@ -154,27 +153,33 @@ export default function CurrentTripPage() {
     <DriverScreen title={`Chuyến ${trip.code}`} subtitle={`${vehicle} · ${trip.progress.done}/${total} điểm`}
       footer={<>
         {allDone
-          ? <Button size="large" block disabled={waiting > 0} onClick={() => navigate('/driver/return')}>{waiting ? 'Chờ gửi hết kết quả để báo về kho' : 'Báo về kho'}</Button>
+          ? <>
+            <Button size="large" block disabled={waiting > 0} onClick={() => navigate('/driver/return')}>Báo về kho</Button>
+            {waiting > 0 && <span className="caption warning" style={{ textAlign: 'center' }}>Còn {waiting} kết quả chờ gửi</span>}
+          </>
           : next && <Button size="large" block onClick={() => navigate(`/driver/stops/${next.id}`)}>Ghi kết quả giao</Button>}
         <span className={`row caption ${locTone}`} style={{ justifyContent: 'center', gap: 8 }}><LocIcon size={16} />{locText}</span>
       </>}>
       {!online && (
         <div className="banner danger">
-          <div className="row" style={{ gap: 8 }}><WifiOff size={20} className="danger" /><span className="body-large strong">Mất mạng</span></div>
-          <span className="secondary">Kết quả được lưu trên máy và sẽ tự gửi khi có mạng.{fromCache ? ' Đang hiển thị chuyến đã tải trước đó.' : ''}</span>
+          <div className="row" style={{ gap: 8 }}><WifiOff size={20} className="danger" /><span className="body-large strong">Đang ngoại tuyến · kết quả sẽ tự gửi</span></div>
         </div>
       )}
       {trip.needsAck && (
         <div className="banner info">
           <div className="row" style={{ gap: 8 }}><RefreshCw size={20} className="brand" /><span className="body-large strong">Tuyến đã được điều chỉnh</span></div>
-          <span className="secondary">Phiên bản tuyến {lastReplan.versionNo}: các điểm sau điểm kế tiếp đổi thứ tự, dự kiến {duration(lastReplan.objectiveSeconds)} cho phần còn lại.</span>
           <ErrorBox error={ack.error} />
           <Button block onClick={acknowledge} loading={ack.busy}>Xác nhận tuyến mới</Button>
         </div>
       )}
       {failedSync.length > 0 && (
         <Alert tone="danger" title="Có kết quả không gửi được" action={<Button variant="secondary" onClick={retry}>Thử lại</Button>}>
-          {failedSync.map(x => `${x.label}: ${x.error}`).join(' · ')}
+          {failedSync.map(x => (
+            <span key={x.clientEventId} className="row between" style={{ gap: 8 }}>
+              <span>{x.label}: {x.error}</span>
+              <Button variant="ghost" onClick={() => removeItem(x.clientEventId).catch(() => {})}>Bỏ</Button>
+            </span>
+          ))}
         </Alert>
       )}
       {queued.filter(x => x.state !== 'failed').length > 0 && (

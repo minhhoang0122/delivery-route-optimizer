@@ -1,7 +1,8 @@
 // Khung màn hình máy tính cho Administrator và Dispatcher: thanh điều hướng tối phía trên, nội dung chiếm hết bề rộng.
 import { KeyRound, LogOut, Truck } from 'lucide-react'
-import { NavLink, Outlet } from 'react-router'
+import { NavLink, Outlet, useLocation } from 'react-router'
 import { useAuth } from '../auth.jsx'
+import ErrorBoundary from '../components/ErrorBoundary.jsx'
 import { ROLE } from '../format.js'
 
 const NAV = {
@@ -29,6 +30,7 @@ const NAV = {
 
 export default function DesktopLayout() {
   const { user, logout } = useAuth()
+  const { pathname } = useLocation()
   return (
     <div className="shell">
       <header className="appbar">
@@ -51,7 +53,7 @@ export default function DesktopLayout() {
         </div>
       </header>
       <main className="main">
-        <Outlet />
+        <ErrorBoundary resetKey={pathname}><Outlet /></ErrorBoundary>
       </main>
     </div>
   )

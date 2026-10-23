@@ -1,7 +1,7 @@
 // D04 Đơn chưa giao được (UC08): đơn chỉ quay về danh sách chờ hoặc bị hủy sau khi đối chiếu và chốt chuyến.
 import { useNavigate } from 'react-router'
 import { api } from '../../api.js'
-import { Alert, Badge, Button, Card, ErrorBox, PageHeader, Table, TableSkeleton } from '../../components/ui.jsx'
+import { Alert, Badge, Button, ErrorBox, PageHeader, Table, TableSkeleton } from '../../components/ui.jsx'
 import { time } from '../../format.js'
 import { useLoad } from '../../hooks.js'
 
@@ -14,12 +14,6 @@ const COLUMNS = [
   { key: 'time', title: 'Thời điểm', width: 120 },
   { key: 'status', title: 'Trạng thái', width: 140 },
   { key: 'actions', title: 'Thao tác', width: 200 },
-]
-
-const STEPS = [
-  ['Driver báo về kho', 'Driver gửi kết quả từng điểm và mang hàng chưa giao được về kho.'],
-  ['Đối chiếu chuyến', 'Dispatcher kiểm hàng thực tế tại kho với báo cáo của Driver.'],
-  ['Quyết định và chốt chuyến', 'Chọn chuyển đơn sang kế hoạch sau hoặc hủy đơn, rồi chốt chuyến.'],
 ]
 
 export default function FailedOrdersPage() {
@@ -54,16 +48,6 @@ export default function FailedOrdersPage() {
       )}
       <ErrorBox error={error} onRetry={reload} />
       {loading && !data ? <TableSkeleton columns={COLUMNS} /> : <Table columns={columns} rows={orders} empty="Không có đơn nào chưa giao được" />}
-      <Card title="Cách xử lý đơn chưa giao được">
-        <div className="row top wrap" style={{ gap: 16 }}>
-          {STEPS.map(([title, desc], i) => (
-            <div key={title} className="step" style={{ minWidth: 240 }}>
-              <span className="step-no">{i + 1}</span>
-              <div className="col"><span className="strong">{title}</span><span className="caption secondary">{desc}</span></div>
-            </div>
-          ))}
-        </div>
-      </Card>
     </>
   )
 }

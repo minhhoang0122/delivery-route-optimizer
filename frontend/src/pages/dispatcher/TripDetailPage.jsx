@@ -5,7 +5,7 @@ import { Link, useParams } from 'react-router'
 import { api, newEventId } from '../../api.js'
 import MapView, { Legend, MapOverlay } from '../../components/MapView.jsx'
 import { CONGESTION_HEX, congestionRoutes, geoToLatLngs, isStale, stopState, tripLayers } from '../../components/tripMap.js'
-import { Alert, Button, Card, Checkbox, Dialog, ErrorBox, KeyValue, Loading, PageHeader, Stat, StatusBadge, StopItem } from '../../components/ui.jsx'
+import { Alert, Button, Card, Checkbox, Dialog, ErrorBox, KeyValue, Loading, LoadError, PageHeader, Stat, StatusBadge, StopItem } from '../../components/ui.jsx'
 import { ago, dateTime, duration, kg, km, percent, routeHex, time, TRIP_STATUS, VEHICLE_TYPE } from '../../format.js'
 import { LIVE_MS, useAction, useLoad, useNow } from '../../hooks.js'
 
@@ -21,7 +21,7 @@ function eventDetail(e, stopsById) {
     case 'trip_assigned': return `${p.orderIds?.length} đơn · tuyến phiên bản 1 · ${duration(p.objectiveSeconds)}`
     case 'attempt_recorded': return `${stopsById.get(p.stopId)?.order.code ?? ''} · ${p.result === 'delivered' ? 'giao thành công' : `chưa giao được (${p.reason})`}`
     case 'route_replanned': return `Phiên bản ${p.fromVersion} → ${p.toVersion} · tiết kiệm ${duration(p.savingSeconds)}`
-    case 'reroute_evaluated': return p.valid ? `Hiện tại ${duration(p.currentSeconds)}, đề xuất ${duration(p.proposedSeconds)} · ${p.meetsThreshold ? 'đạt ngưỡng' : 'không đạt ngưỡng'}` : p.reason
+    case 'reroute_evaluated': return p.valid ? `Hiện tại ${duration(p.currentSeconds)}, đề xuất ${duration(p.proposedSeconds)} · ${p.meetsThreshold ? 'đề xuất đổi tuyến' : 'không đổi tuyến'}` : p.reason
     case 'loading_mismatch': return `Thiếu ${p.missingOrderIds?.length ?? 0} kiện`
     case 'trip_returned': return `Mang về ${p.returnedOrderIds?.length ?? 0} kiện`
     case 'trip_closed': return `${p.requeue?.length ?? 0} đơn chuyển kế hoạch sau, ${p.cancel?.length ?? 0} đơn hủy`
@@ -70,12 +70,29 @@ function ProposalCard({ trip, now, onChanged }) {
     )
   }
 
+  const cardTitle = sub => (
+    <div className="row"><span className="icon-wrap tone-info"><Route size={18} /></span>
+      <div className="col"><h3 className="h4">Đề xuất đổi tuyến</h3>{sub && <span className="caption muted">{sub}</span>}</div>
+    </div>
+  )
+
+  // Lần đánh giá không lấy được dữ liệu tuyến: không có thứ tự đề xuất để vẽ, chỉ cho đóng đề xuất
+  if (!p.valid) {
+    return (
+      <Card tone="brand" title={cardTitle()}>
+        <Alert tone="warning" title="Chưa lấy được dữ liệu tuyến">{p.reason}</Alert>
+        <ErrorBox error={err} />
+        <div className="row end"><Button variant="secondary" onClick={dismiss} loading={decide.busy}>Đóng</Button></div>
+      </Card>
+    )
+  }
+
   const pos = [p.position.lat, p.position.lon]
   const depot = [trip.depot.lat, trip.depot.lon]
-  const pts = ids => ids.map(id => byId.get(id)).map(s => [s.order.lat, s.order.lon])
+  const pts = ids => (ids ?? []).map(id => byId.get(id)).filter(Boolean).map(s => [s.order.lat, s.order.lon])
   const color = routeHex(trip.vehicle.id)
   const done = trip.stops.filter(s => s.status !== 'pending').sort((a, b) => a.seq - b.seq)
-  const proposedSeq = new Map(p.proposedStopIds.map((id, i) => [id, done.length + i + 1]))
+  const proposedSeq = new Map((p.proposedStopIds ?? []).map((id, i) => [id, done.length + i + 1]))
   const stops = trip.stops.map(s => ({
     lat: s.order.lat, lon: s.order.lon, color, label: proposedSeq.get(s.id) ?? s.seq,
     state: s.status === 'delivered' ? 'done' : s.status === 'failed' ? 'failed' : 'pending', title: s.order.code,
@@ -89,22 +106,18 @@ function ProposalCard({ trip, now, onChanged }) {
   const next = byId.get(p.nextStopId)
 
   return (
-    <Card tone="brand" title={<div className="row"><span className="icon-wrap tone-info"><Route size={18} /></span><div className="col"><h3 className="h4">Đề xuất đổi tuyến</h3>{(p.auto || !p.meetsThreshold) && <span className="caption muted">{p.auto ? `Các chặng còn lại chậm thêm ${duration(p.increase.increase)}` : 'Không đủ ngưỡng, giữ tuyến hiện tại'}</span>}</div></div>}>
-      {!p.valid ? <Alert tone="warning" title="Chưa lấy được dữ liệu tuyến">{p.reason}</Alert> : (
-        <>
-          <MapView height={320} depot={trip.depot} routes={routes} stops={stops} vehicles={[{ key: 'p', lat: pos[0], lon: pos[1], color, label: ago(p.position.observedAt, now) }]} fitKey={`p${p.eventId}`}>
-            <MapOverlay><Legend items={[{ color: '#6b7280', label: 'Tuyến hiện tại', line: true, dashed: true }, ...(p.meetsThreshold ? [{ color, label: 'Tuyến đề xuất', line: true }] : []), { color: '#94a3b8', label: 'Đã đi qua', line: true }, ...(trip.congestion?.length ? [{ color: CONGESTION_HEX, label: 'Ùn tắc', line: true }] : [])]} /></MapOverlay>
-          </MapView>
-          <div className="row top">
-            <div className="tile grow"><span className="caption muted">Hiện tại</span><span className="h3">{duration(p.currentSeconds)}</span></div>
-            <div className="tile info grow"><span className="caption secondary">Đề xuất</span><span className="h3 brand">{duration(p.proposedSeconds)}</span></div>
-            <div className={`tile grow ${p.savingSeconds > 0 ? 'success' : ''}`}><span className="caption secondary">Tiết kiệm</span><span className={`h3 ${p.savingSeconds > 0 ? 'success' : ''}`}>{duration(p.savingSeconds)} ({percent(p.savingRatio)})</span></div>
-          </div>
-          <div className="stack-sm">
-            <div className="row" style={{ gap: 8 }}><Lock size={16} className="muted" /><span>Giữ nguyên điểm {next?.seq > 1 ? `1–${next?.seq}` : next?.seq}</span></div>
-          </div>
-        </>
-      )}
+    <Card tone="brand" title={cardTitle(p.auto && p.increase ? `Các chặng còn lại chậm thêm ${duration(p.increase.increase)}` : !p.meetsThreshold ? 'Tiết kiệm không đáng kể, giữ tuyến hiện tại' : null)}>
+      <MapView height={320} depot={trip.depot} routes={routes} stops={stops} vehicles={[{ key: 'p', lat: pos[0], lon: pos[1], color, label: ago(p.position.observedAt, now) }]} fitKey={`p${p.eventId}`}>
+        <MapOverlay><Legend items={[{ color: '#6b7280', label: 'Tuyến hiện tại', line: true, dashed: true }, ...(p.meetsThreshold ? [{ color, label: 'Tuyến đề xuất', line: true }] : []), { color: '#94a3b8', label: 'Đã đi qua', line: true }, ...(trip.congestion?.length ? [{ color: CONGESTION_HEX, label: 'Ùn tắc', line: true }] : [])]} /></MapOverlay>
+      </MapView>
+      <div className="row top">
+        <div className="tile grow"><span className="caption muted">Hiện tại</span><span className="h3">{duration(p.currentSeconds)}</span></div>
+        <div className="tile info grow"><span className="caption secondary">Đề xuất</span><span className="h3 brand">{duration(p.proposedSeconds)}</span></div>
+        <div className={`tile grow ${p.savingSeconds > 0 ? 'success' : ''}`}><span className="caption secondary">Tiết kiệm</span><span className={`h3 ${p.savingSeconds > 0 ? 'success' : ''}`}>{duration(p.savingSeconds)} ({percent(p.savingRatio)})</span></div>
+      </div>
+      <div className="stack-sm">
+        <div className="row" style={{ gap: 8 }}><Lock size={16} className="muted" /><span>Giữ nguyên điểm {next?.seq > 1 ? `1–${next?.seq}` : next?.seq}</span></div>
+      </div>
       <ErrorBox error={err && err.code !== 'STALE' ? err : null} />
       <div className="row end">
         <div className="row">
@@ -131,7 +144,7 @@ export default function TripDetailPage() {
   const action = useAction()
   if (loading && !data) return <Loading />
   const t = data?.trip
-  if (!t) return <ErrorBox error={error} onRetry={reload} />
+  if (!t) return <LoadError error={error} onRetry={reload} notFound="Không tìm thấy chuyến" back="/dispatcher/trips" />
   const byId = new Map(t.stops.map(s => [s.id, s]))
   const layers = tripLayers(t, { now, label: t.position ? ago(t.position.observedAt, now) : undefined })
   const stale = t.status === 'in_progress' && isStale(t.position, now)

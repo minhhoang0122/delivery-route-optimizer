@@ -7,21 +7,23 @@ import { useNavigate, useParams } from 'react-router'
 import { newEventId } from '../../api.js'
 import { DriverScreen } from '../../layouts/DriverLayout.jsx'
 import { useDriver } from '../../layouts/driverContext.js'
-import { Alert, Badge, Button, Field, KeyValue, Loading } from '../../components/ui.jsx'
+import { useAuth } from '../../auth.jsx'
+import { Alert, Badge, Button, ErrorBox, Field, KeyValue, Loading } from '../../components/ui.jsx'
 import { FAIL_REASONS, kg } from '../../format.js'
-import { enqueue, flush } from '../../offline.js'
+import { enqueue } from '../../offline.js'
 
 export default function StopResultPage() {
   const { stopId } = useParams()
   const navigate = useNavigate()
-  const { trip, sync } = useDriver()
+  const { user } = useAuth()
+  const { trip, sync, error: loadError, reload } = useDriver()
   const [mode, setMode] = useState('view')
   const [reason, setReason] = useState(FAIL_REASONS[0])
   const [note, setNote] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState(null)
 
-  if (trip === undefined) return <DriverScreen title="Điểm dừng"><Loading /></DriverScreen>
+  if (trip === undefined) return <DriverScreen title="Điểm dừng">{loadError ? <ErrorBox error={loadError} onRetry={reload} /> : <Loading />}</DriverScreen>
   const stop = trip?.stops.find(s => s.id === Number(stopId))
   const back = <button type="button" className="btn ghost icon-only" onClick={() => (mode === 'fail' ? setMode('view') : navigate('/driver'))} title="Quay lại"><ChevronLeft size={22} /></button>
   if (!stop) {
@@ -41,11 +43,11 @@ export default function StopResultPage() {
     }
     try {
       await enqueue({
-        clientEventId, kind: 'attempt', tripId: trip.id, stopId: stop.id, body,
+        clientEventId, userId: user.id, kind: 'attempt', tripId: trip.id, stopId: stop.id, body,
         path: `/driver/trips/${trip.id}/stops/${stop.id}/attempts`, label: `Điểm ${stop.seq} (${o.code})`,
       })
       // Gửi ngay nếu có mạng; mất mạng thì kết quả vẫn nằm trong hàng đợi và tự gửi sau
-      flush().then(sync)
+      sync()
       navigate('/driver')
     } catch (e) {
       setError(`Không lưu được trên máy: ${e.message}`)
@@ -67,7 +69,6 @@ export default function StopResultPage() {
       <DriverScreen title={`Điểm ${stop.seq}/${total}`} subtitle={`${o.recipientName} · ${o.address.split(',')[0]}`} back={back}
         footer={<Button size="large" block loading={busy} onClick={() => submit('failed')}>Gửi kết quả</Button>}>
         <span className="driver-title">Lý do chưa giao được</span>
-        <p className="secondary">Kiện {o.code} sẽ được mang về kho để Dispatcher đối chiếu.</p>
         <div className="stack-sm" role="radiogroup">
           {FAIL_REASONS.map(r => (
             <label key={r} className={`option${reason === r ? ' selected' : ''}`}>
@@ -101,7 +102,7 @@ export default function StopResultPage() {
         {o.note && (
           <div className="row top" style={{ padding: 12, borderRadius: 3, background: 'var(--warn-bg)', gap: 8 }}>
             <Info size={18} className="warning" />
-            <div className="col"><span className="caption strong warning">Ghi chú của người nhận</span><span className="body-large">{o.note}</span></div>
+            <div className="col"><span className="caption strong warning">Ghi chú cho Driver</span><span className="body-large">{o.note}</span></div>
           </div>
         )}
         <a className="btn secondary large block" href={`tel:${o.phone.replace(/\s/g, '')}`}><Phone size={18} /> Gọi người nhận</a>

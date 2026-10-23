@@ -1,5 +1,6 @@
 // Thành phần giao diện dùng chung, tương ứng các component trong trang Design System của Figma.
 import { CircleAlert, CircleCheck, Info, LoaderCircle, TriangleAlert } from 'lucide-react'
+import { Link } from 'react-router'
 import { initials } from '../format.js'
 
 export function Button({ variant = 'primary', size, block, icon: Icon, loading, children, className = '', ...rest }) {
@@ -225,6 +226,15 @@ export function StopItem({ state, seq, name, address, meta, onClick, right }) {
       {right}
     </div>
   )
+}
+
+/**
+ * Lỗi khi tải trang chi tiết. 404 thì báo không tìm thấy kèm nút về danh sách (thử lại vô ích);
+ * lỗi khác vẫn có nút Thử lại.
+ */
+export function LoadError({ error, onRetry, notFound, back, backLabel = 'Về danh sách' }) {
+  if (error?.status === 404) return <Alert tone="warning" title={notFound} action={<Link className="btn secondary" to={back}>{backLabel}</Link>} />
+  return <ErrorBox error={error} onRetry={onRetry} />
 }
 
 export function ErrorBox({ error, onRetry }) {

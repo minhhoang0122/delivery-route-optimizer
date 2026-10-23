@@ -12,11 +12,11 @@ import { useAction } from '../../hooks.js'
 
 export default function ReturnPage() {
   const navigate = useNavigate()
-  const { trip, rawTrip, outbox, setTrip } = useDriver()
+  const { trip, rawTrip, outbox, setTrip, error, reload } = useDriver()
   const [checked, setChecked] = useState(() => new Set())
   const action = useAction()
   const eventId = useRef(newEventId())
-  if (trip === undefined) return <DriverScreen title="Báo về kho"><Loading /></DriverScreen>
+  if (trip === undefined) return <DriverScreen title="Báo về kho">{error ? <ErrorBox error={error} onRetry={reload} /> : <Loading />}</DriverScreen>
   const back = <button type="button" className="btn ghost icon-only" onClick={() => navigate('/driver')} title="Quay lại"><ChevronLeft size={22} /></button>
   if (!trip || trip.status !== 'in_progress') {
     return <DriverScreen title="Báo về kho" back={back}><Alert tone="info" title="Không có chuyến đang giao để báo về kho" /></DriverScreen>
@@ -49,7 +49,6 @@ export default function ReturnPage() {
       {failed.length > 0 && (
         <section className="card" style={{ gap: 8 }}>
           <span className="h4">Hàng mang về kho ({failed.length} kiện)</span>
-          <p className="secondary">Đánh dấu từng kiện đã mang về đủ.</p>
           <div>
             {failed.map(s => (
               <label key={s.id} className="check-row" style={{ cursor: 'pointer' }}>
