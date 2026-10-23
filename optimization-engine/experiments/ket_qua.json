@@ -10,8 +10,8 @@
       "vehicles": 1,
       "longest": 9785,
       "unassigned": 0,
-      "insertionMs": 0.7021000000000015,
-      "searchMs": 12.889800000000001
+      "insertionMs": 0.6667000000000058,
+      "searchMs": 13.5336
     },
     {
       "matrix": "16:00",
@@ -23,8 +23,8 @@
       "vehicles": 4,
       "longest": 3568,
       "unassigned": 0,
-      "insertionMs": 0.34969999999999857,
-      "searchMs": 9.602699999999999
+      "insertionMs": 0.2565000000000026,
+      "searchMs": 9.066200000000002
     },
     {
       "matrix": "16:00",
@@ -36,8 +36,8 @@
       "vehicles": 5,
       "longest": 2655,
       "unassigned": 1,
-      "insertionMs": 0.26549999999999585,
-      "searchMs": 8.453399999999995
+      "insertionMs": 0.2447999999999979,
+      "searchMs": 6.268999999999998
     },
     {
       "matrix": "17:30",
@@ -49,8 +49,8 @@
       "vehicles": 1,
       "longest": 10347,
       "unassigned": 0,
-      "insertionMs": 0.09440000000000737,
-      "searchMs": 9.434299999999993
+      "insertionMs": 0.16199999999999193,
+      "searchMs": 9.08380000000001
     },
     {
       "matrix": "17:30",
@@ -62,8 +62,8 @@
       "vehicles": 4,
       "longest": 3447,
       "unassigned": 0,
-      "insertionMs": 0.08299999999999841,
-      "searchMs": 8.743899999999996
+      "insertionMs": 0.08480000000000132,
+      "searchMs": 8.892600000000002
     },
     {
       "matrix": "17:30",
@@ -75,8 +75,8 @@
       "vehicles": 4,
       "longest": 2640,
       "unassigned": 3,
-      "insertionMs": 0.0910999999999973,
-      "searchMs": 4.862800000000007
+      "insertionMs": 0.0841000000000065,
+      "searchMs": 4.945700000000002
     }
   ],
   "e2": [
@@ -465,27 +465,89 @@
   "e5": [
     {
       "n": 5,
-      "medianMs": 0.08299999999999841,
+      "medianMs": 0.07450000000000045,
       "evaluations": 47,
       "legs": 60
     },
     {
       "n": 10,
-      "medianMs": 0.21349999999998204,
+      "medianMs": 0.20609999999999218,
       "evaluations": 141,
       "legs": 220
     },
     {
       "n": 15,
-      "medianMs": 1.725200000000001,
+      "medianMs": 1.5923999999999978,
       "evaluations": 1284,
       "legs": 480
     },
     {
       "n": 20,
-      "medianMs": 4.704200000000014,
+      "medianMs": 4.606999999999999,
       "evaluations": 4037,
       "legs": 840
+    }
+  ],
+  "e6": [
+    {
+      "matrix": "16:00",
+      "objective": "travel",
+      "vehicles": 1,
+      "total": 9785,
+      "longest": 9785,
+      "waitAvg": 4991.35,
+      "waitMax": 9572,
+      "unassigned": 0
+    },
+    {
+      "matrix": "16:00",
+      "objective": "travel_cap",
+      "vehicles": 4,
+      "total": 11639,
+      "longest": 3568,
+      "waitAvg": 1394.85,
+      "waitMax": 3101,
+      "unassigned": 0
+    },
+    {
+      "matrix": "16:00",
+      "objective": "waiting",
+      "vehicles": 5,
+      "total": 13672,
+      "longest": 3522,
+      "waitAvg": 1100.9,
+      "waitMax": 2177,
+      "unassigned": 0
+    },
+    {
+      "matrix": "17:30",
+      "objective": "travel",
+      "vehicles": 1,
+      "total": 10347,
+      "longest": 10347,
+      "waitAvg": 5191.95,
+      "waitMax": 9601,
+      "unassigned": 0
+    },
+    {
+      "matrix": "17:30",
+      "objective": "travel_cap",
+      "vehicles": 4,
+      "total": 11934,
+      "longest": 3447,
+      "waitAvg": 1420.25,
+      "waitMax": 2898,
+      "unassigned": 0
+    },
+    {
+      "matrix": "17:30",
+      "objective": "waiting",
+      "vehicles": 5,
+      "total": 13548,
+      "longest": 3735,
+      "waitAvg": 1098.8,
+      "waitMax": 2355,
+      "unassigned": 0
     }
   ]
 }

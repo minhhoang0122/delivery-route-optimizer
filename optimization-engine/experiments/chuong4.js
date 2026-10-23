@@ -4,6 +4,7 @@
 //   node experiments/chuong4.js --json     ghi thêm experiments/ket_qua.json
 import { readFileSync, writeFileSync } from 'node:fs';
 import { evaluateReroute, insertion, localSearch, plan, routeSeconds, totalSeconds } from '../src/index.js';
+import { metrics, solve, waitingCost } from './muc_tieu.js';
 
 const read = name => JSON.parse(readFileSync(new URL(`../test/fixtures/${name}`, import.meta.url), 'utf8'));
 const scenario = read('kich_ban.json');
@@ -161,6 +162,25 @@ for (const n of [5, 10, 15, 20]) {
 }
 table(['Số đơn', 'Thời gian tính, trung vị 20 lần (ms)', 'Phép đánh giá', 'Chặng cần lấy từ TomTom (2 cấu hình xe)', 'Thời gian lấy ước tính (giây, 0,2 s/chặng)'],
   out.e5.map(e => [e.n, e.medianMs.toFixed(1).replace(".", ","), e.evaluations, e.legs, Math.round(e.legs * 0.2)]));
+
+// ---------------------------------------------------------------- 4.4.2 Ảnh hưởng của mục tiêu và giới hạn thời lượng
+// Cùng Insertion, Relocate và Swap, chỉ khác hàm chi phí: tổng thời gian chạy (không giới hạn, giới hạn 60 phút)
+// và tổng thời gian khách chờ. Hai dòng đầu dùng chính engine, dòng thứ ba dùng biến thể trong muc_tieu.js.
+console.log('## 4.4.2 Ảnh hưởng của mục tiêu và giới hạn thời lượng chuyến\n');
+out.e6 = [];
+for (const [label, m] of Object.entries(MATRICES)) {
+  for (const cap of [null, 60]) {
+    const P = problem(m, { maxRouteMinutes: cap });
+    const b = localSearch(P, insertion(P));
+    out.e6.push({ matrix: label, objective: cap ? 'travel_cap' : 'travel', ...metrics(P, b.routes, b.unassigned) });
+  }
+  const P = problem(m);
+  const w = solve(P, waitingCost);
+  out.e6.push({ matrix: label, objective: 'waiting', ...metrics(P, w.routes, w.unassigned) });
+}
+const OBJ = { travel: 'Tổng thời gian di chuyển, không giới hạn', travel_cap: 'Tổng thời gian di chuyển, giới hạn 60 phút', waiting: 'Tổng thời gian khách chờ' };
+table(['Ma trận', 'Mục tiêu', 'Số xe', 'Tổng thời gian di chuyển (phút)', 'Chuyến dài nhất (phút)', 'Khách chờ trung bình (phút)', 'Khách chờ lâu nhất (phút)', 'Chưa xếp'],
+  out.e6.map(e => [e.matrix, OBJ[e.objective], e.vehicles, minutes(e.total), minutes(e.longest), minutes(e.waitAvg), minutes(e.waitMax), e.unassigned]));
 
 if (process.argv.includes('--json')) {
   writeFileSync(new URL('./ket_qua.json', import.meta.url), JSON.stringify(out, null, 2));
