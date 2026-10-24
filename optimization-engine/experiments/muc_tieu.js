@@ -5,7 +5,7 @@
 
 const legOf = (P, v, a, b) => (a === b ? 0 : P.travel(P.vehicles[v].profile, a, b));
 
-/** Thời điểm đến từng điểm và thời gian cả tuyến; null nếu có chặng thiếu dữ liệu. */
+/** Thời điểm đến từng điểm và thời lượng cả tuyến (chạy và phục vụ); null nếu có chặng thiếu dữ liệu. */
 export function timeline(P, v, route) {
   const arrivals = [];
   let clock = 0;
@@ -15,6 +15,7 @@ export function timeline(P, v, route) {
     if (t == null) return null;
     clock += t;
     arrivals.push(clock);
+    clock += P.orders[o].serviceSeconds ?? P.serviceSeconds ?? 0;   // thời gian phục vụ, mặc định 0
     prev = P.orders[o].point;
   }
   const back = legOf(P, v, prev, P.depot);

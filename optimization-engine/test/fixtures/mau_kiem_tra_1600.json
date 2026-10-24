@@ -1,0 +1,298 @@
+{
+ "departAt": "2026-10-26T16:00:00+07:00",
+ "so_voi": "2026-10-12T16:00:00+07:00",
+ "ghi_luc": "2026-10-24T00:19:47.291Z",
+ "thong_ke": {
+  "so_chang": 40,
+  "hop_le": 40,
+  "trung_khop": 2,
+  "lech_tuong_doi_tb": 0.012465791775736023,
+  "lech_tuong_doi_max": 0.045075125208681135,
+  "lech_tuyet_doi_max_giay": 29,
+  "trong_5pt": 40,
+  "tong_cu": 33393,
+  "tong_moi": 33619
+ },
+ "chang": [
+  {
+   "cau_hinh": "motorcycle",
+   "tu": "KHO",
+   "den": "DH-1021",
+   "cu": 848,
+   "moi": 856
+  },
+  {
+   "cau_hinh": "motorcycle",
+   "tu": "DH-1021",
+   "den": "DH-1022",
+   "cu": 275,
+   "moi": 287
+  },
+  {
+   "cau_hinh": "motorcycle",
+   "tu": "DH-1022",
+   "den": "DH-1023",
+   "cu": 599,
+   "moi": 626
+  },
+  {
+   "cau_hinh": "motorcycle",
+   "tu": "DH-1023",
+   "den": "DH-1024",
+   "cu": 910,
+   "moi": 910
+  },
+  {
+   "cau_hinh": "motorcycle",
+   "tu": "DH-1024",
+   "den": "DH-1025",
+   "cu": 262,
+   "moi": 261
+  },
+  {
+   "cau_hinh": "motorcycle",
+   "tu": "DH-1025",
+   "den": "DH-1026",
+   "cu": 1218,
+   "moi": 1212
+  },
+  {
+   "cau_hinh": "motorcycle",
+   "tu": "DH-1026",
+   "den": "DH-1028",
+   "cu": 901,
+   "moi": 926
+  },
+  {
+   "cau_hinh": "motorcycle",
+   "tu": "DH-1028",
+   "den": "DH-1029",
+   "cu": 1117,
+   "moi": 1132
+  },
+  {
+   "cau_hinh": "motorcycle",
+   "tu": "DH-1029",
+   "den": "DH-1032",
+   "cu": 1172,
+   "moi": 1201
+  },
+  {
+   "cau_hinh": "motorcycle",
+   "tu": "DH-1032",
+   "den": "DH-1039",
+   "cu": 498,
+   "moi": 489
+  },
+  {
+   "cau_hinh": "motorcycle",
+   "tu": "DH-1039",
+   "den": "DH-1040",
+   "cu": 378,
+   "moi": 379
+  },
+  {
+   "cau_hinh": "motorcycle",
+   "tu": "DH-1040",
+   "den": "DH-1041",
+   "cu": 576,
+   "moi": 577
+  },
+  {
+   "cau_hinh": "motorcycle",
+   "tu": "DH-1041",
+   "den": "DH-1042",
+   "cu": 175,
+   "moi": 173
+  },
+  {
+   "cau_hinh": "motorcycle",
+   "tu": "DH-1042",
+   "den": "DH-1043",
+   "cu": 390,
+   "moi": 397
+  },
+  {
+   "cau_hinh": "motorcycle",
+   "tu": "DH-1043",
+   "den": "DH-1044",
+   "cu": 610,
+   "moi": 628
+  },
+  {
+   "cau_hinh": "motorcycle",
+   "tu": "DH-1044",
+   "den": "DH-1045",
+   "cu": 237,
+   "moi": 244
+  },
+  {
+   "cau_hinh": "motorcycle",
+   "tu": "DH-1045",
+   "den": "DH-1046",
+   "cu": 474,
+   "moi": 485
+  },
+  {
+   "cau_hinh": "motorcycle",
+   "tu": "DH-1046",
+   "den": "DH-1047",
+   "cu": 845,
+   "moi": 852
+  },
+  {
+   "cau_hinh": "motorcycle",
+   "tu": "DH-1047",
+   "den": "DH-1048",
+   "cu": 625,
+   "moi": 619
+  },
+  {
+   "cau_hinh": "motorcycle",
+   "tu": "DH-1048",
+   "den": "DH-1049",
+   "cu": 1994,
+   "moi": 2003
+  },
+  {
+   "cau_hinh": "truck",
+   "tu": "KHO",
+   "den": "DH-1021",
+   "cu": 992,
+   "moi": 1002
+  },
+  {
+   "cau_hinh": "truck",
+   "tu": "DH-1021",
+   "den": "DH-1022",
+   "cu": 371,
+   "moi": 374
+  },
+  {
+   "cau_hinh": "truck",
+   "tu": "DH-1022",
+   "den": "DH-1023",
+   "cu": 842,
+   "moi": 846
+  },
+  {
+   "cau_hinh": "truck",
+   "tu": "DH-1023",
+   "den": "DH-1024",
+   "cu": 1492,
+   "moi": 1502
+  },
+  {
+   "cau_hinh": "truck",
+   "tu": "DH-1024",
+   "den": "DH-1025",
+   "cu": 336,
+   "moi": 335
+  },
+  {
+   "cau_hinh": "truck",
+   "tu": "DH-1025",
+   "den": "DH-1026",
+   "cu": 1916,
+   "moi": 1911
+  },
+  {
+   "cau_hinh": "truck",
+   "tu": "DH-1026",
+   "den": "DH-1028",
+   "cu": 1238,
+   "moi": 1251
+  },
+  {
+   "cau_hinh": "truck",
+   "tu": "DH-1028",
+   "den": "DH-1029",
+   "cu": 1472,
+   "moi": 1460
+  },
+  {
+   "cau_hinh": "truck",
+   "tu": "DH-1029",
+   "den": "DH-1032",
+   "cu": 1565,
+   "moi": 1593
+  },
+  {
+   "cau_hinh": "truck",
+   "tu": "DH-1032",
+   "den": "DH-1039",
+   "cu": 531,
+   "moi": 527
+  },
+  {
+   "cau_hinh": "truck",
+   "tu": "DH-1039",
+   "den": "DH-1040",
+   "cu": 411,
+   "moi": 412
+  },
+  {
+   "cau_hinh": "truck",
+   "tu": "DH-1040",
+   "den": "DH-1041",
+   "cu": 675,
+   "moi": 675
+  },
+  {
+   "cau_hinh": "truck",
+   "tu": "DH-1041",
+   "den": "DH-1042",
+   "cu": 186,
+   "moi": 183
+  },
+  {
+   "cau_hinh": "truck",
+   "tu": "DH-1042",
+   "den": "DH-1043",
+   "cu": 1432,
+   "moi": 1441
+  },
+  {
+   "cau_hinh": "truck",
+   "tu": "DH-1043",
+   "den": "DH-1044",
+   "cu": 1064,
+   "moi": 1061
+  },
+  {
+   "cau_hinh": "truck",
+   "tu": "DH-1044",
+   "den": "DH-1045",
+   "cu": 246,
+   "moi": 254
+  },
+  {
+   "cau_hinh": "truck",
+   "tu": "DH-1045",
+   "den": "DH-1046",
+   "cu": 523,
+   "moi": 529
+  },
+  {
+   "cau_hinh": "truck",
+   "tu": "DH-1046",
+   "den": "DH-1047",
+   "cu": 1124,
+   "moi": 1130
+  },
+  {
+   "cau_hinh": "truck",
+   "tu": "DH-1047",
+   "den": "DH-1048",
+   "cu": 668,
+   "moi": 662
+  },
+  {
+   "cau_hinh": "truck",
+   "tu": "DH-1048",
+   "den": "DH-1049",
+   "cu": 2205,
+   "moi": 2214
+  }
+ ]
+}

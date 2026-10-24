@@ -10,8 +10,8 @@
       "vehicles": 1,
       "longest": 9785,
       "unassigned": 0,
-      "insertionMs": 0.6667000000000058,
-      "searchMs": 13.5336
+      "insertionMs": 0.6687000000000012,
+      "searchMs": 11.961500000000001
     },
     {
       "matrix": "16:00",
@@ -23,8 +23,8 @@
       "vehicles": 4,
       "longest": 3568,
       "unassigned": 0,
-      "insertionMs": 0.2565000000000026,
-      "searchMs": 9.066200000000002
+      "insertionMs": 0.3684999999999974,
+      "searchMs": 8.7483
     },
     {
       "matrix": "16:00",
@@ -36,8 +36,8 @@
       "vehicles": 5,
       "longest": 2655,
       "unassigned": 1,
-      "insertionMs": 0.2447999999999979,
-      "searchMs": 6.268999999999998
+      "insertionMs": 0.22039999999999793,
+      "searchMs": 6.0321
     },
     {
       "matrix": "17:30",
@@ -49,8 +49,8 @@
       "vehicles": 1,
       "longest": 10347,
       "unassigned": 0,
-      "insertionMs": 0.16199999999999193,
-      "searchMs": 9.08380000000001
+      "insertionMs": 0.14499999999999602,
+      "searchMs": 7.1053
     },
     {
       "matrix": "17:30",
@@ -62,8 +62,8 @@
       "vehicles": 4,
       "longest": 3447,
       "unassigned": 0,
-      "insertionMs": 0.08480000000000132,
-      "searchMs": 8.892600000000002
+      "insertionMs": 0.07899999999999352,
+      "searchMs": 7.2021000000000015
     },
     {
       "matrix": "17:30",
@@ -75,8 +75,8 @@
       "vehicles": 4,
       "longest": 2640,
       "unassigned": 3,
-      "insertionMs": 0.0841000000000065,
-      "searchMs": 4.945700000000002
+      "insertionMs": 0.0870999999999924,
+      "searchMs": 3.71220000000001
     }
   ],
   "e2": [
@@ -465,25 +465,25 @@
   "e5": [
     {
       "n": 5,
-      "medianMs": 0.07450000000000045,
+      "medianMs": 0.0864000000000118,
       "evaluations": 47,
       "legs": 60
     },
     {
       "n": 10,
-      "medianMs": 0.20609999999999218,
+      "medianMs": 0.22109999999999275,
       "evaluations": 141,
       "legs": 220
     },
     {
       "n": 15,
-      "medianMs": 1.5923999999999978,
+      "medianMs": 1.6783000000000072,
       "evaluations": 1284,
       "legs": 480
     },
     {
       "n": 20,
-      "medianMs": 4.606999999999999,
+      "medianMs": 4.844400000000007,
       "evaluations": 4037,
       "legs": 840
     }
@@ -549,5 +549,278 @@
       "waitMax": 2355,
       "unassigned": 0
     }
-  ]
+  ],
+  "td": {
+    "slots": [
+      {
+        "label": "16:00",
+        "departAt": "2026-10-12T16:00:00+07:00"
+      },
+      {
+        "label": "16:30",
+        "departAt": "2026-10-26T16:30:00+07:00"
+      },
+      {
+        "label": "17:00",
+        "departAt": "2026-10-26T17:00:00+07:00"
+      },
+      {
+        "label": "17:30",
+        "departAt": "2026-10-12T17:30:00+07:00"
+      }
+    ],
+    "serviceSeconds": 180,
+    "fifo": {
+      "checked": 2520,
+      "violations": 0,
+      "marginSeconds": 265
+    },
+    "rows": [
+      {
+        "departure": "16:00",
+        "cap": 60,
+        "method": "static",
+        "vehicles": 5,
+        "unassigned": 3,
+        "predicted": 15388,
+        "actual": 15664.755393197665,
+        "longest": 3641.695755489709,
+        "over60": 1,
+        "stops": 17,
+        "etaMeanSeconds": 13.538982115251095,
+        "etaMaxSeconds": 52.18590605487407
+      },
+      {
+        "departure": "16:00",
+        "cap": 60,
+        "method": "time_dependent",
+        "vehicles": 5,
+        "unassigned": 4,
+        "predicted": 14880.834599361413,
+        "actual": 14880.834599361413,
+        "longest": 3565.7268355851484,
+        "over60": 0,
+        "stops": 16,
+        "etaMeanSeconds": 0,
+        "etaMaxSeconds": 0
+      },
+      {
+        "departure": "16:00",
+        "cap": null,
+        "method": "static",
+        "vehicles": 1,
+        "unassigned": 0,
+        "predicted": 13385,
+        "actual": 14145.458207098447,
+        "longest": 14145.458207098447,
+        "over60": 1,
+        "stops": 20,
+        "etaMeanSeconds": 457.28486032496585,
+        "etaMaxSeconds": 737.458207098447
+      },
+      {
+        "departure": "16:00",
+        "cap": null,
+        "method": "time_dependent",
+        "vehicles": 1,
+        "unassigned": 0,
+        "predicted": 13465.28832626142,
+        "actual": 13465.28832626142,
+        "longest": 13465.28832626142,
+        "over60": 1,
+        "stops": 20,
+        "etaMeanSeconds": 0,
+        "etaMaxSeconds": 0
+      },
+      {
+        "departure": "16:45",
+        "cap": 60,
+        "method": "static",
+        "vehicles": 5,
+        "unassigned": 4,
+        "predicted": 15861,
+        "actual": 15928.952741850175,
+        "longest": 3586.400108792557,
+        "over60": 0,
+        "stops": 16,
+        "etaMeanSeconds": 5.580807802555682,
+        "etaMaxSeconds": 18.573935026062827
+      },
+      {
+        "departure": "16:45",
+        "cap": 60,
+        "method": "time_dependent",
+        "vehicles": 5,
+        "unassigned": 4,
+        "predicted": 15928.952741850175,
+        "actual": 15928.952741850175,
+        "longest": 3586.400108792557,
+        "over60": 0,
+        "stops": 16,
+        "etaMeanSeconds": 0,
+        "etaMaxSeconds": 0
+      },
+      {
+        "departure": "16:45",
+        "cap": null,
+        "method": "static",
+        "vehicles": 1,
+        "unassigned": 0,
+        "predicted": 14153.5,
+        "actual": 14227.884658831274,
+        "longest": 14227.884658831274,
+        "over60": 1,
+        "stops": 20,
+        "etaMeanSeconds": 19.39554815473057,
+        "etaMaxSeconds": 60.884658831273555
+      },
+      {
+        "departure": "16:45",
+        "cap": null,
+        "method": "time_dependent",
+        "vehicles": 1,
+        "unassigned": 0,
+        "predicted": 13930.884658831274,
+        "actual": 13930.884658831274,
+        "longest": 13930.884658831274,
+        "over60": 1,
+        "stops": 20,
+        "etaMeanSeconds": 0,
+        "etaMaxSeconds": 0
+      }
+    ]
+  },
+  "service3": {
+    "serviceSeconds": 180,
+    "e1": [
+      {
+        "matrix": "16:00",
+        "cap": null,
+        "insertion": 13574,
+        "improved": 13385,
+        "evaluations": 3846,
+        "moves": 5,
+        "vehicles": 1,
+        "longest": 13385,
+        "unassigned": 0
+      },
+      {
+        "matrix": "16:00",
+        "cap": 60,
+        "insertion": 17385,
+        "improved": 15388,
+        "evaluations": 2807,
+        "moves": 6,
+        "vehicles": 5,
+        "longest": 3549,
+        "unassigned": 3
+      },
+      {
+        "matrix": "16:00",
+        "cap": 45,
+        "insertion": 12927,
+        "improved": 11445,
+        "evaluations": 1848,
+        "moves": 5,
+        "vehicles": 5,
+        "longest": 2677,
+        "unassigned": 6
+      },
+      {
+        "matrix": "17:30",
+        "cap": null,
+        "insertion": 14329,
+        "improved": 13947,
+        "evaluations": 3846,
+        "moves": 5,
+        "vehicles": 1,
+        "longest": 13947,
+        "unassigned": 0
+      },
+      {
+        "matrix": "17:30",
+        "cap": 60,
+        "insertion": 17553,
+        "improved": 15917,
+        "evaluations": 1065,
+        "moves": 2,
+        "vehicles": 5,
+        "longest": 3583,
+        "unassigned": 4
+      },
+      {
+        "matrix": "17:30",
+        "cap": 45,
+        "insertion": 12725,
+        "improved": 10257,
+        "evaluations": 2130,
+        "moves": 7,
+        "vehicles": 4,
+        "longest": 2615,
+        "unassigned": 7
+      }
+    ],
+    "e6": [
+      {
+        "matrix": "16:00",
+        "objective": "travel",
+        "vehicles": 1,
+        "total": 13385,
+        "longest": 13385,
+        "waitAvg": 6701.35,
+        "waitMax": 12992,
+        "unassigned": 0
+      },
+      {
+        "matrix": "16:00",
+        "objective": "travel_cap",
+        "vehicles": 5,
+        "total": 15388,
+        "longest": 3549,
+        "waitAvg": 1404.5294117647059,
+        "waitMax": 2876,
+        "unassigned": 3
+      },
+      {
+        "matrix": "16:00",
+        "objective": "waiting",
+        "vehicles": 5,
+        "total": 17652,
+        "longest": 4376,
+        "waitAvg": 1382,
+        "waitMax": 2851,
+        "unassigned": 0
+      },
+      {
+        "matrix": "17:30",
+        "objective": "travel",
+        "vehicles": 1,
+        "total": 13947,
+        "longest": 13947,
+        "waitAvg": 6901.95,
+        "waitMax": 13021,
+        "unassigned": 0
+      },
+      {
+        "matrix": "17:30",
+        "objective": "travel_cap",
+        "vehicles": 5,
+        "total": 15917,
+        "longest": 3583,
+        "waitAvg": 1356.5,
+        "waitMax": 2819,
+        "unassigned": 4
+      },
+      {
+        "matrix": "17:30",
+        "objective": "waiting",
+        "vehicles": 5,
+        "total": 17209,
+        "longest": 4077,
+        "waitAvg": 1385.3,
+        "waitMax": 2517,
+        "unassigned": 0
+      }
+    ]
+  }
 }

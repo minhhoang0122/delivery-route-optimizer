@@ -7,6 +7,12 @@
 // - travel(profile, a, b) trả về số giây đi từ điểm a đến điểm b theo cấu hình xe, hoặc null khi chặng
 //   không có dữ liệu hợp lệ. Chặng thiếu dữ liệu không bao giờ được coi là 0 giây.
 // - Tuyến của một xe là mảng chỉ số đơn theo thứ tự giao, xuất phát và kết thúc tại kho.
+// - Thời gian phụ thuộc giờ (tùy chọn): travelAt(profile, a, b, giờ) trả về số giây đi chặng a → b khi xe rời a
+//   lúc `giờ` (giây kể từ 0:00 giờ địa phương). Khi có travelAt, tuyến được tính tiến theo thời gian: xuất phát lúc
+//   startSeconds, mỗi chặng lấy thời gian ứng với giờ xe thực sự rời điểm trước, cộng thời gian phục vụ tại điểm.
+//   Không có travelAt thì dùng travel như trước (một ma trận cho cả chuyến).
+// - Thời gian phục vụ: serviceSeconds của từng đơn, nếu không có thì P.serviceSeconds, mặc định 0. Thời lượng
+//   chuyến (và giới hạn maxRouteSeconds) gồm thời gian chạy và thời gian phục vụ.
 
 const now = () => performance.now();
 
@@ -17,29 +23,57 @@ const REASONS = {
   duration: 'Vượt giới hạn thời lượng chuyến',
 };
 
-/** Thời gian một chặng: cùng điểm thì 0, thiếu dữ liệu thì null. */
-function leg(P, profile, a, b) {
+/** Thời gian một chặng khi rời điểm a lúc `clock`: cùng điểm thì 0, thiếu dữ liệu thì null. */
+function leg(P, profile, a, b, clock) {
   if (a === b) return 0;
-  const t = P.travel(profile, a, b);
+  const t = P.travelAt ? P.travelAt(profile, a, b, clock) : P.travel(profile, a, b);
   return t == null ? null : t;
+}
+
+const serviceOf = (P, o) => P.orders[o].serviceSeconds ?? P.serviceSeconds ?? 0;
+const startClock = P => P.startSeconds ?? 0;
+
+/**
+ * Tính tiến từ điểm `prev` lúc `clock` qua các đơn route[from..] rồi về kho. Trả về giờ về đến kho, null nếu
+ * có chặng không hợp lệ. Mọi hàm đánh giá tuyến cộng theo đúng thứ tự này (chặng rồi phục vụ), nhờ đó cùng
+ * một tuyến luôn cho cùng một số, kể cả khi chỉ tính lại phần đuôi lúc chèn đơn.
+ */
+function forward(P, profile, prev, clock, route, from = 0, arrivals = null) {
+  for (let k = from; k < route.length; k++) {
+    const u = P.orders[route[k]].point;
+    const t = leg(P, profile, prev, u, clock);
+    if (t == null) return null;
+    clock += t;
+    arrivals?.push(clock);
+    clock += serviceOf(P, route[k]);
+    prev = u;
+  }
+  const back = leg(P, profile, prev, P.depot, clock);
+  return back == null ? null : clock + back;
 }
 
 const fits = (P, v, o) => P.orders[o].vehicleTypes.includes(P.vehicles[v].type);
 const loadOf = (P, route) => route.reduce((s, o) => s + P.orders[o].weightKg, 0);
 
-/** Thời gian một tuyến, tính cả chặng rời điểm xuất phát và chặng về kho. Infinity nếu có chặng không hợp lệ. */
-export function routeSeconds(P, v, route, start = P.depot) {
-  const profile = P.vehicles[v].profile;
-  let total = 0;
-  let prev = start;
-  for (const o of route) {
-    const t = leg(P, profile, prev, P.orders[o].point);
-    if (t == null) return Infinity;
-    total += t;
-    prev = P.orders[o].point;
-  }
-  const back = leg(P, profile, prev, P.depot);
-  return back == null ? Infinity : total + back;
+/**
+ * Thời lượng một tuyến (chạy và phục vụ), tính cả chặng rời điểm xuất phát và chặng về kho.
+ * Infinity nếu có chặng không hợp lệ. startSeconds là giờ xuất phát, chỉ có tác dụng khi có travelAt.
+ */
+export function routeSeconds(P, v, route, start = P.depot, startSeconds = startClock(P)) {
+  const end = forward(P, P.vehicles[v].profile, start, startSeconds, route);
+  return end == null ? Infinity : end - startSeconds;
+}
+
+/**
+ * Lịch của một tuyến: giờ đến từng điểm (giây kể từ 0:00, là giờ dự kiến đến), giờ về kho, thời lượng,
+ * thời gian chạy và thời gian phục vụ. null nếu có chặng không hợp lệ.
+ */
+export function routeSchedule(P, v, route, { start = P.depot, startSeconds = startClock(P) } = {}) {
+  const arrivals = [];
+  const end = forward(P, P.vehicles[v].profile, start, startSeconds, route, 0, arrivals);
+  if (end == null) return null;
+  const service = route.reduce((s, o) => s + serviceOf(P, o), 0);
+  return { arrivals, end, seconds: end - startSeconds, travelSeconds: end - startSeconds - service, serviceSeconds: service };
 }
 
 function reasonText(found) {
@@ -48,8 +82,14 @@ function reasonText(found) {
   return keys.length ? keys.map(k => REASONS[k]).join('; ') : REASONS.vehicle_type;
 }
 
-/** Vị trí chèn có mức tăng ΔT = t(i,u) + t(u,j) − t(i,j) thấp nhất của đơn o trên từng xe. */
+/**
+ * Vị trí chèn có mức tăng thời lượng ΔT thấp nhất của đơn o trên từng xe.
+ * Ma trận cố định: ΔT = t(i,u) + t(u,j) − t(i,j) + phục vụ(u).
+ * Thời gian phụ thuộc giờ: chèn u làm mọi chặng sau đó rời điểm muộn hơn nên công thức trên không còn đúng;
+ * ΔT được tính bằng cách giữ giờ rời các điểm phía trước và tính lại phần đuôi từ vị trí chèn.
+ */
 function insertionOptions(P, routes, loads, costs, o) {
+  if (P.travelAt) return insertionOptionsAt(P, routes, loads, costs, o);
   const options = [];
   const found = new Set();
   const u = P.orders[o].point;
@@ -66,10 +106,55 @@ function insertionOptions(P, routes, loads, costs, o) {
       const b = leg(P, profile, u, j);
       const c = leg(P, profile, i, j);
       if (a == null || b == null || c == null) { found.add('no_route'); continue; }
-      const delta = a + b - c;
+      const delta = a + b - c + serviceOf(P, o);
       if (P.maxRouteSeconds && costs[v] + delta > P.maxRouteSeconds) { found.add('duration'); continue; }
       // Bằng nhau thì giữ vị trí đứng trước (số thứ tự vị trí tăng dần)
       if (!best || delta < best.delta) best = { v, p, delta };
+    }
+    if (best) options.push(best);
+  }
+  return { options, found };
+}
+
+function insertionOptionsAt(P, routes, loads, costs, o) {
+  const options = [];
+  const found = new Set();
+  const u = P.orders[o].point;
+  const t0 = startClock(P);
+  for (let v = 0; v < P.vehicles.length; v++) {
+    if (!fits(P, v, o)) { found.add('vehicle_type'); continue; }
+    if (loads[v] + P.orders[o].weightKg > P.vehicles[v].capacityKg) { found.add('capacity'); continue; }
+    const profile = P.vehicles[v].profile;
+    const r = routes[v];
+    // depart[p]: giờ rời điểm thứ p của tuyến hiện tại (p = 0 là kho); không đổi khi chèn đơn vào sau điểm đó
+    const depart = [t0];
+    let clock = t0;
+    let prev = P.depot;
+    for (const x of r) {
+      const pt = P.orders[x].point;
+      const t = leg(P, profile, prev, pt, clock);
+      if (t == null) break;
+      clock += t;
+      clock += serviceOf(P, x);
+      depart.push(clock);
+      prev = pt;
+    }
+    let best = null;
+    for (let p = 0; p <= r.length; p++) {
+      if (p >= depart.length) { found.add('no_route'); break; }
+      const i = p === 0 ? P.depot : P.orders[r[p - 1]].point;
+      const a = leg(P, profile, i, u, depart[p]);
+      if (a == null) { found.add('no_route'); continue; }
+      let c = depart[p];
+      c += a;
+      c += serviceOf(P, o);
+      const end = forward(P, profile, u, c, r, p);
+      if (end == null) { found.add('no_route'); continue; }
+      const seconds = end - t0;
+      if (P.maxRouteSeconds && seconds > P.maxRouteSeconds) { found.add('duration'); continue; }
+      const delta = seconds - costs[v];
+      // Bằng nhau thì giữ vị trí đứng trước (số thứ tự vị trí tăng dần)
+      if (!best || delta < best.delta) best = { v, p, delta, seconds };
     }
     if (best) options.push(best);
   }
@@ -97,7 +182,8 @@ export function insertion(P) {
     if (!best) { unassigned.push({ order: o, reason: reasonText(found) }); continue; }
     routes[best.v].splice(best.p, 0, o);
     loads[best.v] += P.orders[o].weightKg;
-    costs[best.v] += best.delta;
+    // Phụ thuộc giờ: lấy đúng thời lượng đã tính cho tuyến mới thay vì cộng dồn ΔT
+    costs[best.v] = P.travelAt ? best.seconds : costs[best.v] + best.delta;
   }
   return { routes, unassigned, stats: { ms: now() - t0, evaluations: 0 } };
 }
@@ -109,18 +195,22 @@ export function insertion(P) {
  * trước mỗi lần xét một phương án (NFR09). Local Search không thêm hoặc bớt đơn.
  *  start[v]   điểm xe v đang đứng (chuyến đang giao), mặc định là kho
  *  locked[v]  số đơn đầu tuyến của xe v không được đổi (đã xử lý và điểm kế tiếp)
+ *  startTimes[v]  giờ xe v rời start[v] (chỉ dùng khi có travelAt), mặc định P.startSeconds
  *  sameRoute  chỉ đổi thứ tự trong cùng một xe (sau khi xe đã xuất phát)
+ * Mỗi phương án được đánh giá bằng routeSeconds trên cả tuyến, nên khi có travelAt mọi chặng phía sau điểm
+ * bị đổi đều được tính lại theo giờ rời điểm mới.
  */
 export function localSearch(P, initial, {
   maxEvaluations = 10_000, maxMs = 2_000, epsilon = 0,
-  start = null, locked = null, sameRoute = false,
+  start = null, locked = null, sameRoute = false, startTimes = null,
 } = {}) {
   const t0 = now();
   const routes = initial.routes.map(r => r.slice());
   const V = routes.length;
   const startOf = v => start?.[v] ?? P.depot;
   const lockOf = v => locked?.[v] ?? 0;
-  const costs = routes.map((r, v) => routeSeconds(P, v, r, startOf(v)));
+  const clockOf = v => startTimes?.[v] ?? startClock(P);
+  const costs = routes.map((r, v) => routeSeconds(P, v, r, startOf(v), clockOf(v)));
   let evaluations = 0;
   let moves = 0;
   let stopReason = null;
@@ -132,7 +222,7 @@ export function localSearch(P, initial, {
   };
   const value = (v, r) => {
     if (loadOf(P, r) > P.vehicles[v].capacityKg) return Infinity;
-    const c = routeSeconds(P, v, r, startOf(v));
+    const c = routeSeconds(P, v, r, startOf(v), clockOf(v));
     return P.maxRouteSeconds && c > P.maxRouteSeconds ? Infinity : c;
   };
 
@@ -219,12 +309,18 @@ export function plan(P, options = {}) {
   const improved = localSearch(P, first, options);
   const finalTotal = totalSeconds(P, improved.routes);
   return {
-    routes: improved.routes.map((r, v) => ({
-      vehicleId: P.vehicles[v].id,
-      orderIds: r.map(o => P.orders[o].id),
-      seconds: routeSeconds(P, v, r),
-      loadKg: Math.round(loadOf(P, r) * 100) / 100,
-    })),
+    routes: improved.routes.map((r, v) => {
+      const s = routeSchedule(P, v, r);
+      return {
+        vehicleId: P.vehicles[v].id,
+        orderIds: r.map(o => P.orders[o].id),
+        seconds: routeSeconds(P, v, r),
+        loadKg: Math.round(loadOf(P, r) * 100) / 100,
+        // Giờ dự kiến đến từng đơn và giờ về kho (giây kể từ 0:00, tính từ P.startSeconds)
+        arrivalSeconds: s?.arrivals ?? null,
+        returnSeconds: s?.end ?? null,
+      };
+    }),
     unassigned: improved.unassigned.map(u => ({ orderId: P.orders[u.order].id, reason: u.reason })),
     stats: {
       insertionSeconds: insertionTotal,
@@ -241,15 +337,20 @@ export function plan(P, options = {}) {
  * Đánh giá đổi thứ tự các điểm còn lại của một xe đang giao (UC07, mục 3.4.5–3.4.7).
  * Phần tuyến được tính từ vị trí hiện tại, qua điểm kế tiếp đang khóa, các điểm còn lại rồi về kho.
  * Cả thứ tự hiện hành và thứ tự đề xuất được tính trên cùng một ma trận mới.
- *  stops:   [{ id, point }] các điểm chưa xử lý theo thứ tự hiện hành; phần tử đầu là điểm kế tiếp
+ *  stops:   [{ id, point, serviceSeconds? }] các điểm chưa xử lý theo thứ tự hiện hành; phần tử đầu là điểm kế tiếp
  *  start:   khóa điểm vị trí xe
  *  profile: cấu hình định tuyến của xe
+ *  travelAt, startSeconds: tùy chọn, thời gian phụ thuộc giờ; startSeconds là giờ hiện tại của xe
+ *  serviceSeconds: thời gian phục vụ mặc định tại mỗi điểm còn lại (0)
  */
-export function evaluateReroute({ depot, travel, profile, start, stops, minSavingSeconds = 60, minSavingRatio = 0.05, maxEvaluations = 10_000, maxMs = 2_000 }) {
+export function evaluateReroute({ depot, travel, travelAt = null, startSeconds = 0, serviceSeconds = 0, profile, start, stops, minSavingSeconds = 60, minSavingRatio = 0.05, maxEvaluations = 10_000, maxMs = 2_000 }) {
   const P = {
     depot,
     travel,
-    orders: stops.map(s => ({ id: s.id, code: String(s.id), point: s.point, weightKg: 0, vehicleTypes: ['any'] })),
+    travelAt,
+    startSeconds,
+    serviceSeconds,
+    orders: stops.map(s => ({ id: s.id, code: String(s.id), point: s.point, weightKg: 0, vehicleTypes: ['any'], serviceSeconds: s.serviceSeconds })),
     vehicles: [{ id: 0, type: 'any', profile, capacityKg: Infinity }],
   };
   const current = stops.map((_, i) => i);
@@ -297,4 +398,68 @@ export function detectIncrease({ points, profile, oldTravel, newTravel, relative
     legs, before, after, increase, slowLegs,
     triggered: legs > 0 && (increase >= absolute || (before > 0 && increase / before >= relative)),
   };
+}
+
+// ---------------------------------------------------------------- Thời gian chặng theo giờ từ nhiều khung giờ đã ghi
+
+/** "16:30" → 59.400 (giây kể từ 0:00). */
+export function clockSeconds(hhmm) {
+  const [h, m = 0, s = 0] = String(hhmm).split(':').map(Number);
+  return h * 3600 + m * 60 + s;
+}
+
+/**
+ * Tạo travelAt từ các ma trận đã ghi ở vài khung giờ: slots = [{ seconds, travel(profile, a, b) }].
+ * Giữa hai khung giờ liền nhau, thời gian chặng nội suy tuyến tính theo giờ rời điểm; trước khung đầu và sau
+ * khung cuối giữ nguyên giá trị của khung gần nhất. Một trong hai khung bao quanh thiếu dữ liệu thì chặng là null.
+ *
+ * Tính chất FIFO (rời muộn hơn thì không đến sớm hơn): trên đoạn [t1, t2], giờ đến t + τ(t) có độ dốc
+ * 1 + (τ2 − τ1)/(t2 − t1), nên FIFO giữ khi τ1 − τ2 ≤ t2 − t1, tức thời gian chặng không giảm nhanh hơn
+ * khoảng cách giữa hai khung. Với khung cách 30 phút, chặng phải nhanh lên hơn 30 phút mới vi phạm; dùng
+ * fifoCheck để kiểm tra trên dữ liệu thật. Đoạn giữ nguyên ở hai đầu luôn thỏa FIFO.
+ */
+export function interpolateSlots(slots) {
+  const S = slots.slice().sort((x, y) => x.seconds - y.seconds);
+  if (!S.length) throw new Error('Cần ít nhất một khung giờ');
+  const last = S.length - 1;
+  return (profile, a, b, t) => {
+    if (a === b) return 0;
+    if (t <= S[0].seconds) return S[0].travel(profile, a, b);
+    if (t >= S[last].seconds) return S[last].travel(profile, a, b);
+    let k = 0;
+    while (S[k + 1].seconds <= t) k++;
+    const x = S[k].travel(profile, a, b);
+    if (t === S[k].seconds) return x;
+    const y = S[k + 1].travel(profile, a, b);
+    if (x == null || y == null) return null;
+    return x + (y - x) * (t - S[k].seconds) / (S[k + 1].seconds - S[k].seconds);
+  };
+}
+
+/**
+ * Kiểm tra FIFO của interpolateSlots trên mọi chặng giữa các điểm cho trước: vi phạm khi một chặng nhanh lên
+ * nhiều hơn khoảng cách giữa hai khung giờ liền nhau. margin là phần dư nhỏ nhất (giây) của (t2 − t1) − (τ1 − τ2).
+ */
+export function fifoCheck(slots, profiles, points) {
+  const S = slots.slice().sort((x, y) => x.seconds - y.seconds);
+  const violations = [];
+  let checked = 0;
+  let margin = Infinity;
+  for (const profile of profiles) {
+    for (const a of points) {
+      for (const b of points) {
+        if (a === b) continue;
+        for (let k = 0; k + 1 < S.length; k++) {
+          const x = S[k].travel(profile, a, b);
+          const y = S[k + 1].travel(profile, a, b);
+          if (x == null || y == null) continue;
+          checked++;
+          const m = (S[k + 1].seconds - S[k].seconds) - (x - y);
+          margin = Math.min(margin, m);
+          if (m < 0) violations.push({ profile, a, b, from: S[k].seconds, to: S[k + 1].seconds, before: x, after: y });
+        }
+      }
+    }
+  }
+  return { checked, violations, margin, ok: violations.length === 0 };
 }
