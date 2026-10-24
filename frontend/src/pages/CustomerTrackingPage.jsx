@@ -86,7 +86,7 @@ export default function CustomerTrackingPage() {
       {ask?.kind === 'defer' && (
         <Dialog title="Giao sau" confirmLabel="Xác nhận" busy={action.busy} confirmDisabled={!ask.time}
           onCancel={() => setAsk(null)} onConfirm={() => send('defer', { time: ask.time })}>
-          <Field label="Giao sau">
+          <Field label="Nhận hàng từ">
             <select className="select" value={ask.time} onChange={e => setAsk({ ...ask, time: e.target.value })}>
               {t.actions.deferTimes.map(x => <option key={x} value={x}>{x}</option>)}
             </select>
