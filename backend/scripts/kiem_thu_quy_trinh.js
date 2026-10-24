@@ -3,7 +3,10 @@
 //   npm run test:flow
 // Phần tự đổi tuyến gọi thẳng bước kiểm tra định kỳ của Backend (cùng biến PG*), cần REROUTE_COOLDOWN_SECONDS > 0.
 // Ngoài luồng chính còn kiểm tra: bỏ đơn thiếu khỏi chuyến, giao sau, kết thúc chuyến do sự cố, thất lạc, chuyển hoàn,
-// tự chốt chuyến giao hết, tối đa số lần giao lại, việc cần xử lý của Dispatcher và kiểm tra dữ liệu nhập.
+// tự chốt chuyến giao hết, tối đa số lần giao lại, việc cần xử lý của Dispatcher, kiểm tra dữ liệu nhập; đơn cùng điểm giao
+// đi cùng xe, giờ dự kiến trong bản nháp, giao khác thứ tự (hệ thống sắp lại, điểm giao sau vẫn ghim cuối), trang theo dõi
+// đơn của khách (dữ liệu tối thiểu, hẹn giờ thì sắp lại theo giờ hẹn, không kịp trong ca thì về chờ xếp, hẹn ngày khác).
+// Dùng bộ dữ liệu 60 đơn của npm run seed và nguồn ma trận replay (không cần khóa TomTom).
 // Biến API_BASE đổi địa chỉ Backend (mặc định http://localhost:3000/api).
 // Kịch bản ghi dữ liệu thật vào cơ sở dữ liệu, chỉ chạy trên cơ sở dữ liệu thử: phải đặt FLOW_TEST_ALLOW=1
 // cùng PGDATABASE/PGPORT của cơ sở dữ liệu thử (biến đặt sẵn trong môi trường được ưu tiên hơn file .env).
@@ -11,6 +14,8 @@ import { execFileSync } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { clockText, roundUp } from '../src/services/clock.js';
+import { haversineM } from '../src/services/matrix.js';
 
 // Kịch bản tạo tài khoản, giao chuyến và gọi công cụ mô phỏng ghi thẳng vào PostgreSQL theo cấu hình hiện tại,
 // nên không chạy nếu chưa xác nhận đang dùng cơ sở dữ liệu thử
@@ -63,12 +68,18 @@ check(selfLock.status === 400, 'không tự khóa chính mình');
 
 console.log('Dispatcher: lập kế hoạch');
 const opt = (await api(disp, 'GET', '/planning/options')).data;
-check(opt.orders.length === 20, '20 đơn chờ xếp');
+check(opt.orders.length === 60, '60 đơn chờ xếp');
+check(opt.defaults.shiftEnd && !('maxRouteMinutes' in opt.defaults) && opt.vehicles.filter(v => !v.problem).every(v => v.capacityParcels > 0),
+  'tùy chọn lập kế hoạch: giờ hết ca mặc định, không còn giới hạn thời lượng mỗi chuyến; xe có số kiện tối đa');
 const ready = opt.vehicles.filter(v => !v.problem).map(v => v.id);
 check(ready.length === 4, '4 xe sẵn sàng (xe 5 bảo trì)');
 const badRun = await api(disp, 'POST', '/planning/runs', { clientEventId: randomUUID(), orderIds: opt.orders.map(o => o.id), vehicleIds: opt.vehicles.map(v => v.id) });
 check(badRun.status === 400, 'chọn xe bảo trì bị từ chối, không lưu bản nháp');
-const runReq = { clientEventId: randomUUID(), orderIds: opt.orders.map(o => o.id), vehicleIds: ready, maxRouteMinutes: 60 };
+// Ca bắt đầu bây giờ (mặc định), hết ca sau 5 giờ để khách còn hẹn giờ được trong ca
+const shiftEnd = clockText(new Date(Date.now() + 5 * 3600_000));
+const badShift = await api(disp, 'POST', '/planning/runs', { clientEventId: randomUUID(), orderIds: opt.orders.map(o => o.id), vehicleIds: ready, shiftEnd: '25:00' });
+check(badShift.status === 400, 'giờ hết ca sai dạng bị từ chối');
+const runReq = { clientEventId: randomUUID(), orderIds: opt.orders.map(o => o.id), vehicleIds: ready, shiftEnd };
 let run = (await api(disp, 'POST', '/planning/runs', runReq)).data.run;
 const again = await api(disp, 'POST', '/planning/runs', runReq);
 check(again.data.run.id === run.id, 'gửi lại cùng mã không tạo lần tính thứ hai');
@@ -82,7 +93,20 @@ console.log('     tuyến:', r.routes.map(x => `xe ${x.vehicleId}: ${x.orderIds.
 console.log('     chưa xếp:', JSON.stringify(r.unassigned), 'T insertion', r.stats.insertionSeconds, '→', r.stats.finalSeconds, 'đánh giá', r.stats.evaluations, 'ma trận', JSON.stringify(r.matrix));
 const assignedIds = r.routes.flatMap(x => x.orderIds);
 check(new Set(assignedIds).size === assignedIds.length, 'mỗi đơn chỉ một lần');
-check(r.routes.every(x => x.seconds <= 3600), 'mỗi tuyến ≤ 60 phút');
+const endAt = new Date(run.snapshot.params.shiftEndAt);
+check(r.routes.every(x => new Date(x.returnAt) <= endAt) && r.unassigned.length === 0, `mọi xe về kho trước giờ hết ca ${shiftEnd}, không đơn nào chưa xếp`);
+check(r.routes.every(x => x.arrivals.length === x.orderIds.length && x.arrivals.every((a, k) => a.orderId === x.orderIds[k] && new Date(a.at) < new Date(x.returnAt))),
+  'bản nháp có giờ dự kiến từng đơn và giờ về kho của mỗi tuyến');
+const capOf = new Map(opt.vehicles.map(v => [v.id, v]));
+check(r.routes.every(x => x.loadKg <= capOf.get(x.vehicleId).capacityKg && x.loadParcels <= capOf.get(x.vehicleId).capacityParcels),
+  'mỗi tuyến không vượt tải trọng và số kiện của xe');
+// Đơn cùng điểm giao (cùng tọa độ) đi cùng xe và liền nhau
+const pointOf = new Map(opt.orders.map(o => [o.id, `${o.lat},${o.lon}`]));
+const together = [...new Set(pointOf.values())].every(pt => {
+  const hits = r.routes.flatMap(x => x.orderIds.map((id, k) => ({ v: x.vehicleId, k, pt: pointOf.get(id) }))).filter(h => h.pt === pt);
+  return hits.every(h => h.v === hits[0].v) && hits.map(h => h.k).sort((a, b) => a - b).every((k, i, a) => !i || k === a[i - 1] + 1);
+});
+check(together && r.splitPoints.length === 0, 'đơn cùng điểm giao đi cùng xe, giao liền nhau');
 
 console.log('Dispatcher: giao chuyến');
 const commitId = randomUUID();
@@ -203,7 +227,7 @@ const { applyReroute, periodicRerouteCheck } = await import('../src/services/tri
 const { config } = await import('../src/config.js');
 const view = async () => (await api(disp, 'GET', `/trips/${tA.id}`)).data.trip;
 const checkNow = async () => (await periodicRerouteCheck()).find(x => x.tripId === tA.id);
-const incident = factor => execFileSync(process.execPath, ['scripts/simulate.js', 'incident', '--trip', String(tA.id), '--factor', String(factor)], { cwd: ROOT, encoding: 'utf8' }).trim().split(/\r?\n/)[0];
+const incident = factor => execFileSync(process.execPath, ['scripts/simulate.js', 'incident', '--trip', String(tA.id), '--factor', String(factor), '--force'], { cwd: ROOT, encoding: 'utf8' }).trim().split(/\r?\n/)[0];
 const here = () => pos(stops[1].order.lat, stops[1].order.lon);
 await here();
 const t0 = await view();
@@ -211,7 +235,7 @@ const c0 = await checkNow();
 const t0b = await view();
 check(t0b.routeVersion.id === t0.routeVersion.id && !t0b.lastReplan, `dữ liệu không đổi thì giữ tuyến hiện hành (${c0?.outcome} ${c0?.reason})`);
 if (stops.length - 2 >= 3) {
-  console.log('     ' + incident(4));
+  console.log('     ' + incident(10));
   await here();
   const c1 = await checkNow();
   const t1 = await view();
@@ -227,7 +251,7 @@ if (stops.length - 2 >= 3) {
   const lateExpected = (t1.lateSeconds ?? 0) > dashL.thresholds.lateMinutes * 60 || Boolean(t1.shiftEndAt && t1.etaReturn && new Date(t1.etaReturn) > new Date(t1.shiftEndAt));
   check(dashL.todo.some(x => x.type === 'late' && x.tripId === tA.id) === lateExpected,
     `chuyến trễ so với kế hoạch vào việc cần xử lý khi về kho dự kiến muộn hơn ${dashL.thresholds.lateMinutes} phút (trễ ${t1.lateSeconds} giây)`);
-  console.log('     ' + incident(4));
+  console.log('     ' + incident(10));
   await here();
   const c2 = await checkNow();
   check((await view()).routeVersion.id === t1.routeVersion.id && c2?.reason === 'needs_ack', 'chưa đổi thêm khi thiết bị tài xế chưa nhận tuyến hiện hành');
@@ -244,7 +268,71 @@ if (stops.length - 2 >= 3) {
   check(c1?.reason === 'few_stops', 'còn ít hơn 3 điểm thì không xét đổi tuyến');
 }
 
-console.log('Driver: giao sau; Dispatcher: kết thúc chuyến do sự cố');
+console.log('Khách: theo dõi đơn và tự hẹn lại');
+const tokenOf = async orderId => (await api(disp, 'GET', `/orders/${orderId}`)).data.order.trackingToken;
+const ptOf = s => `${s.order.lat},${s.order.lon}`;
+let ta = await view();
+const posA = ta.position;
+const pendA = ta.stops.filter(s => s.status === 'pending');
+const far = s => haversineM(s.order, posA) > config.tracking.arrivingMeters + 100;
+// Số điểm dừng (điểm giao khác nhau) trước một điểm trong thứ tự hiện hành
+const stopsBefore = s => new Set(pendA.filter(x => x.seq < s.seq && ptOf(x) !== ptOf(s)).map(ptOf)).size;
+const lateStop = pendA.find(s => stopsBefore(s) > 2);
+const nearStop = pendA[0];
+if (lateStop) {
+  const tv = await api(null, 'GET', `/public/tracking/${await tokenOf(lateStop.order.id)}`);
+  const body = JSON.stringify(tv.data);
+  const ALLOWED = ['code', 'status', 'notBeforeAt', 'driverName', 'eta', 'stopsBefore', 'vehicle', 'destination', 'result', 'actions', 'updatedAt'];
+  check(tv.status === 200 && Object.keys(tv.data.tracking).every(k => ALLOWED.includes(k)) && tv.data.tracking.code === lateStop.order.code
+    && !body.includes(lateStop.order.phone) && !body.includes(lateStop.order.recipientName) && !body.includes(lateStop.order.address)
+    && !body.includes(ta.driver.phone) && !body.includes(ta.driver.name)
+    && !ta.stops.some(s => s.id !== lateStop.id && (body.includes(`"${s.order.code}"`) || body.includes(s.order.phone)))
+    && tv.data.tracking.driverName === ta.driver.name.split(' ').at(-1),
+  'trang theo dõi đơn chỉ có dữ liệu tối thiểu của đúng đơn: không số điện thoại, không tên, địa chỉ người nhận, không khách khác, tài xế chỉ có tên gọi');
+  check(tv.data.tracking.stopsBefore === stopsBefore(lateStop) && tv.data.tracking.vehicle === null && tv.data.tracking.destination === null
+    && new Date(tv.data.tracking.eta?.to) > new Date(tv.data.tracking.eta?.from) && tv.data.tracking.actions?.deferTimes.length > 0,
+  `còn ${stopsBefore(lateStop)} điểm dừng trước: có khung giờ dự kiến, không hiện vị trí xe`);
+}
+const tvNear = (await api(null, 'GET', `/public/tracking/${await tokenOf(nearStop.order.id)}`)).data.tracking;
+check(tvNear.stopsBefore <= 2 && Math.abs(tvNear.vehicle?.lat - posA.lat) < 1e-6, 'còn tối đa 2 điểm dừng trước: hiện vị trí xe');
+check((await api(null, 'GET', `/public/tracking/${'0'.repeat(64)}`)).status === 404 && (await api(null, 'GET', '/public/tracking/abc')).status === 404,
+  'mã theo dõi sai thì không có dữ liệu');
+
+// Khách hẹn giao sau giờ dự kiến của điểm cuối: hệ thống tự sắp lại, đơn xuống sau, không giao trước giờ hẹn
+const lastEta = Math.max(...pendA.map(s => new Date(s.eta).getTime()));
+const later = clockText(roundUp(new Date(lastEta + 15 * 60_000), 30));
+const X = pendA.slice(1, -1).find(s => ptOf(s) !== ptOf(pendA[0]) && far(s));
+if (X) {
+  const before = pendA.findIndex(s => s.id === X.id);
+  const dv = await api(null, 'POST', `/public/tracking/${await tokenOf(X.order.id)}/defer`, { time: later });
+  ta = await view();
+  const pendA2 = ta.stops.filter(s => s.status === 'pending');
+  const xs = pendA2.find(s => s.id === X.id);
+  const nb = new Date(xs?.order.notBeforeAt);
+  check(dv.status === 200 && clockText(nb) === later && new Date(xs.eta) >= nb - 1000 && pendA2.findIndex(s => s.id === X.id) > before
+    && ta.routeVersion.reason === 'customer' && new Date(dv.data.tracking.eta?.from) >= nb - 1000,
+  `khách hẹn giao sau ${later}: hệ thống tự sắp lại, đơn xuống sau, dự kiến giao không trước giờ hẹn`);
+  const evC = ta.events.filter(e => e.type === 'customer_deferred').at(-1);
+  check(evC?.actorName == null && evC.payload.by === 'customer' && evC.payload.outcome === 'resequenced', 'nhật ký ghi khách hàng hẹn giờ, điều phối viên và tài xế không phải thao tác');
+  const dvw = (await api(drv[uA], 'GET', '/driver/current-trip')).data.trip;
+  check(dvw.needsAck && dvw.stops.find(s => s.id === X.id).order.notBeforeAt, 'ứng dụng tài xế nhận tuyến mới, điểm có giờ khách hẹn');
+  await api(drv[uA], 'POST', `/driver/trips/${tA.id}/route-ack`, { clientEventId: randomUUID(), routeVersionId: dvw.routeVersion.id });
+
+  // Khách hẹn sau giờ hết ca: không kịp trong ca, đơn ra khỏi chuyến, về chờ xếp ca sau
+  const Y = pendA2.slice(1).find(s => s.id !== X.id && ptOf(s) !== ptOf(pendA2[0]) && far(s));
+  if (Y) {
+    const dy = await api(null, 'POST', `/public/tracking/${await tokenOf(Y.order.id)}/defer`, { time: clockText(new Date(endAt.getTime() + 30 * 60_000)) });
+    ta = await view();
+    check(dy.status === 200 && dy.data.tracking.status === 'pending' && !ta.stops.some(s => s.id === Y.id) && ta.removedStops.some(x => x.orderId === Y.order.id)
+      && (await api(disp, 'GET', `/orders/${Y.order.id}`)).data.order.status === 'pending'
+      && ta.events.some(e => e.type === 'customer_deferred' && e.payload.outcome === 'requeued' && e.payload.orderId === Y.order.id),
+    'khách hẹn sau giờ hết ca: đơn tự ra khỏi chuyến, về chờ xếp ca sau, tài xế thấy kiện cần mang về');
+    const dvy = (await api(drv[uA], 'GET', '/driver/current-trip')).data.trip;
+    if (dvy.needsAck) await api(drv[uA], 'POST', `/driver/trips/${tA.id}/route-ack`, { clientEventId: randomUUID(), routeVersionId: dvy.routeVersion.id });
+  }
+}
+
+console.log('Driver: giao sau, giao khác thứ tự; Dispatcher: kết thúc chuyến do sự cố');
 let vb = (await api(drv[uB], 'GET', '/driver/current-trip')).data.trip;
 if (vb.stops.filter(s => s.status === 'pending').length >= 2) {
   const first = vb.nextStopId;
@@ -258,6 +346,22 @@ if (vb.stops.filter(s => s.status === 'pending').length >= 2) {
   check((await api(drv[uB], 'POST', `/driver/trips/${tB.id}/stops/${first}/defer`, { clientEventId: randomUUID() })).status === 409,
     'điểm đã ở cuối tuyến thì không giao sau thêm');
   vb = df.data.trip;
+  // Giao khác thứ tự: tài xế ghi kết quả cho một điểm ở cuối tuyến thay vì điểm kế tiếp. Hệ thống nhận, sắp lại các điểm
+  // còn lại từ điểm vừa giao; điểm giao sau vẫn ghim cuối tuyến
+  const pendB = vb.stops.filter(s => s.status === 'pending');
+  const ptB = s => `${s.order.lat},${s.order.lon}`;
+  const nextB = vb.stops.find(s => s.id === vb.nextStopId);
+  const jump = pendB.slice(0, -1).reverse().find(s => ptB(s) !== ptB(nextB));
+  if (jump && pendB.length >= 4) {
+    const oo = await api(drv[uB], 'POST', `/driver/trips/${tB.id}/stops/${jump.id}/attempts`, { clientEventId: randomUUID(), result: 'delivered' });
+    const tr = oo.data.trip;
+    const evO = (await api(disp, 'GET', `/trips/${tB.id}`)).data.trip.events.filter(e => e.type === 'route_resequenced').at(-1);
+    check(oo.status === 201 && tr.stops.find(s => s.id === jump.id).status === 'delivered' && tr.routeVersion.reason === 'out_of_order'
+      && evO?.payload.trigger === 'out_of_order' && evO.actorName == null && evO.payload.routeVersionId === tr.routeVersion.id,
+    'giao khác thứ tự: nhận kết quả, hệ thống tự sắp lại các điểm còn lại từ điểm vừa giao');
+    check(tr.stops.filter(s => s.status === 'pending').at(-1)?.id === first, 'điểm giao sau vẫn ghim cuối tuyến sau khi sắp lại');
+    vb = tr;
+  }
 }
 const dB = await api(drv[uB], 'POST', `/driver/trips/${tB.id}/stops/${vb.nextStopId}/attempts`, { clientEventId: randomUUID(), result: 'delivered' });
 check(dB.status === 201, 'giao thành công một điểm trước khi gặp sự cố');
@@ -286,6 +390,8 @@ const dupBody = { clientEventId: randomUUID(), result: 'delivered' };
 const dup = await Promise.all([1, 2, 3, 4].map(() => api(drv[uA], 'POST', `/driver/trips/${tA.id}/stops/${sDup.id}/attempts`, dupBody)));
 check(dup.every(x => x.status === 200 || x.status === 201) && dup.filter(x => !x.data.replayed).length === 1,
   'nhiều lần gửi cùng mã đến đồng thời: một lần ghi, các lần sau nhận lại kết quả (' + dup.map(x => x.status).join(', ') + ')');
+const tvDone = (await api(null, 'GET', `/public/tracking/${(await api(disp, 'GET', `/orders/${sDup.order.id}`)).data.order.trackingToken}`)).data.tracking;
+check(tvDone.status === 'delivered' && tvDone.result?.result === 'delivered' && !tvDone.actions && !tvDone.vehicle, 'trang theo dõi đơn hiện kết quả đã giao, không còn thao tác hẹn lại');
 // Điểm cuối chưa giao được và tài xế không mang kiện đó về: kiện chỉ còn quyết định Thất lạc
 const restA = cur.stops.filter(x => x.status === 'pending' && x.id !== sDup.id);
 const sLost = restA.at(-1);
@@ -326,6 +432,17 @@ const uD = Object.keys(byDriver)[3];
 if (uD) {
   console.log('Hệ thống: tự chốt chuyến giao hết');
   const tD = byDriver[uD];
+  // Khách hẹn ngày khác trước khi chuyến xuất phát: đơn tự ra khỏi chuyến, về chờ xếp
+  const zStop = tD.stops.at(-1);
+  const zToken = (await api(disp, 'GET', `/orders/${zStop.order.id}`)).data.order.trackingToken;
+  const rz = await api(null, 'POST', `/public/tracking/${zToken}/reschedule`, {});
+  const tDv = (await api(disp, 'GET', `/trips/${tD.id}`)).data.trip;
+  check(rz.status === 200 && rz.data.tracking.status === 'pending' && !tDv.stops.some(s => s.id === zStop.id) && tDv.routeVersion.reason === 'customer'
+    && tDv.events.some(e => e.type === 'customer_rescheduled' && e.payload.by === 'customer' && e.actorName == null)
+    && (await api(disp, 'GET', `/orders/${zStop.order.id}`)).data.order.status === 'pending',
+  'khách hẹn ngày khác: đơn tự ra khỏi chuyến, về chờ xếp, nhật ký ghi khách hàng');
+  check((await api(null, 'POST', `/public/tracking/${zToken}/reschedule`, {})).status === 409, 'đơn đã ra khỏi chuyến thì không hẹn lại được nữa');
+  tD.stops = tDv.stops;
   await api(drv[uD], 'POST', `/driver/trips/${tD.id}/start`, { clientEventId: randomUUID(), checkedOrderIds: tD.stops.map(s => s.order.id) });
   for (const s of tD.stops) await api(drv[uD], 'POST', `/driver/trips/${tD.id}/stops/${s.id}/attempts`, { clientEventId: randomUUID(), result: 'delivered' });
   const retD = await api(drv[uD], 'POST', `/driver/trips/${tD.id}/return`, { clientEventId: randomUUID(), returnedOrderIds: [] });
@@ -339,7 +456,7 @@ console.log('Hệ thống: tối đa số lần giao lại');
 // Đơn đã giao không thành công một lần (chuyến đầu); giao lại bằng xe và tài xế vừa giải phóng cho tới khi đạt số lần tối đa
 const retryOrder = stops[1].order.id;
 for (let n = 2; n <= tr.maxDeliveryAttempts; n++) {
-  let rr = (await api(disp, 'POST', '/planning/runs', { clientEventId: randomUUID(), orderIds: [retryOrder], vehicleIds: [tA.vehicle.id], maxRouteMinutes: 0 })).data.run;
+  let rr = (await api(disp, 'POST', '/planning/runs', { clientEventId: randomUUID(), orderIds: [retryOrder], vehicleIds: [tA.vehicle.id], shiftEnd })).data.run;
   for (let i = 0; i < 60 && rr.status === 'running'; i++) {
     await new Promise(res => setTimeout(res, 300));
     rr = (await api(disp, 'GET', `/planning/runs/${rr.id}`)).data.run;

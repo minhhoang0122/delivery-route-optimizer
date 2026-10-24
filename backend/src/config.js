@@ -20,11 +20,21 @@ export const config = {
   // Với nguồn tomtom, chặng lấy trong khoảng này được dùng lại thay vì gọi lại TomTom
   matrixReuseMinutes: num('MATRIX_REUSE_MINUTES', 30),
 
-  // Giới hạn thời lượng mỗi chuyến mặc định khi lập kế hoạch (phút, 0 là không giới hạn)
-  defaultMaxRouteMinutes: num('DEFAULT_MAX_ROUTE_MINUTES', 60),
+  // Với nguồn tomtom, lập kế hoạch lấy hai khung giờ: giờ bắt đầu ca và sau đó ngần này phút (nội suy giữa hai khung)
+  secondSlotMinutes: num('MATRIX_SECOND_SLOT_MINUTES', 60),
+
+  // Giờ địa phương: độ lệch so với UTC (phút), Việt Nam là +7 giờ và không đổi giờ theo mùa
+  tzOffsetMinutes: num('TZ_OFFSET_MINUTES', 420),
+  // Giờ hết ca mặc định khi lập kế hoạch (HH:MM); giờ bắt đầu ca mặc định là bây giờ, làm tròn lên 5 phút
+  defaultShiftEnd: process.env.SHIFT_END || '18:00',
+
+  // Thời gian phục vụ: mỗi lần dừng ở một điểm (đỗ xe, tìm cửa) và mỗi đơn giao tại điểm đó (giây).
+  // Dùng chung cho lập kế hoạch, giờ dự kiến và đổi tuyến
+  stopSeconds: num('STOP_SECONDS', 90),
+  serviceSecondsPerOrder: num('SERVICE_SECONDS_PER_ORDER', 90),
 
   // Giới hạn tính toán của Local Search (NFR09)
-  maxEvaluations: num('LS_MAX_EVALUATIONS', 10_000),
+  maxEvaluations: num('LS_MAX_EVALUATIONS', 100_000),
   maxSearchMs: num('LS_MAX_MS', 2_000),
 
   // Điều kiện điều chỉnh tuyến (mục 3.4.6–3.4.7)
@@ -38,6 +48,22 @@ export const config = {
     // Chu kỳ kiểm tra tự động (giây), mặc định 120, 0 là tắt. Mỗi lần chỉ lấy các chặng nối tiếp của thứ tự hiện hành;
     // các chặng còn lại và chặng từ vị trí xe chỉ được lấy khi phát hiện tăng thời gian
     checkIntervalSeconds: num('REROUTE_CHECK_SECONDS', 120),
+  },
+
+  // Lệch tuyến: xe cách đường đi của tuyến hiện hành quá OFF_ROUTE_METERS ở ít nhất OFF_ROUTE_POSITIONS vị trí liên tiếp
+  // kéo dài ít nhất OFF_ROUTE_SECONDS giây thì hệ thống sắp lại các điểm còn lại từ vị trí xe (0 giây: chỉ xét số vị trí)
+  offRoute: {
+    meters: num('OFF_ROUTE_METERS', 300),
+    seconds: num('OFF_ROUTE_SECONDS', 60),
+    positions: num('OFF_ROUTE_POSITIONS', 2),
+  },
+
+  // Trang theo dõi đơn của khách (không đăng nhập): số yêu cầu tối đa mỗi phút từ một địa chỉ IP
+  tracking: {
+    readsPerMinute: num('TRACKING_READS_PER_MINUTE', 30),
+    writesPerMinute: num('TRACKING_WRITES_PER_MINUTE', 5),
+    // Xe cách điểm giao trong ngần này mét thì coi như tài xế đang tới, khách không hẹn lại được nữa
+    arrivingMeters: num('TRACKING_ARRIVING_M', 300),
   },
 
   // Việc cần xử lý trên màn hình Tổng quan của Dispatcher
@@ -64,5 +90,6 @@ export function checkConfig() {
   const problems = [];
   if (!config.jwtSecret || config.jwtSecret.length < 16) problems.push('JWT_SECRET phải dài ít nhất 16 ký tự');
   if (!['replay', 'tomtom', 'mock'].includes(config.matrixSource)) problems.push('MATRIX_SOURCE chỉ nhận replay, tomtom hoặc mock');
+  if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(config.defaultShiftEnd)) problems.push('SHIFT_END phải có dạng HH:MM');
   return problems;
 }

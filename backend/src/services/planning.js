@@ -4,7 +4,8 @@ import { plan } from 'optimization-engine';
 import { config } from '../config.js';
 import { query, transaction } from '../db.js';
 import { badRequest } from '../errors.js';
-import { buildMatrix, pointKey } from './matrix.js';
+import { atSeconds, localMidnight, nextClock, parseClock, roundUp, secondsFrom, todayAt } from './clock.js';
+import { buildMatrix, locationKey, pointKey } from './matrix.js';
 import { routeGeometry } from './tomtom.js';
 
 const ACTIVE = `('assigned', 'in_progress', 'awaiting_reconciliation')`;
@@ -65,8 +66,22 @@ export function orderProblem(o) {
   return null;
 }
 
+/**
+ * Giờ bắt đầu và giờ hết ca của kế hoạch. shiftStart, shiftEnd dạng HH:MM giờ địa phương; giờ bắt đầu mặc định là bây
+ * giờ làm tròn lên 5 phút, giờ hết ca mặc định SHIFT_END (18:00). Giờ hết ca không sau giờ bắt đầu thì là ngày hôm sau.
+ */
+export function shiftWindow({ shiftStart = null, shiftEnd = null } = {}, now = new Date()) {
+  if (shiftStart != null && parseClock(shiftStart) == null) throw badRequest('Giờ bắt đầu ca phải có dạng HH:MM');
+  if (shiftEnd != null && parseClock(shiftEnd) == null) throw badRequest('Giờ hết ca phải có dạng HH:MM');
+  const startAt = shiftStart != null ? todayAt(shiftStart, now) : roundUp(now, 5);
+  const endAt = nextClock(shiftEnd ?? config.defaultShiftEnd, startAt);
+  if (endAt - startAt > 16 * 3600_000) throw badRequest('Giờ hết ca phải sau giờ bắt đầu ca, ca dài tối đa 16 giờ');
+  return { startAt, endAt };
+}
+
 /** Kiểm tra đầu vào và tạo bản chụp dữ liệu tại thời điểm lập kế hoạch (input_snapshot). */
-export async function prepareSnapshot({ orderIds, vehicleIds, maxRouteMinutes, depotId }) {
+export async function prepareSnapshot({ orderIds, vehicleIds, shiftStart = null, shiftEnd = null, maxRouteMinutes = null, depotId }) {
+  const shift = shiftWindow({ shiftStart, shiftEnd });
   const depot = await loadDepot(depotId);
   if (!depot) throw badRequest('Chưa khai báo kho xuất phát');
   const orders = await loadOrders('o.id = ANY($1)', [orderIds]);
@@ -87,18 +102,25 @@ export async function prepareSnapshot({ orderIds, vehicleIds, maxRouteMinutes, d
     depot: { id: depot.id, name: depot.name, address: depot.address, lat: depot.latitude, lon: depot.longitude },
     orders: orders.map(o => ({
       id: o.id, code: o.code, version: o.version, recipientName: o.recipient_name, address: o.address,
-      lat: o.latitude, lon: o.longitude, weightKg: o.weight_kg, vehicleTypes: o.vehicle_types,
+      lat: o.latitude, lon: o.longitude, weightKg: o.weight_kg, parcels: o.parcels, vehicleTypes: o.vehicle_types,
+      notBeforeAt: o.not_before_at,
     })),
     vehicles: vehicles.map(v => ({
       id: v.id, plate: v.plate, type: v.vehicle_type, profile: v.routing_profile, capacityKg: v.capacity_kg,
-      driverId: v.driver_id, driverName: v.driver_name,
+      capacityParcels: v.capacity_parcels, driverId: v.driver_id, driverName: v.driver_name,
     })),
-    params: { maxRouteMinutes: maxRouteMinutes || null, maxEvaluations: config.maxEvaluations, maxMs: config.maxSearchMs },
+    params: {
+      shiftStartAt: shift.startAt, shiftEndAt: shift.endAt,
+      stopSeconds: config.stopSeconds, serviceSeconds: config.serviceSecondsPerOrder,
+      // Giới hạn thời lượng mỗi chuyến (cách cũ): chỉ còn dùng khi yêu cầu gửi lên có maxRouteMinutes
+      maxRouteMinutes: maxRouteMinutes || null,
+      maxEvaluations: config.maxEvaluations, maxMs: config.maxSearchMs,
+    },
   };
 }
 
 const depotKey = d => pointKey('d', d.id, d.lat, d.lon);
-const orderKey = o => pointKey('o', o.id, o.lat, o.lon);
+const orderKey = o => locationKey(o.lat, o.lon);
 
 /** Chạy nền: lập ma trận, Insertion Heuristic, Local Search rồi lưu bản nháp. */
 export async function runPlanning(runId, snapshot) {
@@ -106,29 +128,44 @@ export async function runPlanning(runId, snapshot) {
   try {
     set('matrix', { done: 0, total: 0 });
     const t0 = performance.now();
+    const params = snapshot.params;
+    const startAt = new Date(params.shiftStartAt ?? Date.now());
+    const endAt = params.shiftEndAt ? new Date(params.shiftEndAt) : null;
     const points = [
       { key: depotKey(snapshot.depot), lat: snapshot.depot.lat, lon: snapshot.depot.lon },
       ...snapshot.orders.map(o => ({ key: orderKey(o), lat: o.lat, lon: o.lon })),
     ];
     const profiles = [...new Set(snapshot.vehicles.map(v => v.profile))];
+    // Thời gian phụ thuộc giờ: nguồn tomtom lấy khung giờ bắt đầu ca và một khung sau đó; replay dùng các khung đã ghi
     const matrix = await buildMatrix({
-      points, profiles,
+      points, profiles, departAt: startAt, slots: 2,
       onProgress: (done, total) => set('matrix', { done, total }),
     });
     const matrixMs = performance.now() - t0;
 
     set('optimize');
+    // Giờ trong Optimization Engine tính bằng giây kể từ 0:00 của ngày bắt đầu ca
+    const base = localMidnight(startAt);
     const P = {
       depot: depotKey(snapshot.depot),
       travel: matrix.travel,
-      orders: snapshot.orders.map(o => ({ id: o.id, code: o.code, point: orderKey(o), weightKg: o.weightKg, vehicleTypes: o.vehicleTypes })),
+      travelAt: matrix.travelAt,
+      startSeconds: secondsFrom(base, startAt),
+      shiftEndSeconds: endAt ? secondsFrom(base, endAt) : null,
+      stopSeconds: params.stopSeconds ?? config.stopSeconds,
+      serviceSeconds: params.serviceSeconds ?? config.serviceSecondsPerOrder,
+      orders: snapshot.orders.map(o => ({
+        id: o.id, code: o.code, point: orderKey(o), weightKg: o.weightKg, parcels: o.parcels ?? 1, vehicleTypes: o.vehicleTypes,
+        notBeforeSeconds: o.notBeforeAt && new Date(o.notBeforeAt) > startAt ? secondsFrom(base, o.notBeforeAt) : null,
+      })),
       vehicles: [...snapshot.vehicles].sort((a, b) => a.id - b.id)
-        .map(v => ({ id: v.id, type: v.type, profile: v.profile, capacityKg: v.capacityKg })),
-      maxRouteSeconds: snapshot.params.maxRouteMinutes ? snapshot.params.maxRouteMinutes * 60 : null,
+        .map(v => ({ id: v.id, type: v.type, profile: v.profile, capacityKg: v.capacityKg, capacityParcels: v.capacityParcels ?? undefined })),
+      maxRouteSeconds: params.maxRouteMinutes ? params.maxRouteMinutes * 60 : null,
     };
-    const out = plan(P, { maxEvaluations: snapshot.params.maxEvaluations, maxMs: snapshot.params.maxMs });
+    const out = plan(P, { maxEvaluations: params.maxEvaluations, maxMs: params.maxMs });
 
     const orderById = new Map(snapshot.orders.map(o => [o.id, o]));
+    const at = s => (s == null ? null : atSeconds(base, s));
     const routes = [];
     for (const r of out.routes) {
       if (!r.orderIds.length) continue;
@@ -140,8 +177,20 @@ export async function runPlanning(runId, snapshot) {
         const d = matrix.distance(v.profile, seq[i], seq[i + 1]);
         distanceM = d == null ? null : distanceM + d;
       }
-      routes.push({ vehicleId: v.id, driverId: v.driverId, orderIds: r.orderIds, seconds: r.seconds, distanceM, loadKg: r.loadKg, geometry: null });
+      routes.push({
+        vehicleId: v.id, driverId: v.driverId, orderIds: r.orderIds, seconds: Math.round(r.seconds), distanceM,
+        loadKg: r.loadKg, loadParcels: r.loadParcels,
+        // Giờ dự kiến giao từng đơn và giờ về kho, tính từ giờ bắt đầu ca theo thời gian phụ thuộc giờ và thời gian phục vụ
+        arrivals: r.orderIds.map((id, k) => ({ orderId: id, at: at(r.arrivalSeconds?.[k]) })),
+        returnAt: at(r.returnSeconds),
+        geometry: null,
+      });
     }
+    // Điểm giao có đơn phải tách khác xe (vượt tải, không có loại xe chung)
+    const splitPoints = out.splitPoints.map(s => ({
+      orderIds: s.orderIds, orderCodes: s.orderIds.map(id => orderById.get(id)?.code), address: orderById.get(s.orderIds[0])?.address,
+      reason: s.reason, parts: s.parts,
+    }));
 
     if (!routes.length) {
       await query(`UPDATE planning_runs SET status = 'failed', result = $2 WHERE id = $1`, [runId, {
@@ -162,7 +211,12 @@ export async function runPlanning(runId, snapshot) {
     const result = {
       routes,
       unassigned: out.unassigned,
-      stats: { ...out.stats, matrixMs: Math.round(matrixMs) },
+      splitPoints,
+      shift: { startAt, endAt },
+      stats: {
+        ...out.stats, matrixMs: Math.round(matrixMs),
+        finishAt: at(out.stats.finishSeconds), insertionFinishAt: at(out.stats.insertionFinishSeconds),
+      },
       matrix: { batchIds: matrix.batchIds, ...matrix.stats },
     };
     await transaction(async c => {

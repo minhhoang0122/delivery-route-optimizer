@@ -415,7 +415,7 @@ out.k60.insertionVsLs = [];
   }
 }
 const RULE = { greedy: 'Insertion theo khối lượng giảm dần', regret2: 'Insertion Regret-2 (mặc định)' };
-const LIM = { only: 'chỉ Insertion', default: '+ Relocate/Swap, giới hạn mặc định 10.000 phép / 2 s', converged: '+ Relocate/Swap đến khi hết cải thiện' };
+const LIM = { only: 'chỉ Insertion', default: '+ Relocate/Swap, giới hạn mặc định 100.000 phép / 2 s', converged: '+ Relocate/Swap đến khi hết cải thiện' };
 table(['Cách', 'Số xe', 'Chưa xếp', 'Xe cuối về kho', 'Tổng thời gian chạy (phút)', 'Khách chờ TB (phút)', 'Phép đánh giá', 'Bước cải thiện', 'Lý do dừng', 'Thời gian tính (ms)'],
   out.k60.insertionVsLs.map(e => { const [rule, lim] = e.method.split('_'); return [`${RULE[rule]}, ${LIM[lim]}`, e.vehicles, e.unassigned, clock(e.finish), minutes(e.travel), minutes(e.waitAvg), e.evaluations, e.moves, e.stopReason, ms1(e.ms)]; }));
 // ---------------------------------------------------------------- c) Ma trận cố định so với phụ thuộc giờ
@@ -545,7 +545,7 @@ for (const n of [15, 30, 45, 60]) {
   const N = new Set(orders.map(d => d.diem)).size + 1;
   out.k60.scaling.push({ n, points: N - 1, ...runs[2], legsPerProfile: N * (N - 1), legsTotal: PROFILES60.length * SLOTS60.length * N * (N - 1) });
 }
-table(['Số đơn', 'Số điểm giao', 'Insertion (ms)', 'Local Search đến khi hết cải thiện (ms)', 'Phép đánh giá', 'Giới hạn mặc định 10.000 phép / 2 s', 'Chặng mỗi cấu hình mỗi khung', `Tổng chặng (${PROFILES60.length} cấu hình × ${SLOTS60.length} khung)`],
+table(['Số đơn', 'Số điểm giao', 'Insertion (ms)', 'Local Search đến khi hết cải thiện (ms)', 'Phép đánh giá', 'Giới hạn mặc định 100.000 phép / 2 s', 'Chặng mỗi cấu hình mỗi khung', `Tổng chặng (${PROFILES60.length} cấu hình × ${SLOTS60.length} khung)`],
   out.k60.scaling.map(e => [e.n, e.points, ms1(e.insertionMs), ms1(e.lsMs), e.evaluations, e.defaultStop === 'Không còn phương án cải thiện' ? 'đủ' : e.defaultStop, e.legsPerProfile, e.legsTotal]));
 
 if (process.argv.includes('--json')) {

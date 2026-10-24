@@ -61,7 +61,8 @@ async function send(path, { method = 'GET', body, binary = false } = {}) {
 
 /**
  * Batch Routing đồng bộ, chia nhóm tối đa 100 mục. Mục lỗi tạm thời được gửi lại tối đa 2 lần.
- * queries: [{ from: {lat, lon}, to: {lat, lon}, profile }]
+ * queries: [{ from: {lat, lon}, to: {lat, lon}, profile, departAt? }] — departAt (giờ địa phương có độ lệch, ví dụ
+ * 2026-10-26T17:00:00+07:00) để lấy thời gian theo giao thông dự báo lúc đó; bỏ trống là xuất phát ngay
  * Trả về cùng thứ tự: { ok: true, seconds, meters } | { ok: false, noRoute, error }
  */
 export async function batchRoutes(queries, { onProgress } = {}) {
@@ -74,7 +75,11 @@ export async function batchRoutes(queries, { onProgress } = {}) {
       if (attempt) await sleep(1500 * attempt);
       const { status, data } = await send('/routing/1/batch/sync/json', {
         method: 'POST',
-        body: { batchItems: pending.map(i => ({ query: routeQuery([queries[i].from, queries[i].to], queries[i].profile) })) },
+        body: {
+          batchItems: pending.map(i => ({
+            query: routeQuery([queries[i].from, queries[i].to], queries[i].profile, queries[i].departAt ? { departAt: queries[i].departAt } : {}),
+          })),
+        },
       });
       if (status !== 200) {
         for (const i of pending) out[i] = { ok: false, noRoute: false, error: `HTTP ${status} ${errorText(data)}`.trim() };

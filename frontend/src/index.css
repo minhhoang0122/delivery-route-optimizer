@@ -205,6 +205,7 @@ code, .mono { font-family: var(--mono); font-size: 0.93em; }
 .badge.success { color: var(--ok); }
 .badge.warning { color: var(--warn); }
 .badge.danger { color: var(--bad); }
+.tag-time { display: inline-flex; align-items: center; gap: 4px; padding: 0 5px; border: 1px solid #b9cdee; color: var(--info); font-size: 12px; font-weight: 600; border-radius: 2px; white-space: nowrap; }
 .tag-truck { display: inline-flex; align-items: center; gap: 4px; padding: 0 5px; border: 1px solid #f2c3a6; color: #b4470a; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; border-radius: 2px; }
 
 .chips { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--line-strong); border-radius: var(--r); overflow: hidden; background: var(--surface); }

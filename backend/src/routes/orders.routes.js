@@ -23,11 +23,15 @@ export const toOrder = o => ({
   lat: o.latitude,
   lon: o.longitude,
   weightKg: o.weight_kg,
+  parcels: o.parcels,
   vehicleTypes: o.vehicle_types,
   status: o.status,
   version: o.version,
   note: o.note,
   createdAt: o.created_at,
+  // Khách hẹn giao sau giờ này (trang theo dõi đơn) và mã theo dõi để điều phối viên gửi đường dẫn cho khách
+  notBeforeAt: o.not_before_at,
+  trackingToken: o.tracking_token,
   trip: o.trip_id ? { id: o.trip_id, code: tripCode(o.trip_id) } : null,
 });
 
@@ -66,7 +70,10 @@ router.get('/needs-action', async (_req, res) => {
 router.get('/:id', async (req, res) => {
   const rows = await loadOrders('o.id = $1', [paramId(req)]);
   if (!rows[0]) throw notFound('Không tìm thấy đơn');
-  res.json({ order: toOrder(rows[0]) });
+  // Chuyến gần nhất có đơn này (đang giao hoặc đã kết thúc)
+  const trip = (await query(
+    `SELECT trip_id FROM trip_stops WHERE order_id = $1 AND status <> 'removed' ORDER BY id DESC LIMIT 1`, [rows[0].id])).rows[0];
+  res.json({ order: toOrder({ ...rows[0], trip_id: trip?.trip_id }) });
 });
 
 function readOrder(body) {
@@ -80,6 +87,7 @@ function readOrder(body) {
     address: text(body?.address, 'địa chỉ', { max: 255 }),
     ...servicePoint(body?.lat, body?.lon, 'Vị trí giao'),
     weightKg: number(body?.weightKg, 'khối lượng', { gt: 0, max: 999999 }),
+    parcels: integer(body?.parcels ?? 1, 'số kiện', { min: 1, max: 999 }),
     note: text(body?.note, 'ghi chú', { required: false, max: 255 }),
     vehicleTypes,
     allowDuplicate: body?.allowDuplicate === true,
@@ -92,8 +100,10 @@ function readOrder(body) {
  */
 async function checkOrder(c, o, id = 0) {
   const cap = (await c.query(
-    `SELECT max(capacity_kg) AS kg FROM vehicles WHERE status = 'active' AND vehicle_type = ANY($1)`, [o.vehicleTypes])).rows[0].kg;
-  if (cap != null && o.weightKg > cap) throw badRequest(`Khối lượng vượt tải trọng lớn nhất của xe được phép (${cap} kg)`);
+    `SELECT max(capacity_kg) AS kg, bool_or(capacity_parcels IS NULL) AS unlimited, max(capacity_parcels) AS parcels
+       FROM vehicles WHERE status = 'active' AND vehicle_type = ANY($1)`, [o.vehicleTypes])).rows[0];
+  if (cap.kg != null && o.weightKg > cap.kg) throw badRequest(`Khối lượng vượt tải trọng lớn nhất của xe được phép (${cap.kg} kg)`);
+  if (cap.kg != null && !cap.unlimited && o.parcels > cap.parcels) throw badRequest(`Số kiện vượt sức chứa lớn nhất của xe được phép (${cap.parcels} kiện)`);
   if (o.allowDuplicate) return;
   const same = (await c.query(
     `SELECT code, phone FROM orders WHERE status = 'pending' AND id <> $1
@@ -111,9 +121,9 @@ router.post('/', async (req, res) => {
     if (dup.rows.length) throw conflict('Mã đơn đã tồn tại');
     await checkOrder(c, o);
     const { rows } = await c.query(
-      `INSERT INTO orders (code, recipient_name, phone, address, latitude, longitude, weight_kg, note)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
-      [o.code, o.recipientName, o.phone, o.address, o.lat, o.lon, o.weightKg, o.note]);
+      `INSERT INTO orders (code, recipient_name, phone, address, latitude, longitude, weight_kg, note, parcels)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`,
+      [o.code, o.recipientName, o.phone, o.address, o.lat, o.lon, o.weightKg, o.note, o.parcels]);
     for (const t of o.vehicleTypes) await c.query('INSERT INTO order_vehicle_types (order_id, vehicle_type) VALUES ($1, $2)', [rows[0].id, t]);
     return rows[0].id;
   });
@@ -135,8 +145,8 @@ router.put('/:id', async (req, res) => {
     await checkOrder(c, o, id);
     await c.query(
       `UPDATE orders SET code = $2, recipient_name = $3, phone = $4, address = $5, latitude = $6, longitude = $7,
-                         weight_kg = $8, note = $9, version = version + 1 WHERE id = $1`,
-      [id, o.code, o.recipientName, o.phone, o.address, o.lat, o.lon, o.weightKg, o.note]);
+                         weight_kg = $8, note = $9, parcels = $10, version = version + 1 WHERE id = $1`,
+      [id, o.code, o.recipientName, o.phone, o.address, o.lat, o.lon, o.weightKg, o.note, o.parcels]);
     await c.query('DELETE FROM order_vehicle_types WHERE order_id = $1', [id]);
     for (const t of o.vehicleTypes) await c.query('INSERT INTO order_vehicle_types (order_id, vehicle_type) VALUES ($1, $2)', [id, t]);
   });

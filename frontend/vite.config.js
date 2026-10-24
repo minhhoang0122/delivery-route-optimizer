@@ -11,7 +11,8 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: mode === 'phone' ? true : undefined,
     proxy: {
-      '/api': process.env.API_TARGET || 'http://localhost:3000',
+      // xfwd: gửi kèm địa chỉ IP của trình duyệt (X-Forwarded-For) để Backend giới hạn yêu cầu của trang theo dõi đơn theo từng người
+      '/api': { target: process.env.API_TARGET || 'http://localhost:3000', xfwd: true },
     },
   },
 }))

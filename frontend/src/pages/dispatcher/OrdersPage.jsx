@@ -4,14 +4,14 @@ import { useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { api } from '../../api.js'
 import { Chips, ErrorBox, Field, PageHeader, StatusBadge, Table, TableSkeleton } from '../../components/ui.jsx'
-import { kg, ORDER_STATUS, truckOnly, vehicleTypes } from '../../format.js'
+import { appointment, kg, ORDER_STATUS, parcels, truckOnly, vehicleTypes } from '../../format.js'
 import { useLoad } from '../../hooks.js'
 
 const COLUMNS = [
   { key: 'code', title: 'Mã đơn', width: 120 },
   { key: 'recipient', title: 'Người nhận', width: 220 },
   { key: 'address', title: 'Địa chỉ', width: 300 },
-  { key: 'weight', title: 'Khối lượng', width: 120 },
+  { key: 'weight', title: 'Hàng', width: 130 },
   { key: 'types', title: 'Loại xe được phép', width: 200 },
   { key: 'status', title: 'Trạng thái', width: 168 },
 ]
@@ -39,12 +39,13 @@ export default function OrdersPage() {
       code: o => <span className="strong">{o.code}</span>,
       recipient: o => <div className="col"><span className="strong">{o.recipientName}</span><span className="caption muted">{o.phone}</span></div>,
       address: o => o.address,
-      weight: o => <span className="tabular">{kg(o.weightKg)}</span>,
+      weight: o => <div className="col"><span className="tabular">{kg(o.weightKg)}</span><span className="caption muted">{parcels(o.parcels)}</span></div>,
       types: o => truckOnly(o.vehicleTypes) ? <span className="tag-truck"><Truck size={12} /> Chỉ xe tải nhỏ</span> : vehicleTypes(o.vehicleTypes),
       status: o => (
         <div className="col">
           <StatusBadge map={ORDER_STATUS} value={o.status} />
           {o.trip && <span className="caption muted">{o.trip.code}</span>}
+          {o.notBeforeAt && <span className="tag-time">{appointment(o.notBeforeAt)}</span>}
         </div>
       ),
     }[c.key],
@@ -67,7 +68,7 @@ export default function OrdersPage() {
       <ErrorBox error={error} onRetry={reload} />
       {loading && !data ? <TableSkeleton columns={COLUMNS} /> : (
         <Table columns={columns} rows={shown} empty="Không có đơn phù hợp"
-          onRowClick={o => (o.status === 'pending' ? navigate(`/dispatcher/orders/${o.id}/edit`) : o.trip && navigate(`/dispatcher/trips/${o.trip.id}`))} />
+          onRowClick={o => navigate(`/dispatcher/orders/${o.id}/edit`)} />
       )}
     </>
   )

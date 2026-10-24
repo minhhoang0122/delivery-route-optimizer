@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router'
 import { api, newEventId } from '../../api.js'
 import { Badge, Button, Card, Checkbox, Chips, Dot, Empty, ErrorBox, Field, Loading, PageHeader, Progress, Stat } from '../../components/ui.jsx'
-import { kg, PLAN_STATUS, routeHex, time, truckOnly, VEHICLE_TYPE } from '../../format.js'
+import { kg, parcels, PLAN_STATUS, routeHex, time, truckOnly, VEHICLE_TYPE } from '../../format.js'
 import { useLoad } from '../../hooks.js'
 
 const STEPS = [
@@ -38,7 +38,9 @@ export default function PlanningPage() {
   const initial = {
     orders: new Set(prevSnap ? prevSnap.orders.map(o => o.id).filter(id => okOrders.includes(id)) : okOrders),
     vehicles: new Set(prevSnap ? prevSnap.vehicles.map(v => v.id).filter(id => okVehicles.includes(id)) : okVehicles),
-    maxMinutes: String(prevSnap ? prevSnap.params.maxRouteMinutes ?? 0 : opt.defaults.maxRouteMinutes || 0),
+    // Giờ bắt đầu ca mặc định là bây giờ (làm tròn); "Tính lại" giữ giờ hết ca của lần trước
+    shiftStart: opt.defaults.shiftStart,
+    shiftEnd: prevSnap?.params.shiftEndAt ? time(prevSnap.params.shiftEndAt) : opt.defaults.shiftEnd,
   }
   return <PlanningForm key={from ?? 'new'} opt={opt} runs={runs.data?.runs ?? []} initial={initial} />
 }
@@ -47,7 +49,8 @@ function PlanningForm({ opt, runs, initial }) {
   const navigate = useNavigate()
   const [orders, setOrders] = useState(initial.orders)
   const [vehicles, setVehicles] = useState(initial.vehicles)
-  const [maxMinutes, setMaxMinutes] = useState(initial.maxMinutes)
+  const [shiftStart, setShiftStart] = useState(initial.shiftStart)
+  const [shiftEnd, setShiftEnd] = useState(initial.shiftEnd)
   const [filter, setFilter] = useState('all')
   const [run, setRun] = useState(null)
   const [error, setError] = useState(null)
@@ -69,6 +72,8 @@ function PlanningForm({ opt, runs, initial }) {
       orders: os, vehicles: vs,
       weight: os.reduce((s, o) => s + o.weightKg, 0),
       capacity: vs.reduce((s, v) => s + v.capacityKg, 0),
+      parcels: os.reduce((s, o) => s + (o.parcels ?? 1), 0),
+      parcelCapacity: vs.some(v => v.capacityParcels == null) ? null : vs.reduce((s, v) => s + v.capacityParcels, 0),
       motorcycles: vs.filter(v => v.type === 'motorcycle').length,
     }
   }, [opt, orders, vehicles])
@@ -105,7 +110,7 @@ function PlanningForm({ opt, runs, initial }) {
     try {
       const d = await api('/planning/runs', {
         method: 'POST',
-        body: { clientEventId: newEventId(), orderIds: [...orders], vehicleIds: [...vehicles], maxRouteMinutes: Number(maxMinutes) || 0 },
+        body: { clientEventId: newEventId(), orderIds: [...orders], vehicleIds: [...vehicles], shiftStart, shiftEnd },
       })
       setRun(d.run)
       poll(d.run.id)
@@ -144,7 +149,7 @@ function PlanningForm({ opt, runs, initial }) {
                 <div key={o.id} className="col" style={{ padding: '8px 0', borderBottom: i < shownOrders.length - 1 ? '1px solid var(--line)' : 0 }}>
                   <div className="row between">
                     <Checkbox label={`${o.code} · ${o.recipientName}`} checked={orders.has(o.id)} disabled={computing || Boolean(o.problem)} onChange={v => toggle(orders, setOrders, o.id, v)} />
-                    <span className={`medium tabular ${orders.has(o.id) ? '' : 'muted'}`}>{kg(o.weightKg)}</span>
+                    <span className={`medium tabular ${orders.has(o.id) ? '' : 'muted'}`}>{kg(o.weightKg)} · {parcels(o.parcels)}</span>
                   </div>
                   <div className="row" style={{ paddingLeft: 26, gap: 8 }}>
                     <span className="caption muted">{o.address}</span>
@@ -173,7 +178,7 @@ function PlanningForm({ opt, runs, initial }) {
                     </div>
                     <div className="row muted" style={{ paddingLeft: 26, gap: 6, opacity: v.problem ? 0.7 : 1 }}>
                       {v.type === 'motorcycle' ? <Bike size={16} /> : <Truck size={16} />}
-                      <span className="caption">{VEHICLE_TYPE[v.type]} · {kg(v.capacityKg)}</span>
+                      <span className="caption">{VEHICLE_TYPE[v.type]} · {kg(v.capacityKg)}{v.capacityParcels ? ` · ${parcels(v.capacityParcels)}` : ''}</span>
                     </div>
                     {v.problem && <span className="caption warning" style={{ paddingLeft: 26 }}>{v.problem}</span>}
                   </div>
@@ -186,28 +191,29 @@ function PlanningForm({ opt, runs, initial }) {
             <Card title="Tóm tắt" style={{ flex: '0 1 280px' }}>
               <div className="row top" style={{ gap: 16 }}>
                 <div className="grow"><Stat label="Đơn" value={orders.size} /></div>
-                <div className="grow"><Stat label="Tổng khối lượng" value={kg(selected.weight)} /></div>
+                <div className="grow"><Stat label="Tổng khối lượng" value={kg(selected.weight)} sub={parcels(selected.parcels)} /></div>
               </div>
               <div className="row top" style={{ gap: 16 }}>
                 <div className="grow"><Stat label="Xe" value={vehicles.size} sub={`${selected.motorcycles} xe máy, ${vehicles.size - selected.motorcycles} xe tải nhỏ`} /></div>
-                <div className="grow"><Stat label="Tổng tải" value={kg(selected.capacity)} /></div>
+                <div className="grow"><Stat label="Tổng tải" value={kg(selected.capacity)} sub={selected.parcelCapacity != null ? parcels(selected.parcelCapacity) : undefined} /></div>
               </div>
               <hr className="divider" />
               <div className="col" style={{ gap: 6 }}>
                 <div className="row between"><span className="caption muted">Khối lượng so với tổng tải</span><span className="caption strong secondary">{selected.capacity ? Math.round((selected.weight / selected.capacity) * 100) : 0}%</span></div>
                 <Progress value={selected.capacity ? selected.weight / selected.capacity : 0} width="100%" />
               </div>
-              <Field label="Giới hạn thời lượng mỗi chuyến (phút)" helper="0 là không giới hạn">
-                <input className="input" type="number" min={0} max={1440} value={maxMinutes} onChange={e => setMaxMinutes(e.target.value)} />
-              </Field>
-              <Button icon={Route} block onClick={compute} loading={submitting} disabled={!orders.size || !vehicles.size}>Tính phương án</Button>
+              <div className="row top" style={{ gap: 12 }}>
+                <div className="grow"><Field label="Bắt đầu ca"><input className="input" type="time" value={shiftStart} onChange={e => setShiftStart(e.target.value)} /></Field></div>
+                <div className="grow"><Field label="Hết ca"><input className="input" type="time" value={shiftEnd} onChange={e => setShiftEnd(e.target.value)} /></Field></div>
+              </div>
+              <Button icon={Route} block onClick={compute} loading={submitting} disabled={!orders.size || !vehicles.size || !shiftStart || !shiftEnd}>Tính phương án</Button>
             </Card>
           ) : (
             <Card style={{ flex: '0 1 280px' }}>
               <span className="icon-wrap tone-info" style={{ width: 48, height: 48 }}><LoaderCircle size={24} className="spin" /></span>
               <div className="col">
                 <h3 className="h4">Đang tính phương án…</h3>
-                <span className="caption muted">{orders.size} đơn · {vehicles.size} xe · Kho Hải Châu</span>
+                <span className="caption muted">{orders.size} đơn · {vehicles.size} xe · {shiftStart}–{shiftEnd}{opt.depot ? ` · ${opt.depot.name}` : ''}</span>
               </div>
               {step === 'matrix' && run.progress.total > 0 && (
                 <div className="col" style={{ gap: 6 }}>

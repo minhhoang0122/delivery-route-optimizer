@@ -7,7 +7,7 @@ import { query } from '../db.js';
 import { badRequest, forbidden, notFound } from '../errors.js';
 import { eventPayload, fingerprint, requireEventId } from '../idempotency.js';
 import {
-  acknowledgeRoute, ACTIVE_STATUSES, deferStop, INCIDENT_REASON, loadTrip, recordAttempt, recordPosition, returnTrip, startTrip, tripCode,
+  acknowledgeRoute, ACTIVE_STATUSES, deferStop, followDriver, INCIDENT_REASON, loadTrip, recordAttempt, recordPosition, returnTrip, startTrip, tripCode,
 } from '../services/trips.js';
 import { idList, integer, number, oneOf, paramId, text, timestamp } from '../validate.js';
 
@@ -92,9 +92,14 @@ router.post('/trips/:id/stops/:stopId/attempts', async (req, res) => {
   const note = text(req.body?.note, 'ghi chú', { required: reason === 'Khác', max: 255 });
   const occurredAt = timestamp(req.body?.occurredAt, 'thời điểm', { required: false }) ?? new Date();
   if (occurredAt.getTime() > Date.now() + 60_000) throw badRequest('Thời điểm ghi kết quả ở tương lai');
-  const out = await recordAttempt(id, paramId(req, 'stopId'), req.user, {
+  const stopId = paramId(req, 'stopId');
+  const out = await recordAttempt(id, stopId, req.user, {
     result, reason, note, occurredAt, clientEventId, fp: fingerprint(eventPayload(req.body)),
   });
+  // Giao khác thứ tự: hệ thống đi theo tài xế, sắp lại các điểm còn lại từ điểm vừa giao (lỗi khi sắp lại không làm hỏng kết quả đã ghi)
+  if (out.outOfOrder) {
+    await followDriver(id, { trigger: 'out_of_order', from: out.from, stopId }).catch(err => console.error('Sắp lại theo tài xế lỗi', err.message));
+  }
   res.status(out.replayed ? 200 : 201).json({ replayed: out.replayed, trip: await loadTrip(id) });
 });
 

@@ -36,10 +36,11 @@ async function routeVersionPoints(rv) {
     if (ev.proposedStopIds.some(id => !byId.has(id))) return null;
     return [ev.position, ...ev.proposedStopIds.map(id => byId.get(id)), depot];
   }
-  if (rv.reason === 'deferred') {
-    // Giao sau: từ vị trí xe (hoặc điểm vừa xử lý) lúc Driver dời điểm, qua các điểm còn lại theo thứ tự mới rồi về kho
+  if (!['initial', 'orders_removed'].includes(rv.reason)) {
+    // Giao sau, giao khác thứ tự, lệch tuyến, khách hẹn lại: sự kiện tạo phiên bản ghi điểm xuất phát (vị trí xe hoặc điểm
+    // vừa xử lý) và các điểm còn lại theo thứ tự mới; đường đi từ điểm xuất phát qua các điểm đó rồi về kho
     const ev = (await query(
-      `SELECT payload FROM trip_events WHERE trip_id = $1 AND event_type = 'stop_deferred' AND (payload->>'routeVersionId')::int = $2
+      `SELECT payload FROM trip_events WHERE trip_id = $1 AND (payload->>'routeVersionId')::int = $2 AND payload ? 'stopIds'
         ORDER BY id DESC LIMIT 1`, [rv.trip_id, rv.id])).rows[0]?.payload;
     if (!ev?.start || !ev.stopIds?.length) return null;
     const stops = (await query(
@@ -113,4 +114,23 @@ export async function backfillGeometry({ limit = PER_RUN } = {}) {
     }
   }
   return filled;
+}
+
+/** Khoảng cách (mét) từ điểm { lat, lon } tới đường gấp khúc GeoJSON (kinh độ, vĩ độ), tính trên mặt phẳng chiếu quanh điểm. */
+export function distanceToLine(p, coords) {
+  const r = Math.PI / 180;
+  const kx = Math.cos(p.lat * r) * r * 6371000;
+  const ky = r * 6371000;
+  const xy = c => [(c[0] - p.lon) * kx, (c[1] - p.lat) * ky];
+  let best = coords.length ? Math.hypot(...xy(coords[0])) : Infinity;
+  for (let i = 1; i < coords.length; i++) {
+    const [bx, by] = xy(coords[i - 1]);
+    const [ax, ay] = xy(coords[i]);
+    const dx = ax - bx;
+    const dy = ay - by;
+    const len2 = dx * dx + dy * dy;
+    const k = len2 ? Math.max(0, Math.min(1, -(bx * dx + by * dy) / len2)) : 0;
+    best = Math.min(best, Math.hypot(bx + k * dx, by + k * dy));
+  }
+  return best;
 }

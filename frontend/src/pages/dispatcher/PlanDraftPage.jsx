@@ -1,13 +1,13 @@
 // D09 Bản nháp kế hoạch và UC05 Duyệt, giao chuyến.
 // Bản nháp chưa giữ chỗ đơn, xe và Driver; bấm Phân chuyến thì Backend kiểm tra lại và ghi trong một transaction.
-import { ChevronRight, Clock, RefreshCw, TriangleAlert } from 'lucide-react'
+import { ChevronDown, ChevronRight, Clock, RefreshCw, Split, TriangleAlert } from 'lucide-react'
 import { useMemo, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router'
 import { api, newEventId } from '../../api.js'
 import MapView, { Legend, MapOverlay } from '../../components/MapView.jsx'
 import { geoToLatLngs, NO_ROAD_LEGEND, noRoadRoute } from '../../components/tripMap.js'
 import { Alert, Badge, Button, Card, Dialog, Dot, ErrorBox, Loading, LoadError, PageHeader, Progress, Stat } from '../../components/ui.jsx'
-import { dateTime, duration, kg, km, PLAN_STATUS, routeHex, time, VEHICLE_TYPE } from '../../format.js'
+import { dateTime, duration, kg, km, parcels, PLAN_STATUS, routeHex, time, VEHICLE_TYPE } from '../../format.js'
 import { useAction, useLoad } from '../../hooks.js'
 
 export default function PlanDraftPage() {
@@ -15,6 +15,8 @@ export default function PlanDraftPage() {
   const navigate = useNavigate()
   const { data, error, loading, reload } = useLoad(() => api(`/planning/runs/${id}`), [id])
   const [confirm, setConfirm] = useState(false)
+  // Tuyến đang mở danh sách giờ dự kiến từng điểm
+  const [open, setOpen] = useState(() => new Set())
   const action = useAction()
   // Một mã thao tác cho mỗi lần mở trang: bấm lại hoặc mạng chập chờn gửi lặp cũng không tạo chuyến trùng
   const commitId = useRef(newEventId())
@@ -58,7 +60,12 @@ export default function PlanDraftPage() {
   const at = t => (new Date(t).toDateString() === new Date().toDateString() ? time(t) : dateTime(t))
   const matrixNote = !m ? '' : m.source === 'mock'
     ? 'Thời gian ước lượng, chưa có TomTom'
-    : `Thời gian từ TomTom · lấy lúc ${at(m.newest)}${m.estimated ? ` · ${m.estimated} chặng ước lượng` : ''}`
+    : `Thời gian từ TomTom${m.slots?.length ? ` theo giờ ${m.slots.join(', ')}` : ''} · lấy lúc ${at(m.newest)}${m.estimated ? ` · ${m.estimated} chặng ước lượng` : ''}`
+  const stats = result?.stats ?? {}
+  const shift = result?.shift
+  const splits = result?.splitPoints ?? []
+  const earlier = stats.finishAt && stats.insertionFinishAt ? (new Date(stats.insertionFinishAt) - new Date(stats.finishAt)) / 1000 : 0
+  const toggle = vid => setOpen(o => { const n = new Set(o); if (n.has(vid)) n.delete(vid); else n.add(vid); return n })
 
   return (
     <>
@@ -84,38 +91,83 @@ export default function PlanDraftPage() {
         <div className="stack" style={{ flex: '0 1 452px', minWidth: 320 }}>
           <Card compact>
             <div className="row top" style={{ gap: 16 }}>
-              <div style={{ flex: '1 1 170px' }}><Stat label="Tổng thời gian di chuyển" value={duration(total)} /></div>
+              {stats.finishAt
+                ? <div style={{ flex: '1 1 150px' }}><Stat label="Xe cuối về kho" value={time(stats.finishAt)} sub={shift ? `Ca ${time(shift.startAt)}–${time(shift.endAt)}` : undefined} /></div>
+                : <div style={{ flex: '1 1 150px' }}><Stat label="Tổng thời gian di chuyển" value={duration(total)} /></div>}
               <Stat sep label="Quãng đường" value={km(distance)} />
               <Stat sep label="Đơn đã xếp" value={`${placed}/${snap.orders.length}`} sub={unassigned.length ? `${unassigned.length} chưa xếp` : undefined} subTone="warning" />
             </div>
           </Card>
-          <Card compact title="Tổng thời gian di chuyển" extra={saved > 0 && <Badge tone="success">−{duration(saved)}</Badge>}>
-            <div className="row">
-              <div className="tile grow" style={{ border: '1px solid var(--line)' }}><span className="caption muted">Xếp lần đầu</span><span className="body-large strong secondary">{duration(result?.stats?.insertionSeconds)}</span></div>
-              <ChevronRight size={20} className="muted" />
-              <div className="tile success grow"><span className="caption secondary">Sau khi sắp xếp lại</span><span className="body-large strong success">{duration(total)}</span></div>
-            </div>
-          </Card>
+          {stats.finishAt ? (
+            <Card compact title="Giờ xe cuối về kho" extra={earlier >= 60 && <Badge tone="success">Sớm hơn {duration(earlier)}</Badge>}>
+              <div className="row">
+                <div className="tile grow" style={{ border: '1px solid var(--line)' }}><span className="caption muted">Xếp lần đầu</span><span className="body-large strong secondary">{time(stats.insertionFinishAt)}</span></div>
+                <ChevronRight size={20} className="muted" />
+                <div className="tile success grow"><span className="caption secondary">Sau khi sắp xếp lại</span><span className="body-large strong success">{time(stats.finishAt)}</span></div>
+              </div>
+            </Card>
+          ) : (
+            <Card compact title="Tổng thời gian di chuyển" extra={saved > 0 && <Badge tone="success">−{duration(saved)}</Badge>}>
+              <div className="row">
+                <div className="tile grow" style={{ border: '1px solid var(--line)' }}><span className="caption muted">Xếp lần đầu</span><span className="body-large strong secondary">{duration(result?.stats?.insertionSeconds)}</span></div>
+                <ChevronRight size={20} className="muted" />
+                <div className="tile success grow"><span className="caption secondary">Sau khi sắp xếp lại</span><span className="body-large strong success">{duration(total)}</span></div>
+              </div>
+            </Card>
+          )}
           <Card compact title="Tuyến theo xe" extra={<span className="caption muted">{routes.length} xe · {placed} điểm</span>}>
             <div>
               {routes.map((r, i) => {
                 const v = byVehicle.get(r.vehicleId)
+                const loadParcels = r.loadParcels ?? r.orderIds.reduce((s, oid) => s + (byOrder.get(oid)?.parcels ?? 1), 0)
+                const expanded = open.has(r.vehicleId)
                 return (
-                  <div key={r.vehicleId} className="row" style={{ padding: '6px 0', borderBottom: i < routes.length - 1 ? '1px solid var(--line)' : 0 }}>
-                    <Dot color={routeHex(r.vehicleId)} size={12} />
-                    <div className="col grow">
-                      <span className="strong">{v.plate} · {v.driverName}</span>
-                      <span className="caption muted">{VEHICLE_TYPE[v.type]}</span>
+                  <div key={r.vehicleId} className="col" style={{ padding: '6px 0', gap: 6, borderBottom: i < routes.length - 1 ? '1px solid var(--line)' : 0 }}>
+                    <div className="row">
+                      <Dot color={routeHex(r.vehicleId)} size={12} />
+                      <div className="col grow">
+                        <span className="strong">{v.plate} · {v.driverName}</span>
+                        <span className="caption muted">{VEHICLE_TYPE[v.type]}{r.returnAt ? ` · về kho ${time(r.returnAt)}` : ''}</span>
+                      </div>
+                      <div className="col" style={{ width: 198, gap: 4 }}>
+                        <div className="row between"><span className="medium">{r.orderIds.length} đơn · {duration(r.seconds)}</span><span className="caption muted">{km(r.distanceM)}</span></div>
+                        <div className="row between"><Progress value={r.loadKg / v.capacityKg} color={routeHex(r.vehicleId)} /><span className="caption strong secondary">{kg(r.loadKg)}/{kg(v.capacityKg)}</span></div>
+                        <div className="row between">
+                          <Progress value={v.capacityParcels ? loadParcels / v.capacityParcels : 0} color={routeHex(r.vehicleId)} />
+                          <span className="caption strong secondary">{v.capacityParcels ? `${loadParcels}/${parcels(v.capacityParcels)}` : parcels(loadParcels)}</span>
+                        </div>
+                      </div>
+                      {r.arrivals && <Button variant="ghost" icon={expanded ? ChevronDown : ChevronRight} title="Giờ dự kiến từng điểm" onClick={() => toggle(r.vehicleId)} />}
                     </div>
-                    <div className="col" style={{ width: 198, gap: 6 }}>
-                      <div className="row between"><span className="medium">{r.orderIds.length} đơn · {duration(r.seconds)}</span><span className="caption muted">{km(r.distanceM)}</span></div>
-                      <div className="row between"><Progress value={r.loadKg / v.capacityKg} color={routeHex(r.vehicleId)} /><span className="caption strong secondary">{kg(r.loadKg)}/{kg(v.capacityKg)}</span></div>
-                    </div>
+                    {expanded && (
+                      <div className="stack-sm" style={{ paddingLeft: 22 }}>
+                        {r.arrivals.map((a, k) => {
+                          const o = byOrder.get(a.orderId)
+                          return (
+                            <div key={a.orderId} className="row between" style={{ gap: 8 }}>
+                              <span className="caption"><span className="strong">{k + 1}.</span> {o?.code} · {o?.recipientName} · {o?.address}</span>
+                              <span className="caption strong tabular">{time(a.at)}</span>
+                            </div>
+                          )
+                        })}
+                        <div className="row between"><span className="caption muted">Về kho</span><span className="caption strong tabular">{time(r.returnAt)}</span></div>
+                      </div>
+                    )}
                   </div>
                 )
               })}
             </div>
           </Card>
+          {splits.length > 0 && (
+            <Card compact tone="warning" title={<span className="row" style={{ gap: 8 }}><Split size={18} className="warning" /><span className="h4">Đơn cùng địa chỉ phải tách ({splits.length})</span></span>}>
+              {splits.map(sp => (
+                <div key={sp.orderIds.join('-')} className="col" style={{ paddingLeft: 12, borderLeft: '1px solid var(--warn)' }}>
+                  <span className="strong">{sp.address} · {sp.orderCodes.join(', ')}</span>
+                  <span className="caption secondary">{sp.reason} · {sp.parts.map(pt => `${pt.vehicleId ? byVehicle.get(pt.vehicleId)?.plate : 'chưa xếp'}: ${pt.orderIds.length} đơn`).join(' · ')}</span>
+                </div>
+              ))}
+            </Card>
+          )}
           {unassigned.length > 0 && (
             <Card compact tone="warning" title={<span className="row" style={{ gap: 8 }}><TriangleAlert size={18} className="warning" /><span className="h4">Đơn chưa xếp ({unassigned.length})</span></span>}>
               {unassigned.map(u => {

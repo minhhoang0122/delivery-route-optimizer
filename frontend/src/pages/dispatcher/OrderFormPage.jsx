@@ -1,15 +1,15 @@
 // D03 Tạo đơn / sửa đơn (UC02). Vị trí giao chọn bằng cách bấm trên bản đồ hoặc tìm theo địa chỉ.
 // Sửa địa chỉ thì bỏ vị trí đã chọn; đơn trùng (cùng người nhận, địa chỉ, số điện thoại đang chờ xếp) hỏi lại trước khi lưu.
-import { MapPin, Search, TriangleAlert } from 'lucide-react'
+import { Copy, ExternalLink, MapPin, Search, TriangleAlert } from 'lucide-react'
 import { useState } from 'react'
-import { useNavigate, useParams } from 'react-router'
+import { Link, useNavigate, useParams } from 'react-router'
 import { api } from '../../api.js'
 import MapView from '../../components/MapView.jsx'
-import { Alert, Button, Card, Checkbox, Dialog, ErrorBox, Field, Loading, LoadError, PageHeader } from '../../components/ui.jsx'
-import { geocodeMatch, streetLevelOnly } from '../../format.js'
+import { Alert, Button, Card, Checkbox, Dialog, ErrorBox, Field, Loading, LoadError, PageHeader, StatusBadge } from '../../components/ui.jsx'
+import { appointment, geocodeMatch, ORDER_STATUS, streetLevelOnly } from '../../format.js'
 import { useAction, useLoad } from '../../hooks.js'
 
-const EMPTY = { code: '', recipientName: '', phone: '', address: '', weightKg: '', note: '', lat: null, lon: null, vehicleTypes: ['motorcycle', 'small_truck'] }
+const EMPTY = { code: '', recipientName: '', phone: '', address: '', weightKg: '', parcels: '1', note: '', lat: null, lon: null, vehicleTypes: ['motorcycle', 'small_truck'] }
 
 export default function OrderFormPage() {
   const { id } = useParams()
@@ -19,7 +19,7 @@ export default function OrderFormPage() {
     return existing.error ? <LoadError error={existing.error} onRetry={existing.reload} notFound="Không tìm thấy đơn" back="/dispatcher/orders" /> : <Loading />
   }
   const order = existing.data?.order
-  const initial = order ? { ...order, weightKg: String(order.weightKg).replace('.', ','), note: order.note ?? '' } : EMPTY
+  const initial = order ? { ...order, weightKg: String(order.weightKg).replace('.', ','), parcels: String(order.parcels ?? 1), note: order.note ?? '' } : EMPTY
   return <OrderForm key={id ?? 'new'} id={id} order={order} initial={initial} depot={depot.data?.depots[0]} />
 }
 
@@ -39,6 +39,12 @@ function OrderForm({ id, order, initial, depot: d }) {
   const setAddress = e => { setForm({ ...form, address: e.target.value, lat: null, lon: null }); setMatch(null); setResults(null) }
   const weight = Number(String(form.weightKg).replace(',', '.'))
   const weightError = touched && !(weight > 0) ? 'Khối lượng phải lớn hơn 0' : null
+  const pieces = Number(form.parcels)
+  const parcelsError = touched && !(Number.isInteger(pieces) && pieces >= 1) ? 'Số kiện là số nguyên từ 1' : null
+  // Đường dẫn theo dõi đơn gửi cho khách (khách mở không cần đăng nhập)
+  const trackingUrl = order?.trackingToken ? `${window.location.origin}/theo-doi/${order.trackingToken}` : null
+  const [copied, setCopied] = useState(false)
+  const copyLink = () => navigator.clipboard?.writeText(trackingUrl).then(() => setCopied(true)).catch(() => {})
   const typeError = touched && !form.vehicleTypes.length ? 'Chọn ít nhất một loại xe' : null
   const pinError = touched && form.lat == null ? 'Bấm vào bản đồ để chọn vị trí giao' : null
   const toggleType = (t, on) => setForm({ ...form, vehicleTypes: on ? [...new Set([...form.vehicleTypes, t])] : form.vehicleTypes.filter(x => x !== t) })
@@ -46,8 +52,8 @@ function OrderForm({ id, order, initial, depot: d }) {
   async function submit(e, allowDuplicate = false) {
     e?.preventDefault()
     setTouched(true)
-    if (!(weight > 0) || !form.vehicleTypes.length || form.lat == null) return
-    const body = { ...form, weightKg: weight, allowDuplicate }
+    if (!(weight > 0) || parcelsError || !form.vehicleTypes.length || form.lat == null) return
+    const body = { ...form, weightKg: weight, parcels: pieces, allowDuplicate }
     const ok = await save.run(() => (id ? api(`/orders/${id}`, { method: 'PUT', body }) : api('/orders', { method: 'POST', body })))
     if (ok) navigate('/dispatcher/orders')
   }
@@ -64,13 +70,29 @@ function OrderForm({ id, order, initial, depot: d }) {
 
   return (
     <form className="stack-lg" onSubmit={submit}>
-      <PageHeader title={id ? `Sửa đơn ${order?.code ?? ''}` : 'Tạo đơn hàng'}
+      <PageHeader title={id ? (readOnly ? `Đơn ${order?.code ?? ''}` : `Sửa đơn ${order?.code ?? ''}`) : 'Tạo đơn hàng'}
+        badge={order && <StatusBadge map={ORDER_STATUS} value={order.status} />}
         actions={<>
           {id && !readOnly && <Button variant="secondary" onClick={() => { save.setError(null); setConfirmCancel(true) }} disabled={save.busy}>Hủy đơn</Button>}
           <Button variant="secondary" onClick={() => navigate('/dispatcher/orders')}>Quay lại</Button>
           {!readOnly && <Button type="submit" loading={save.busy}>Lưu đơn</Button>}
         </>} />
-      {readOnly && <Alert tone="warning" title="Đơn đã vào kế hoạch, không sửa được" />}
+      {readOnly && (
+        <Alert tone="info" title={order.trip ? `Chuyến ${order.trip.code}` : 'Đơn không còn chờ xếp'}
+          action={order.trip && <Link className="btn secondary" to={`/dispatcher/trips/${order.trip.id}`}>Xem chuyến</Link>}>
+          {order.notBeforeAt ? appointment(order.notBeforeAt) : undefined}
+        </Alert>
+      )}
+      {!readOnly && order?.notBeforeAt && <Alert tone="info" title={appointment(order.notBeforeAt)} />}
+      {trackingUrl && (
+        <Card compact title="Đường dẫn theo dõi đơn">
+          <div className="row" style={{ gap: 8 }}>
+            <input className="input grow" value={trackingUrl} readOnly onFocus={e => e.target.select()} />
+            <Button variant="secondary" icon={Copy} onClick={copyLink}>{copied ? 'Đã sao chép' : 'Sao chép'}</Button>
+            <a className="btn ghost icon-only" href={trackingUrl} target="_blank" rel="noreferrer" title="Mở trang theo dõi"><ExternalLink size={18} /></a>
+          </div>
+        </Card>
+      )}
       <ErrorBox error={dupError ? null : save.error} />
       <div className="grid-2">
         <Card title="Thông tin đơn">
@@ -99,6 +121,9 @@ function OrderForm({ id, order, initial, depot: d }) {
             )}
             <Field label="Khối lượng (kg)" error={weightError}>
               <input className={`input${weightError ? ' invalid' : ''}`} value={form.weightKg} onChange={set('weightKg')} inputMode="decimal" required />
+            </Field>
+            <Field label="Số kiện" error={parcelsError}>
+              <input className={`input${parcelsError ? ' invalid' : ''}`} value={form.parcels} onChange={set('parcels')} inputMode="numeric" required />
             </Field>
             <Field label="Loại xe được phép" error={typeError}>
               <div className="row" style={{ gap: 24 }}>

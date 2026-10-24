@@ -1,5 +1,5 @@
 // R01 Chuyến hiện tại, R02 Bắt đầu chuyến (kiểm hàng), R02b Hàng không khớp, R05 Mất mạng (UC10, UC10.1, UC11, UC12).
-import { CircleCheck, Info, LocateFixed, Navigation, Package, Phone, RefreshCw, Undo2, WifiOff } from 'lucide-react'
+import { CircleCheck, Clock, Info, LocateFixed, Navigation, Package, PackageX, Phone, RefreshCw, Undo2, WifiOff } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { api, newEventId } from '../../api.js'
@@ -7,11 +7,15 @@ import { DriverScreen } from '../../layouts/DriverLayout.jsx'
 import { useDriver } from '../../layouts/driverContext.js'
 import { Alert, Button, Empty, ErrorBox, Loading, StatusBadge, StopItem } from '../../components/ui.jsx'
 import { stopState } from '../../components/tripMap.js'
-import { ago, kg, time, TRIP_STATUS, VEHICLE_TYPE } from '../../format.js'
+import { ago, appointment, kg, parcels, time, TRIP_STATUS, VEHICLE_TYPE } from '../../format.js'
 import { useAction, useNow } from '../../hooks.js'
 import { isHeld, removeItem } from '../../offline.js'
 
 const mapsLink = o => `https://www.google.com/maps/dir/?api=1&destination=${o.lat},${o.lon}`
+// Phiên bản tuyến do hệ thống tạo (đổi tuyến, đi theo tài xế, khách hẹn lại): ứng dụng báo ngắn "Tuyến đã cập nhật"
+const SYSTEM_ROUTE = ['replan', 'out_of_order', 'off_route', 'customer']
+/** Thẻ giờ khách hẹn trên điểm dừng. */
+const Appointment = ({ stop }) => (stop.order.notBeforeAt ? <span className="tag-time"><Clock size={12} />{appointment(stop.order.notBeforeAt)}</span> : null)
 
 function NextStopCard({ stop, total }) {
   const o = stop.order
@@ -21,7 +25,7 @@ function NextStopCard({ stop, total }) {
       <div className="col">
         <span className="driver-title">{o.recipientName}</span>
         <span className="body-large secondary">{o.address}</span>
-        <span className="row secondary" style={{ gap: 8 }}><Package size={16} className="muted" />{kg(o.weightKg)}{stop.eta ? ` · Dự kiến ${time(stop.eta)}` : ''}{stop.deferred ? ' · Giao sau' : ''}</span>
+        <span className="row wrap secondary" style={{ gap: 8 }}><Package size={16} className="muted" />{kg(o.weightKg)} · {parcels(o.parcels)}{stop.eta ? ` · Dự kiến ${time(stop.eta)}` : ''}{stop.deferred ? ' · Giao sau' : ''}<Appointment stop={stop} /></span>
       </div>
       {o.note && (
         <div className="row top" style={{ padding: 8, borderRadius: 3, background: 'var(--warn-bg)', gap: 8 }}>
@@ -138,8 +142,10 @@ export default function CurrentTripPage() {
   const allDone = !trip.stops.some(s => s.status === 'pending')
 
   // Tuyến vừa được hệ thống đổi: báo ngắn cho đến 1 phút sau khi thiết bị đã nhận; danh sách điểm đã theo thứ tự mới
-  const lr = trip.lastReplan
-  const routeUpdated = lr && lr.routeVersionId === trip.routeVersion?.id && (!lr.received || now - new Date(lr.receivedAt).getTime() < 60_000)
+  const rv = trip.routeVersion
+  const routeUpdated = rv && SYSTEM_ROUTE.includes(rv.reason)
+    && (trip.needsAck || (trip.routeReceivedAt && now - new Date(trip.routeReceivedAt).getTime() < 60_000))
+  const removed = trip.removedStops ?? []
 
   const locationNote = {
     sharing: [LocateFixed, 'success', `Đang chia sẻ vị trí · cập nhật ${ago(location.lastSentAt, now)}`],
@@ -168,7 +174,18 @@ export default function CurrentTripPage() {
       )}
       {routeUpdated && (
         <div className="banner info">
-          <div className="row" style={{ gap: 8 }}><RefreshCw size={20} className="brand" /><span className="body-large strong">Tuyến đã cập nhật · {time(lr.at)}</span></div>
+          <div className="row" style={{ gap: 8 }}><RefreshCw size={20} className="brand" /><span className="body-large strong">Tuyến đã cập nhật · {time(rv.createdAt)}</span></div>
+        </div>
+      )}
+      {removed.length > 0 && (
+        <div className="banner">
+          <div className="row top" style={{ gap: 8 }}>
+            <PackageX size={20} className="warning" />
+            <div className="col">
+              <span className="body-large strong">Mang về kho {removed.length} kiện</span>
+              {removed.map(r => <span key={r.stopId} className="caption secondary">{r.orderCode} · {r.reason}</span>)}
+            </div>
+          </div>
         </div>
       )}
       {failedSync.length > 0 && (
@@ -212,7 +229,8 @@ export default function CurrentTripPage() {
         <>
           <div className="row between"><span className="h4">Các điểm còn lại</span><span className="caption muted">{rest.length} điểm</span></div>
           {rest.map(s => <StopItem key={s.id} state="pending" seq={s.seq} name={s.order.recipientName} address={s.order.address}
-            meta={`${s.eta ? `Dự kiến ${time(s.eta)} · ` : ''}${kg(s.order.weightKg)}${s.deferred ? ' · Giao sau' : ''}`} onClick={() => navigate(`/driver/stops/${s.id}`)} />)}
+            meta={`${s.eta ? `Dự kiến ${time(s.eta)} · ` : ''}${kg(s.order.weightKg)} · ${parcels(s.order.parcels)}${s.deferred ? ' · Giao sau' : ''}`}
+            right={<Appointment stop={s} />} onClick={() => navigate(`/driver/stops/${s.id}`)} />)}
         </>
       )}
       {trip.stops.some(s => s.status !== 'pending' && !s.queued) && (

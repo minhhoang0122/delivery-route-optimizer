@@ -45,7 +45,7 @@ export default function DashboardPage() {
 
   return (
     <>
-      <PageHeader title="Tổng quan ca làm việc" subtitle={`${longDate()} · Kho Hải Châu`}
+      <PageHeader title="Tổng quan ca làm việc" subtitle={`${longDate()}${data?.depot ? ` · ${data.depot.name}` : ''}`}
         actions={<Link className="btn primary" to="/dispatcher/planning"><Route size={16} /> Lập kế hoạch</Link>} />
       <ErrorBox error={error} onRetry={reload} />
       {m && (

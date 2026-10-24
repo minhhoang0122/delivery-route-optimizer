@@ -36,7 +36,7 @@ export default function DesktopLayout() {
       <header className="appbar">
         <div className="appbar-brand">
           <span className="logo"><Truck size={14} /></span>
-          Điều hành giao hàng <small>Kho Hải Châu</small>
+          Điều hành giao hàng
         </div>
         <nav aria-label="Điều hướng chính">
           {NAV[user.role].map((group, i) => (

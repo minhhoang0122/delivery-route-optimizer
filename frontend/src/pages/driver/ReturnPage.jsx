@@ -7,7 +7,7 @@ import { api, newEventId } from '../../api.js'
 import { DriverScreen } from '../../layouts/DriverLayout.jsx'
 import { useDriver } from '../../layouts/driverContext.js'
 import { Alert, Button, ErrorBox, Loading } from '../../components/ui.jsx'
-import { kg, time, VEHICLE_TYPE } from '../../format.js'
+import { kg, parcels, time, VEHICLE_TYPE } from '../../format.js'
 import { useAction } from '../../hooks.js'
 
 export default function ReturnPage() {
@@ -62,10 +62,21 @@ export default function ReturnPage() {
                   }} />
                   <span>{s.order.code} · {s.order.recipientName}</span>
                 </span>
-                <span className="medium secondary">{kg(s.order.weightKg)}</span>
+                <span className="medium secondary">{kg(s.order.weightKg)} · {parcels(s.order.parcels)}</span>
               </label>
             ))}
           </div>
+        </section>
+      )}
+      {trip.removedStops?.length > 0 && (
+        <section className="card" style={{ gap: 8 }}>
+          <span className="h4">Kiện khách hẹn lại ({trip.removedStops.length})</span>
+          {trip.removedStops.map(r => (
+            <div key={r.stopId} className="check-row">
+              <span>{r.orderCode}</span>
+              <span className="caption secondary">{r.reason}</span>
+            </div>
+          ))}
         </section>
       )}
       <ErrorBox error={action.error} />

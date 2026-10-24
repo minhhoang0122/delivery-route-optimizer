@@ -7,7 +7,7 @@ import { api, newEventId } from '../../api.js'
 import MapView, { Legend, MapOverlay } from '../../components/MapView.jsx'
 import { CONGESTION_HEX, congestionRoutes, geoToLatLngs, isStale, NO_ROAD_LEGEND, noRoadRoute, staleAfter, stopState, tripLayers } from '../../components/tripMap.js'
 import { Alert, Badge, Button, Card, Checkbox, Dialog, ErrorBox, Field, KeyValue, Loading, LoadError, PageHeader, Stat, StatusBadge, StopItem } from '../../components/ui.jsx'
-import { ago, dateTime, distance, duration, kg, km, percent, routeHex, routeUpdate, time, TRIP_STATUS, VEHICLE_TYPE } from '../../format.js'
+import { ago, appointment, dateTime, distance, duration, kg, km, parcels, percent, routeHex, routeUpdate, time, TRIP_STATUS, VEHICLE_TYPE } from '../../format.js'
 import { LIVE_MS, useAction, useLoad, useNow } from '../../hooks.js'
 
 const EVENT_LABEL = {
@@ -15,7 +15,9 @@ const EVENT_LABEL = {
   attempt_recorded: 'Ghi kết quả giao', trip_returned: 'Báo về kho', trip_closed: 'Chốt chuyến', trip_revoked: 'Thu hồi chuyến',
   loading_mismatch: 'Hàng không khớp khi xuất phát', reroute_evaluated: 'Đánh giá đổi tuyến',
   trip_aborted: 'Kết thúc chuyến do sự cố', stop_deferred: 'Giao sau', orders_removed: 'Bỏ đơn thiếu khỏi chuyến',
+  route_resequenced: 'Sắp lại theo tài xế', customer_deferred: 'Khách hẹn giờ giao', customer_rescheduled: 'Khách hẹn ngày khác',
 }
+const TRIGGER = { out_of_order: 'giao khác thứ tự', off_route: 'xe lệch tuyến' }
 
 function eventDetail(e, stopsById, versionNo) {
   const p = e.payload || {}
@@ -33,6 +35,9 @@ function eventDetail(e, stopsById, versionNo) {
     case 'trip_aborted': return `${p.orderIds?.length ?? 0} điểm chưa giao${p.note ? ` · ${p.note}` : ''}`
     case 'stop_deferred': return `${stopsById.get(p.stopId)?.order.code ?? ''} xuống cuối tuyến · ${routeUpdate(p.toVersion)} · tài xế yêu cầu`
     case 'orders_removed': return `${(p.orderCodes ?? []).join(', ')} · ${routeUpdate(p.toVersion)}`
+    case 'route_resequenced': return `${TRIGGER[p.trigger] ?? p.trigger}${p.trigger === 'out_of_order' && stopsById.get(p.stopId) ? ` (${stopsById.get(p.stopId).order.code})` : ''} · ${routeUpdate(p.toVersion)} · ${duration(p.proposedSeconds)}`
+    case 'customer_deferred': return `${p.orderCode} · giao sau ${time(p.notBeforeAt)} · ${p.outcome === 'requeued' ? 'không kịp trong ca, đơn về chờ xếp' : p.outcome === 'resequenced' ? `${routeUpdate(p.toVersion)}, dự kiến ${time(p.etaAt)}` : `giữ thứ tự, dự kiến ${time(p.etaAt)}`}`
+    case 'customer_rescheduled': return `${p.orderCode} · đơn về chờ xếp${p.toVersion ? ` · ${routeUpdate(p.toVersion)}` : ''}`
     default: return ''
   }
 }
@@ -150,8 +155,12 @@ export default function TripDetailPage() {
               <StopItem key={s.id} state={stopState(s, t.nextStopId)} seq={s.seq} name={s.order.recipientName} address={s.order.address}
                 meta={s.attempt
                   ? `${s.attempt.result === 'delivered' ? 'Đã giao' : s.attempt.reason} ${time(s.attempt.occurredAt)} · ${s.order.code} · ${kg(s.order.weightKg)}${s.attempt.note ? ` · ${s.attempt.note}` : ''}`
-                  : `${s.eta ? `Dự kiến ${time(s.eta)} · ` : ''}${s.order.code} · ${kg(s.order.weightKg)}${s.deferred ? ' · Giao sau' : ''}`}
-                right={s.attempt?.farFromStop ? <Badge tone="warning">Ghi cách điểm giao {distance(s.attempt.distanceM)}</Badge> : undefined} />
+                  : `${s.eta ? `Dự kiến ${time(s.eta)} · ` : ''}${s.order.code} · ${kg(s.order.weightKg)} · ${parcels(s.order.parcels)}${s.deferred ? ' · Giao sau' : ''}`}
+                right={s.attempt?.farFromStop ? <Badge tone="warning">Ghi cách điểm giao {distance(s.attempt.distanceM)}</Badge>
+                  : s.status === 'pending' && s.order.notBeforeAt ? <span className="tag-time">{appointment(s.order.notBeforeAt)}</span> : undefined} />
+            ))}
+            {t.removedStops?.map(r => (
+              <StopItem key={`r${r.stopId}`} state="failed" seq="–" name={r.orderCode} address={r.reason} meta={`Đơn về chờ xếp lúc ${time(r.at)}${t.status === 'in_progress' ? ' · tài xế mang kiện về kho' : ''}`} />
             ))}
           </div>
         </Card>
@@ -181,7 +190,7 @@ export default function TripDetailPage() {
               <span className="caption muted tabular" style={{ width: 130 }}>{dateTime(e.createdAt)}</span>
               <span className="strong" style={{ width: 210 }}>{EVENT_LABEL[e.type] ?? e.type}</span>
               <span className="secondary grow">{eventDetail(e, byId, versionNo)}</span>
-              <span className="caption muted">{e.actorName ?? 'Hệ thống'}</span>
+              <span className="caption muted">{e.actorName ?? (e.payload?.by === 'customer' ? 'Khách hàng' : 'Hệ thống')}</span>
             </div>
           ))}
         </div>

@@ -106,6 +106,7 @@ const toVehicle = r => ({
   plate: r.plate,
   type: r.vehicle_type,
   capacityKg: r.capacity_kg,
+  capacityParcels: r.capacity_parcels,
   routingProfile: r.routing_profile,
   status: r.status,
   driver: r.driver_id ? { id: r.driver_id, name: r.driver_name } : null,
@@ -138,6 +139,8 @@ function readVehicle(body) {
     plate: text(body?.plate, 'biển số', { max: 20 }),
     type,
     capacityKg: number(body?.capacityKg, 'tải trọng', CAPACITY[type]),
+    // Số kiện thùng xe chứa được; để trống là không giới hạn
+    capacityParcels: integer(body?.capacityParcels, 'số kiện tối đa', { required: false, min: 1, max: 1000 }),
     // Cấu hình định tuyến đi theo loại xe: xe máy dùng motorcycle, xe tải nhỏ dùng truck
     routingProfile: type === 'motorcycle' ? 'motorcycle' : 'truck',
   };
@@ -148,8 +151,8 @@ router.post('/vehicles', async (req, res) => {
   const dup = await query('SELECT 1 FROM vehicles WHERE plate = $1', [v.plate]);
   if (dup.rows.length) throw conflict('Biển số đã tồn tại');
   const { rows } = await query(
-    'INSERT INTO vehicles (plate, vehicle_type, capacity_kg, routing_profile) VALUES ($1, $2, $3, $4) RETURNING id',
-    [v.plate, v.type, v.capacityKg, v.routingProfile]);
+    'INSERT INTO vehicles (plate, vehicle_type, capacity_kg, routing_profile, capacity_parcels) VALUES ($1, $2, $3, $4, $5) RETURNING id',
+    [v.plate, v.type, v.capacityKg, v.routingProfile, v.capacityParcels]);
   res.status(201).json({ vehicle: toVehicle(await loadVehicle(rows[0].id)) });
 });
 
@@ -161,12 +164,13 @@ router.put('/vehicles/:id', async (req, res) => {
     const cur = (await c.query('SELECT * FROM vehicles WHERE id = $1 FOR UPDATE', [id])).rows[0];
     if (!cur) throw notFound('Không tìm thấy phương tiện');
     const trip = (await c.query('SELECT id FROM trips WHERE vehicle_id = $1 AND status = ANY($2) LIMIT 1', [id, ACTIVE_STATUSES])).rows[0];
-    const changed = cur.vehicle_type !== v.type || cur.capacity_kg !== v.capacityKg || cur.plate !== v.plate;
+    const changed = cur.vehicle_type !== v.type || cur.capacity_kg !== v.capacityKg || cur.plate !== v.plate
+      || (cur.capacity_parcels ?? null) !== v.capacityParcels;
     if (trip && changed) throw conflict(`Xe đang chạy chuyến ${tripCode(trip.id)}, chưa thể sửa cấu hình`);
     const dup = await c.query('SELECT 1 FROM vehicles WHERE plate = $1 AND id <> $2', [v.plate, id]);
     if (dup.rows.length) throw conflict('Biển số đã tồn tại');
-    await c.query('UPDATE vehicles SET plate = $2, vehicle_type = $3, capacity_kg = $4, routing_profile = $5 WHERE id = $1',
-      [id, v.plate, v.type, v.capacityKg, v.routingProfile]);
+    await c.query('UPDATE vehicles SET plate = $2, vehicle_type = $3, capacity_kg = $4, routing_profile = $5, capacity_parcels = $6 WHERE id = $1',
+      [id, v.plate, v.type, v.capacityKg, v.routingProfile, v.capacityParcels]);
   });
   res.json({ vehicle: toVehicle(await loadVehicle(id)) });
 });

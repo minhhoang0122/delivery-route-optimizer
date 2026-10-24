@@ -3,6 +3,7 @@
 const nf = (n, d = 1) => Number(n).toLocaleString('vi-VN', { minimumFractionDigits: 0, maximumFractionDigits: d })
 
 export const kg = n => `${nf(n, 1)} kg`
+export const parcels = n => `${nf(n ?? 0, 0)} kiện`
 export const km = m => (m == null ? '—' : `${nf(m / 1000, 1)} km`)
 /** Khoảng cách ngắn ghi theo mét, từ 1 km trở lên ghi theo km. */
 export const distance = m => (m == null ? '—' : m < 1000 ? `${Math.round(m)} m` : km(m))
@@ -95,3 +96,18 @@ export const routeUpdate = versionNo => (versionNo > 1 ? `Cập nhật tuyến l
 export const geocodeMatch = type => (['Point Address', 'Address Range'].includes(type) ? 'Khớp tới số nhà'
   : ['Street', 'Cross Street'].includes(type) ? 'Chỉ khớp tên đường' : 'Chỉ khớp khu vực')
 export const streetLevelOnly = type => !['Point Address', 'Address Range'].includes(type)
+
+/** Thẻ giờ khách hẹn trên điểm dừng, ví dụ "Khách hẹn 17:30". */
+export const appointment = t => (t ? `Khách hẹn ${time(t)}` : null)
+
+// Trạng thái đơn hiển thị cho khách trên trang theo dõi đơn
+export const CUSTOMER_STATUS = {
+  pending: 'Chờ xếp chuyến',
+  assigned: 'Đã xếp chuyến',
+  in_delivery: 'Đang giao',
+  delivered: 'Đã giao',
+  needs_action: 'Chưa giao được',
+  cancelled: 'Đã hủy',
+  return_to_sender: 'Chuyển hoàn',
+  lost: 'Đang xử lý',
+}

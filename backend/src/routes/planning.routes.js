@@ -9,7 +9,8 @@ import { conflict, notFound } from '../errors.js';
 import { eventPayload, fingerprint, requireEventId } from '../idempotency.js';
 import { getProgress, loadDepot, loadOrders, loadVehicles, orderProblem, prepareSnapshot, runPlanning, vehicleProblem } from '../services/planning.js';
 import { commitPlan, planCode } from '../services/trips.js';
-import { idList, integer, paramId } from '../validate.js';
+import { clockText, roundUp } from '../services/clock.js';
+import { idList, integer, paramId, text } from '../validate.js';
 import { toOrder } from './orders.routes.js';
 
 const router = Router();
@@ -24,11 +25,15 @@ router.get('/options', async (_req, res) => {
     depot: depot && { id: depot.id, name: depot.name, lat: depot.latitude, lon: depot.longitude },
     orders: orders.map(o => ({ ...toOrder(o), problem: orderProblem(o) })),
     vehicles: vehicles.map(v => ({
-      id: v.id, plate: v.plate, type: v.vehicle_type, capacityKg: v.capacity_kg, routingProfile: v.routing_profile, status: v.status,
+      id: v.id, plate: v.plate, type: v.vehicle_type, capacityKg: v.capacity_kg, capacityParcels: v.capacity_parcels, routingProfile: v.routing_profile, status: v.status,
       driver: v.driver_id ? { id: v.driver_id, name: v.driver_name } : null,
       problem: vehicleProblem(v),
     })),
-    defaults: { maxRouteMinutes: config.defaultMaxRouteMinutes, matrixSource: config.matrixSource, hasTomTomKey: Boolean(config.tomtomKey) },
+    defaults: {
+      shiftStart: clockText(roundUp(new Date(), 5)), shiftEnd: config.defaultShiftEnd,
+      stopSeconds: config.stopSeconds, serviceSeconds: config.serviceSecondsPerOrder,
+      matrixSource: config.matrixSource, hasTomTomKey: Boolean(config.tomtomKey),
+    },
   });
 });
 
@@ -54,8 +59,11 @@ router.post('/runs', async (req, res) => {
   }
   const orderIds = idList(req.body?.orderIds, 'đơn');
   const vehicleIds = idList(req.body?.vehicleIds, 'xe');
+  // Giờ bắt đầu và giờ hết ca (HH:MM); maxRouteMinutes là tùy chọn cũ, vẫn nhận để tương thích
+  const shiftStart = text(req.body?.shiftStart, 'giờ bắt đầu ca', { required: false, max: 5 });
+  const shiftEnd = text(req.body?.shiftEnd, 'giờ hết ca', { required: false, max: 5 });
   const maxRouteMinutes = integer(req.body?.maxRouteMinutes, 'giới hạn thời lượng chuyến', { required: false, min: 0, max: 24 * 60 });
-  const snapshot = await prepareSnapshot({ orderIds, vehicleIds, maxRouteMinutes });
+  const snapshot = await prepareSnapshot({ orderIds, vehicleIds, shiftStart, shiftEnd, maxRouteMinutes });
   const { rows } = await query(
     `INSERT INTO planning_runs (created_by, input_snapshot, status, client_event_id, request_fingerprint)
      VALUES ($1, $2, 'running', $3, $4) RETURNING *`, [req.user.id, snapshot, clientEventId, fp]);

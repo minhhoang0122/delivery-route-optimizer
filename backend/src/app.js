@@ -8,6 +8,7 @@ import driverRoutes from './routes/driver.routes.js';
 import mapRoutes from './routes/map.routes.js';
 import orderRoutes from './routes/orders.routes.js';
 import planningRoutes from './routes/planning.routes.js';
+import publicRoutes from './routes/public.routes.js';
 import resourceRoutes from './routes/resources.routes.js';
 import tripRoutes from './routes/trips.routes.js';
 import userRoutes from './routes/users.routes.js';
@@ -15,11 +16,16 @@ import userRoutes from './routes/users.routes.js';
 export function createApp() {
   const app = express();
   app.disable('x-powered-by');
+  // Địa chỉ IP thật của người dùng khi đi qua proxy trên cùng máy (Vite chuyển tiếp /api kèm X-Forwarded-For), để giới hạn
+  // số yêu cầu của trang theo dõi đơn theo từng người
+  app.set('trust proxy', 'loopback');
   app.use(express.json({ limit: '1mb' }));
 
   app.get('/api/health', (_req, res) => res.json({ ok: true, time: new Date() }));
   app.use('/api/auth', authRoutes);
   app.use('/api/map', mapRoutes);
+  // Trang theo dõi đơn của khách: không đăng nhập, chỉ dữ liệu của đúng đơn có mã theo dõi
+  app.use('/api/public', publicRoutes);
 
   // Từ đây trở xuống đều phải đăng nhập; mỗi router tự kiểm tra vai trò
   app.use('/api', requireAuth);

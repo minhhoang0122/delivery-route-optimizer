@@ -8,6 +8,7 @@ import DriverLayout from './layouts/DriverLayout.jsx'
 import AccountsPage from './pages/admin/AccountsPage.jsx'
 import CreateAccountPage from './pages/admin/CreateAccountPage.jsx'
 import ChangePasswordPage from './pages/ChangePasswordPage.jsx'
+import CustomerTrackingPage from './pages/CustomerTrackingPage.jsx'
 import DashboardPage from './pages/dispatcher/DashboardPage.jsx'
 import DepotPage from './pages/dispatcher/DepotPage.jsx'
 import DriversPage from './pages/dispatcher/DriversPage.jsx'
@@ -57,6 +58,8 @@ export default function App() {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<LoginPage />} />
+      {/* Trang theo dõi đơn của khách: không đăng nhập, mở từ đường dẫn có mã theo dõi */}
+      <Route path="/theo-doi/:token" element={<CustomerTrackingPage />} />
       <Route path="/account/password" element={<RequireLogin><ChangePasswordPage /></RequireLogin>} />
 
       <Route path="/admin" element={<RequireRole role="administrator"><DesktopLayout /></RequireRole>}>
