@@ -12,7 +12,7 @@ export default function ForbiddenPage({ needRole }) {
         <span className="icon-wrap tone-neutral-bg" style={{ width: 80, height: 80 }}><Lock size={40} /></span>
         <div className="stack-sm">
           <h1 className="h3">Bạn không có quyền truy cập trang này</h1>
-          <p className="secondary">{user.username} · {ROLE[user.role]}{needRole ? ` · trang dành cho ${ROLE[needRole]}` : ''}</p>
+          <p className="secondary">{user.username} · {ROLE[user.role]}{needRole ? ` · trang dành cho ${ROLE[needRole].toLowerCase()}` : ''}</p>
         </div>
         <Link className="btn primary" to={HOME[user.role]}>Về trang của tôi</Link>
       </div>

@@ -1,9 +1,10 @@
 // UC02 Quản lý đơn hàng (Dispatcher): danh sách, tạo, sửa trước khi lập kế hoạch.
 import { Router } from 'express';
 import { requireRole } from '../auth.js';
+import { config } from '../config.js';
 import { query, transaction } from '../db.js';
-import { badRequest, conflict, notFound } from '../errors.js';
-import { integer, number, oneOf, paramId, text } from '../validate.js';
+import { badRequest, conflict, HttpError, notFound } from '../errors.js';
+import { integer, mobilePhone, number, oneOf, paramId, phoneDigits, servicePoint, text } from '../validate.js';
 import { loadOrders } from '../services/planning.js';
 import { tripCode } from '../services/trips.js';
 
@@ -11,6 +12,7 @@ const router = Router();
 router.use(requireRole('dispatcher'));
 
 const TYPES = ['motorcycle', 'small_truck'];
+const STATUSES = ['pending', 'assigned', 'in_delivery', 'delivered', 'needs_action', 'cancelled', 'return_to_sender', 'lost'];
 
 export const toOrder = o => ({
   id: o.id,
@@ -32,7 +34,7 @@ export const toOrder = o => ({
 router.get('/', async (req, res) => {
   const status = req.query.status;
   const rows = status
-    ? await loadOrders('o.status = $1', [oneOf(status, 'trạng thái', ['pending', 'assigned', 'in_delivery', 'delivered', 'needs_action', 'cancelled'])])
+    ? await loadOrders('o.status = $1', [oneOf(status, 'trạng thái', STATUSES)])
     : await loadOrders('TRUE');
   const trips = await query('SELECT order_id, trip_id FROM active_assignments');
   const tripOf = new Map(trips.rows.map(r => [r.order_id, r.trip_id]));
@@ -44,7 +46,7 @@ router.get('/needs-action', async (_req, res) => {
   const { rows } = await query(
     `SELECT o.id, o.code, o.recipient_name, o.phone, o.address, o.weight_kg, s.trip_id, t.status AS trip_status,
             a.reason, a.note, a.occurred_at,
-            (SELECT count(*) FROM trip_stops s2 WHERE s2.order_id = o.id) AS attempt_count
+            (SELECT count(*) FROM trip_stops s2 WHERE s2.order_id = o.id AND s2.status = 'failed') AS attempt_count
        FROM orders o
        JOIN trip_stops s ON s.order_id = o.id AND s.status = 'failed'
        JOIN trips t ON t.id = s.trip_id AND t.status IN ('in_progress', 'awaiting_reconciliation')
@@ -57,6 +59,7 @@ router.get('/needs-action', async (_req, res) => {
       trip: { id: r.trip_id, code: tripCode(r.trip_id), status: r.trip_status },
       attemptNo: Number(r.attempt_count), reason: r.reason, note: r.note, occurredAt: r.occurred_at,
     })),
+    maxDeliveryAttempts: config.maxDeliveryAttempts,
   });
 });
 
@@ -73,14 +76,32 @@ function readOrder(body) {
   return {
     code: text(body?.code, 'mã đơn', { max: 20 }),
     recipientName: text(body?.recipientName, 'người nhận', { max: 100 }),
-    phone: text(body?.phone, 'số điện thoại', { max: 20 }),
+    phone: mobilePhone(body?.phone, 'số điện thoại'),
     address: text(body?.address, 'địa chỉ', { max: 255 }),
-    lat: number(body?.lat, 'vĩ độ', { min: -90, max: 90 }),
-    lon: number(body?.lon, 'kinh độ', { min: -180, max: 180 }),
+    ...servicePoint(body?.lat, body?.lon, 'Vị trí giao'),
     weightKg: number(body?.weightKg, 'khối lượng', { gt: 0, max: 999999 }),
     note: text(body?.note, 'ghi chú', { required: false, max: 255 }),
     vehicleTypes,
+    allowDuplicate: body?.allowDuplicate === true,
   };
+}
+
+/**
+ * Kiểm tra theo dữ liệu hiện có: khối lượng không vượt tải trọng lớn nhất của xe đang hoạt động thuộc các loại được phép,
+ * và cảnh báo đơn trùng (cùng người nhận, địa chỉ, số điện thoại đang chờ xếp) trừ khi Dispatcher xác nhận vẫn lưu.
+ */
+async function checkOrder(c, o, id = 0) {
+  const cap = (await c.query(
+    `SELECT max(capacity_kg) AS kg FROM vehicles WHERE status = 'active' AND vehicle_type = ANY($1)`, [o.vehicleTypes])).rows[0].kg;
+  if (cap != null && o.weightKg > cap) throw badRequest(`Khối lượng vượt tải trọng lớn nhất của xe được phép (${cap} kg)`);
+  if (o.allowDuplicate) return;
+  const same = (await c.query(
+    `SELECT code, phone FROM orders WHERE status = 'pending' AND id <> $1
+        AND lower(trim(recipient_name)) = lower($2) AND lower(trim(address)) = lower($3)`, [id, o.recipientName, o.address])).rows
+    .filter(r => phoneDigits(r.phone) === phoneDigits(o.phone));
+  if (same.length) {
+    throw new HttpError(409, 'DUPLICATE_ORDER', `Trùng với đơn ${same.map(r => r.code).join(', ')} đang chờ xếp`, { codes: same.map(r => r.code) });
+  }
 }
 
 router.post('/', async (req, res) => {
@@ -88,6 +109,7 @@ router.post('/', async (req, res) => {
   const id = await transaction(async c => {
     const dup = await c.query('SELECT 1 FROM orders WHERE code = $1', [o.code]);
     if (dup.rows.length) throw conflict('Mã đơn đã tồn tại');
+    await checkOrder(c, o);
     const { rows } = await c.query(
       `INSERT INTO orders (code, recipient_name, phone, address, latitude, longitude, weight_kg, note)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
@@ -110,6 +132,7 @@ router.put('/:id', async (req, res) => {
     if (cur.version !== version) throw conflict('Đơn vừa được sửa ở nơi khác, tải lại trước khi lưu');
     const dup = await c.query('SELECT 1 FROM orders WHERE code = $1 AND id <> $2', [o.code, id]);
     if (dup.rows.length) throw conflict('Mã đơn đã tồn tại');
+    await checkOrder(c, o, id);
     await c.query(
       `UPDATE orders SET code = $2, recipient_name = $3, phone = $4, address = $5, latitude = $6, longitude = $7,
                          weight_kg = $8, note = $9, version = version + 1 WHERE id = $1`,

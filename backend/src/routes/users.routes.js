@@ -65,10 +65,10 @@ router.patch('/:id/role', async (req, res) => {
   const u = await loadAccount(id);
   // Đổi vai trò không được làm mất điều kiện của chuyến đang hoạt động (mục 3.1.4)
   if (u.role === 'driver' && role !== 'driver' && u.active_trip_id) {
-    throw conflict(`Driver đang giữ chuyến ${tripCode(u.active_trip_id)}, chưa thể đổi vai trò`);
+    throw conflict(`Tài xế đang giữ chuyến ${tripCode(u.active_trip_id)}, chưa thể đổi vai trò`);
   }
   if (u.role === 'driver' && role !== 'driver' && u.driver_id) {
-    throw conflict('Tài khoản đã có hồ sơ Driver. Dispatcher cần ngừng hồ sơ này trước khi đổi vai trò.');
+    throw conflict('Tài khoản đã có hồ sơ tài xế. Điều phối viên cần ngừng hồ sơ này trước khi đổi vai trò.');
   }
   await query('UPDATE users SET role = $2 WHERE id = $1', [id, role]);
   res.json({ user: toAccount(await loadAccount(id)) });

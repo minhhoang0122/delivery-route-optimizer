@@ -24,7 +24,7 @@ export default function DepotPage() {
     ['Toạ độ', `${d.lat.toFixed(4)}, ${d.lon.toFixed(4)}`],
     ['Giờ mở cửa', d.openingHours || '—'],
     ['Phương tiện', `${c.vehicles} xe (${c.motorcycles} xe máy, ${c.vehicles - c.motorcycles} xe tải nhỏ)`],
-    ['Driver', `${c.drivers} Driver`],
+    ['Tài xế', `${c.drivers} tài xế`],
   ]
   return (
     <>

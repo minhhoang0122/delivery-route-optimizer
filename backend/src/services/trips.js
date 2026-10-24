@@ -1,8 +1,10 @@
 // Chuyến giao: giao chuyến từ bản nháp (UC05), bắt đầu chuyến (UC11), ghi kết quả (UC13), báo về kho (UC14),
 // đối chiếu và chốt chuyến (UC09), thu hồi (UC16), tự điều chỉnh tuyến còn lại (UC07) và ghi nhận thiết bị Driver đã nhận tuyến (UC10.1).
+// Ngoại lệ: kết thúc chuyến do sự cố, giao sau (dời điểm xuống cuối tuyến), bỏ đơn thiếu khỏi chuyến trước khi xuất phát.
 // Mọi thao tác ghi khóa dòng trips bằng SELECT … FOR UPDATE rồi kiểm tra trạng thái, nên hai thao tác đồng thời
 // trên cùng chuyến (ví dụ bắt đầu và thu hồi) chỉ có một thao tác thành công.
 import { detectIncrease, evaluateReroute } from 'optimization-engine';
+import { randomUUID } from 'node:crypto';
 import { config } from '../config.js';
 import { query, transaction } from '../db.js';
 import { badRequest, conflict, forbidden, HttpError, notFound } from '../errors.js';
@@ -14,6 +16,11 @@ export const tripCode = id => `CH-${String(id).padStart(4, '0')}`;
 export const planCode = id => `KH-${String(id).padStart(4, '0')}`;
 
 const stale = message => new HttpError(409, 'STALE', message);
+
+/** Lý do Dispatcher ghi cho các điểm chưa giao khi kết thúc chuyến do sự cố (không nằm trong danh sách Driver chọn). */
+export const INCIDENT_REASON = 'Sự cố xe/tài xế';
+/** Quyết định khi đối chiếu cho đơn chưa giao được: giao lại (xếp vào kế hoạch sau), chuyển hoàn, thất lạc. */
+export const DECISIONS = ['requeue', 'return_to_sender', 'lost'];
 
 // ---------------------------------------------------------------- đọc chi tiết chuyến
 
@@ -72,7 +79,8 @@ async function lastReplanOf(t, versions) {
   if (!r) return null;
   const e = r.evaluation;
   const routeVersionId = r.route_version_id;
-  const received = routeVersionId != null && t.driver_ack_route_version === routeVersionId;
+  // Mã phiên bản tuyến tăng dần, nên thiết bị đã nhận một phiên bản sau (ví dụ sau khi giao sau) cũng là đã nhận phiên bản này
+  const received = routeVersionId != null && t.driver_ack_route_version != null && t.driver_ack_route_version >= routeVersionId;
   // Tuyến cũ để so sánh: đường đi của phiên bản trước, cắt từ vị trí xe lúc đổi tuyến về kho
   const from = versions.find(v => v.version_no === r.payload.fromVersion)?.geometry?.coordinates;
   const oldLine = e.position ? sliceLine(from, e.position, { lat: t.depot_lat, lon: t.depot_lon }) : null;
@@ -118,15 +126,19 @@ export async function loadTrip(id, { withEvents = false } = {}) {
   const t = rows[0];
   if (!t) return null;
 
+  // Điểm đã bỏ khỏi chuyến (thiếu hàng lúc xuất phát) không còn thuộc chuyến
   const stopsRes = await query(
     `SELECT s.id, s.order_id, s.status, rs.sequence_no,
             o.code, o.recipient_name, o.phone, o.address, o.latitude, o.longitude, o.weight_kg, o.note, o.status AS order_status,
-            a.result, a.reason, a.note AS attempt_note, a.occurred_at, a.received_at
+            a.result, a.reason, a.note AS attempt_note, a.occurred_at, a.received_at, a.distance_m AS attempt_distance_m,
+            a.position_observed_at AS attempt_position_at, ru.role AS recorded_role,
+            (SELECT count(*)::int FROM trip_stops f WHERE f.order_id = s.order_id AND f.status = 'failed') AS failed_attempts
        FROM trip_stops s
        JOIN orders o ON o.id = s.order_id
        LEFT JOIN route_stops rs ON rs.stop_id = s.id AND rs.route_version_id = $2
        LEFT JOIN delivery_attempts a ON a.stop_id = s.id
-      WHERE s.trip_id = $1
+       LEFT JOIN users ru ON ru.id = a.recorded_by
+      WHERE s.trip_id = $1 AND s.status <> 'removed'
       ORDER BY rs.sequence_no NULLS LAST, s.id`, [id, t.current_route_version]);
   const stops = stopsRes.rows;
 
@@ -146,29 +158,51 @@ export async function loadTrip(id, { withEvents = false } = {}) {
   const trail = trailRows.filter((_, i) => i % every === 0 || i === trailRows.length - 1).map(r => [r.longitude, r.latitude]);
 
   const reports = (await query(
-    `SELECT event_type, payload, created_at FROM trip_events
-      WHERE trip_id = $1 AND event_type IN ('trip_returned', 'loading_mismatch', 'trip_started', 'trip_closed')
+    `SELECT id, event_type, payload, created_at FROM trip_events
+      WHERE trip_id = $1 AND event_type IN ('trip_returned', 'trip_aborted', 'loading_mismatch', 'orders_removed', 'stop_deferred',
+                                            'trip_started', 'trip_closed')
       ORDER BY id`, [id])).rows;
-  const last = type => [...reports].reverse().find(r => r.event_type === type) || null;
+  const last = (...types) => [...reports].reverse().find(r => types.includes(r.event_type)) || null;
+  const deferred = new Set(reports.filter(r => r.event_type === 'stop_deferred').map(r => r.payload.stopId));
+  // Báo thiếu hàng chỉ còn hiệu lực khi chưa bỏ đơn thiếu khỏi chuyến sau lần báo đó
+  const mismatch = last('loading_mismatch');
+  const removed = last('orders_removed');
+  const returned = last('trip_returned', 'trip_aborted');
 
-  // Giờ dự kiến: từ điểm vừa xử lý gần nhất (hoặc kho) cộng dồn thời gian các chặng còn lại
+  // Giờ dự kiến không bao giờ ở quá khứ: bắt đầu từ lúc muộn nhất trong (bây giờ, lúc xuất phát, lần ghi kết quả gần nhất),
+  // từ điểm vừa xử lý gần nhất (hoặc kho) cộng dồn thời gian các chặng còn lại theo ma trận đã lưu
+  const now = Date.now();
+  const running = t.status === 'in_progress';
   const travel = await cachedTravel([depotKey(t), ...stops.map(orderKey)], t.routing_profile);
   const done = stops.filter(s => s.status !== 'pending');
   const lastDone = [...done].sort((a, b) => new Date(b.occurred_at) - new Date(a.occurred_at))[0];
-  let clock = t.status === 'in_progress'
-    ? Math.max(new Date(t.started_at).getTime(), lastDone ? new Date(lastDone.occurred_at).getTime() : 0)
-    : Date.now();
-  let prev = lastDone && t.status === 'in_progress' ? orderKey(lastDone) : depotKey(t);
+  let clock = running
+    ? Math.max(now, new Date(t.started_at).getTime(), lastDone ? new Date(lastDone.occurred_at).getTime() : 0)
+    : now;
+  let prev = lastDone && running ? orderKey(lastDone) : depotKey(t);
+  const prevPoint = lastDone && running ? { lat: lastDone.latitude, lon: lastDone.longitude } : { lat: t.depot_lat, lon: t.depot_lon };
+  // Vị trí xe còn mới thì chặng đầu tính từ vị trí xe: thời gian chặng theo ma trận nhân tỉ lệ quãng đường còn lại
+  const fresh = running && pos && now - new Date(pos.observed_at).getTime() <= config.monitor.stalePositionSeconds * 1000;
   const eta = new Map();
   for (const s of stops) {
     if (s.status !== 'pending' || clock == null) continue;
-    const leg = travel(prev, orderKey(s));
+    let leg = travel(prev, orderKey(s));
+    if (fresh && !eta.size && leg != null) {
+      const target = { lat: s.latitude, lon: s.longitude };
+      const full = haversineM(prevPoint, target);
+      if (full > 0) leg = Math.round(leg * Math.min(haversineM({ lat: pos.latitude, lon: pos.longitude }, target) / full, 2));
+    }
     clock = leg == null ? null : clock + leg * 1000;
     eta.set(s.id, clock);
     prev = orderKey(s);
   }
   const back = clock == null ? null : travel(prev, depotKey(t));
   const etaReturn = ['assigned', 'in_progress'].includes(t.status) && clock != null && back != null ? new Date(clock + back * 1000) : null;
+  // Giờ về kho theo kế hoạch (lúc xuất phát cộng thời gian của tuyến ban đầu) và hết giới hạn thời lượng chuyến
+  const initial = versions.find(v => v.version_no === 1);
+  const plannedReturnAt = t.started_at && initial ? new Date(new Date(t.started_at).getTime() + initial.objective_seconds * 1000) : null;
+  const maxMinutes = Number(t.profile_snapshot?.maxRouteMinutes) || 0;
+  const shiftEndAt = t.started_at && maxMinutes > 0 ? new Date(new Date(t.started_at).getTime() + maxMinutes * 60_000) : null;
 
   const next = stops.find(s => s.status === 'pending') || null;
   const trip = {
@@ -196,11 +230,17 @@ export async function loadTrip(id, { withEvents = false } = {}) {
       seq: s.sequence_no ?? i + 1,
       status: s.status,
       eta: eta.get(s.id) ? new Date(eta.get(s.id)) : null,
+      deferred: deferred.has(s.id),
       order: {
         id: s.order_id, code: s.code, recipientName: s.recipient_name, phone: s.phone, address: s.address,
         lat: s.latitude, lon: s.longitude, weightKg: s.weight_kg, note: s.note, status: s.order_status,
+        failedAttempts: s.failed_attempts,
       },
-      attempt: s.result ? { result: s.result, reason: s.reason, note: s.attempt_note, occurredAt: s.occurred_at, receivedAt: s.received_at } : null,
+      attempt: s.result ? {
+        result: s.result, reason: s.reason, note: s.attempt_note, occurredAt: s.occurred_at, receivedAt: s.received_at,
+        recordedByRole: s.recorded_role, distanceM: s.attempt_distance_m, positionAt: s.attempt_position_at,
+        farFromStop: s.attempt_distance_m != null && s.attempt_distance_m > config.podMaxDistanceM,
+      } : null,
     })),
     nextStopId: t.status === 'in_progress' ? next?.id ?? null : null,
     progress: {
@@ -217,9 +257,15 @@ export async function loadTrip(id, { withEvents = false } = {}) {
     trail,
     congestion: t.status === 'in_progress' ? await congestionOf(t, stops, versions) : [],
     etaReturn,
-    returnReport: last('trip_returned') && { ...last('trip_returned').payload, reportedAt: last('trip_returned').created_at },
-    loadingMismatch: t.status === 'assigned' && last('loading_mismatch')
-      ? { ...last('loading_mismatch').payload, reportedAt: last('loading_mismatch').created_at } : null,
+    plannedReturnAt,
+    shiftEndAt,
+    lateSeconds: running && etaReturn && plannedReturnAt ? Math.round((etaReturn - plannedReturnAt) / 1000) : null,
+    staleAfterSeconds: config.monitor.stalePositionSeconds,
+    maxDeliveryAttempts: config.maxDeliveryAttempts,
+    returnReport: returned && { ...returned.payload, aborted: returned.event_type === 'trip_aborted', reportedAt: returned.created_at },
+    abortReport: last('trip_aborted') && { ...last('trip_aborted').payload, reportedAt: last('trip_aborted').created_at },
+    loadingMismatch: t.status === 'assigned' && mismatch && (!removed || removed.id < mismatch.id)
+      ? { ...mismatch.payload, reportedAt: mismatch.created_at } : null,
     closeReport: last('trip_closed')?.payload ?? null,
     lastReplan: t.status === 'in_progress' ? await lastReplanOf(t, versions) : null,
     serverTime: new Date(),
@@ -267,7 +313,49 @@ function addEvent(c, { tripId, actorId, type, payload, clientEventId = null, fp 
 }
 
 const tripOrderIds = async (c, tripId) =>
-  (await c.query('SELECT order_id FROM trip_stops WHERE trip_id = $1 ORDER BY order_id', [tripId])).rows.map(r => r.order_id);
+  (await c.query(`SELECT order_id FROM trip_stops WHERE trip_id = $1 AND status <> 'removed' ORDER BY order_id`, [tripId])).rows.map(r => r.order_id);
+
+/** Thời gian đi qua các điểm theo thứ tự (giây), từ ma trận đã lưu; chặng chưa có thì ước lượng theo đường chim bay. */
+async function sequenceSeconds(points, profile) {
+  const travel = await cachedTravel(points.map(p => p.key), profile);
+  let sum = 0;
+  for (let i = 1; i < points.length; i++) {
+    sum += travel(points[i - 1].key, points[i].key) ?? haversineM(points[i - 1], points[i]) * 1.4 / (25 / 3.6);
+  }
+  return Math.round(sum);
+}
+
+/**
+ * Tạo phiên bản tuyến mới với thứ tự sequence (mã điểm dừng), như khi hệ thống đổi tuyến (UC07).
+ * ack: thiết bị Driver đã có thứ tự mới (Driver vừa yêu cầu), nên ghi luôn là đã nhận.
+ */
+async function addRouteVersion(c, t, { reason, sequence, objectiveSeconds, ack = false }) {
+  const cur = (await c.query('SELECT version_no, matrix_batch_id FROM route_versions WHERE id = $1', [t.current_route_version])).rows[0];
+  const rvId = (await c.query(
+    `INSERT INTO route_versions (trip_id, matrix_batch_id, version_no, objective_seconds, reason)
+     VALUES ($1, $2, $3, $4, $5) RETURNING id`, [t.id, cur.matrix_batch_id, cur.version_no + 1, objectiveSeconds, reason])).rows[0].id;
+  for (let i = 0; i < sequence.length; i++) {
+    await c.query('INSERT INTO route_stops (route_version_id, stop_id, sequence_no) VALUES ($1, $2, $3)', [rvId, sequence[i], i + 1]);
+  }
+  await c.query(
+    `UPDATE trips SET current_route_version = $2, state_version = state_version + 1,
+                      driver_ack_route_version = CASE WHEN $3 THEN $2 ELSE driver_ack_route_version END WHERE id = $1`,
+    [t.id, rvId, ack]);
+  return { routeVersionId: rvId, fromVersion: cur.version_no, toVersion: cur.version_no + 1 };
+}
+
+/** Thứ tự các điểm dừng của phiên bản tuyến hiện hành, kèm tọa độ. */
+const currentOrder = async (c, t) => (await c.query(
+  `SELECT s.id, s.order_id, s.status, o.code, o.latitude AS lat, o.longitude AS lon
+     FROM route_stops rs JOIN trip_stops s ON s.id = rs.stop_id JOIN orders o ON o.id = s.order_id
+    WHERE rs.route_version_id = $1 AND s.status <> 'removed' ORDER BY rs.sequence_no`, [t.current_route_version])).rows;
+
+const depotOf = async (c, t) => {
+  const d = (await c.query('SELECT id, latitude AS lat, longitude AS lon FROM depots WHERE id = $1', [t.depot_id])).rows[0];
+  return { ...d, key: pointKey('d', d.id, d.lat, d.lon) };
+};
+const stopPoint = s => ({ lat: s.lat, lon: s.lon, key: pointKey('o', s.order_id, s.lat, s.lon) });
+const profileOf = async (c, t) => (await c.query('SELECT routing_profile FROM vehicles WHERE id = $1', [t.vehicle_id])).rows[0].routing_profile;
 
 /**
  * Lấy đường đi sau khi transaction đã kết thúc, vì không giữ transaction mở trong lúc gọi TomTom (mục 3.3.2).
@@ -293,7 +381,7 @@ export async function commitPlan(runId, user, { clientEventId, fp }) {
       if (existing.length && existing[0].client_event_id === clientEventId && existing[0].request_fingerprint === fp) {
         return { tripIds: existing.map(r => r.id), replayed: true };
       }
-      throw conflict('Bản nháp này đã được giao chuyến');
+      throw conflict('Bản nháp này đã được phân chuyến');
     }
     if (run.status !== 'draft') throw conflict('Bản nháp không còn hiệu lực, cần tính lại phương án');
 
@@ -324,14 +412,14 @@ export async function commitPlan(runId, user, { clientEventId, fp }) {
         WHERE d.id = ANY($1) ORDER BY d.id FOR UPDATE OF d`, [driverIds])).rows;
     for (const r of result.routes) {
       const d = drivers.find(x => x.id === r.driverId);
-      if (!d || d.status !== 'active' || d.account_status !== 'active') problems.push(`Driver ${d?.full_name ?? r.driverId} không còn sẵn sàng`);
-      else if (d.default_vehicle_id !== r.vehicleId) problems.push(`Driver ${d.full_name} đã đổi xe thường dùng`);
+      if (!d || d.status !== 'active' || d.account_status !== 'active') problems.push(`Tài xế ${d?.full_name ?? r.driverId} không còn sẵn sàng`);
+      else if (d.default_vehicle_id !== r.vehicleId) problems.push(`Tài xế ${d.full_name} đã đổi xe thường dùng`);
     }
     const busy = (await c.query(
       `SELECT id, driver_id, vehicle_id FROM trips WHERE status = ANY($1) AND (driver_id = ANY($2) OR vehicle_id = ANY($3))`,
       [ACTIVE_STATUSES, driverIds, vehicleIds])).rows;
-    if (busy.length) problems.push('Có Driver hoặc xe đang ở chuyến khác chưa kết thúc');
-    if (problems.length) throw conflict('Dữ liệu đã thay đổi so với bản nháp, chưa giao chuyến', problems);
+    if (busy.length) problems.push('Có tài xế hoặc xe đang ở chuyến khác chưa kết thúc');
+    if (problems.length) throw conflict('Dữ liệu đã thay đổi so với bản nháp, chưa phân chuyến', problems);
 
     const profileBatch = async profile => (await c.query(
       `SELECT b.id FROM planning_run_matrices m JOIN matrix_batches b ON b.id = m.matrix_batch_id
@@ -400,7 +488,7 @@ export async function startTrip(tripId, user, { checkedOrderIds, clientEventId, 
     await addEvent(c, { tripId, actorId: user.id, type: 'trip_started', clientEventId, fp, payload: { checkedOrderIds: orderIds } });
     return { ok: true };
   });
-  if (!outcome.ok) throw conflict('Hàng thực nhận không khớp danh sách, đã báo cho Dispatcher', { missingOrderIds: outcome.missing });
+  if (!outcome.ok) throw conflict('Hàng thực nhận không khớp danh sách, đã báo cho điều phối viên', { missingOrderIds: outcome.missing });
 }
 
 // ---------------------------------------------------------------- UC13 ghi kết quả giao
@@ -417,20 +505,78 @@ export async function recordAttempt(tripId, stopId, user, { result, reason, note
       throw conflict('Mã thao tác đã được dùng cho một nội dung khác');
     }
     if (t.status !== 'in_progress') throw conflict('Chuyến không ở trạng thái đang giao');
-    const stop = (await c.query('SELECT * FROM trip_stops WHERE id = $1 AND trip_id = $2 FOR UPDATE', [stopId, tripId])).rows[0];
-    if (!stop) throw notFound('Điểm dừng không thuộc chuyến này');
+    // Cho lệch đồng hồ thiết bị tối đa 1 phút
+    if (new Date(occurredAt).getTime() < new Date(t.started_at).getTime() - 60_000) throw badRequest('Thời điểm ghi kết quả trước lúc bắt đầu chuyến');
+    const stop = (await c.query(
+      `SELECT s.*, o.latitude, o.longitude FROM trip_stops s JOIN orders o ON o.id = s.order_id
+        WHERE s.id = $1 AND s.trip_id = $2 FOR UPDATE OF s`, [stopId, tripId])).rows[0];
+    if (!stop || stop.status === 'removed') throw notFound('Điểm dừng không thuộc chuyến này');
     if (stop.status !== 'pending') throw conflict('Điểm dừng đã có kết quả cuối');
+    // Bằng chứng giao hàng tối thiểu: vị trí xe mới nhất lúc ghi và khoảng cách tới điểm giao
+    const pos = (await c.query(
+      'SELECT latitude, longitude, observed_at FROM vehicle_positions WHERE trip_id = $1 ORDER BY observed_at DESC LIMIT 1', [tripId])).rows[0];
+    const distance = pos ? Math.round(haversineM({ lat: pos.latitude, lon: pos.longitude }, { lat: stop.latitude, lon: stop.longitude })) : null;
     await c.query(
-      `INSERT INTO delivery_attempts (stop_id, client_event_id, request_fingerprint, result, reason, note, occurred_at, recorded_by)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
-      [stopId, clientEventId, fp, result, reason, note, occurredAt, user.id]);
+      `INSERT INTO delivery_attempts (stop_id, client_event_id, request_fingerprint, result, reason, note, occurred_at, recorded_by,
+                                      position_lat, position_lon, position_observed_at, distance_m)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
+      [stopId, clientEventId, fp, result, reason, note, occurredAt, user.id, pos?.latitude ?? null, pos?.longitude ?? null, pos?.observed_at ?? null, distance]);
     await c.query('UPDATE trip_stops SET status = $2 WHERE id = $1', [stopId, result]);
     await c.query('UPDATE orders SET status = $2, version = version + 1 WHERE id = $1',
       [stop.order_id, result === 'delivered' ? 'delivered' : 'needs_action']);
     await c.query('UPDATE trips SET state_version = state_version + 1 WHERE id = $1', [tripId]);
-    await addEvent(c, { tripId, actorId: user.id, type: 'attempt_recorded', clientEventId, fp, payload: { stopId, orderId: stop.order_id, result, reason } });
+    await addEvent(c, { tripId, actorId: user.id, type: 'attempt_recorded', clientEventId, fp, payload: { stopId, orderId: stop.order_id, result, reason, distanceM: distance } });
     return { replayed: false };
   });
+}
+
+// ---------------------------------------------------------------- giao sau
+
+/**
+ * Driver báo khách vắng, quay lại sau: điểm đó xuống cuối các điểm còn lại, thành một phiên bản tuyến mới như khi hệ thống
+ * đổi tuyến (người thực hiện để trống, Driver yêu cầu ghi trong payload). Dispatcher không phải duyệt.
+ * Điểm kế tiếp luôn là điểm chưa giao đầu tiên theo thứ tự hiện hành, nên sau khi giao sau điểm kế tiếp là điểm đứng sau nó.
+ */
+export async function deferStop(tripId, stopId, user, { clientEventId, fp }) {
+  const out = await transaction(async c => {
+    const t = await lockTrip(c, tripId);
+    ensureOwner(t, user);
+    if (await findReplay(c, tripId, 'stop_deferred', clientEventId, fp)) return null;
+    if (t.status !== 'in_progress') throw conflict('Chuyến không ở trạng thái đang giao');
+    const order = await currentOrder(c, t);
+    const target = order.find(s => s.id === stopId);
+    if (!target) throw notFound('Điểm dừng không thuộc chuyến này');
+    if (target.status !== 'pending') throw conflict('Điểm dừng đã có kết quả cuối');
+    const pending = order.filter(s => s.status === 'pending');
+    if (pending.length < 2) throw conflict('Chỉ còn một điểm chưa giao');
+    if (pending.at(-1).id === stopId) throw conflict('Điểm này đã ở cuối tuyến');
+    const rest = [...pending.filter(s => s.id !== stopId), target];
+    const depot = await depotOf(c, t);
+    const profile = await profileOf(c, t);
+    // Điểm xuất phát của phần còn lại: điểm vừa xử lý gần nhất hoặc kho; đường đi vẽ từ vị trí xe nếu vị trí còn mới
+    const lastDone = (await c.query(
+      `SELECT s.order_id, o.latitude AS lat, o.longitude AS lon FROM delivery_attempts a
+         JOIN trip_stops s ON s.id = a.stop_id JOIN orders o ON o.id = s.order_id
+        WHERE s.trip_id = $1 ORDER BY a.occurred_at DESC LIMIT 1`, [tripId])).rows[0];
+    const from = lastDone ? stopPoint(lastDone) : depot;
+    const pos = (await c.query(
+      `SELECT latitude AS lat, longitude AS lon FROM vehicle_positions
+        WHERE trip_id = $1 AND observed_at > now() - make_interval(secs => $2) ORDER BY observed_at DESC LIMIT 1`,
+      [tripId, config.monitor.stalePositionSeconds])).rows[0];
+    const start = pos ?? { lat: from.lat, lon: from.lon };
+    const restPoints = rest.map(stopPoint);
+    const v = await addRouteVersion(c, t, {
+      reason: 'deferred', ack: true,
+      sequence: [...order.filter(s => s.status !== 'pending').map(s => s.id), ...rest.map(s => s.id)],
+      objectiveSeconds: await sequenceSeconds([from, ...restPoints, depot], profile),
+    });
+    await addEvent(c, {
+      tripId, actorId: null, type: 'stop_deferred', clientEventId, fp,
+      payload: { stopId, orderId: target.order_id, requestedBy: user.id, ...v, start, stopIds: rest.map(s => s.id) },
+    });
+    return { ...v, points: [start, ...restPoints, depot], profile };
+  });
+  if (out) fillGeometryLater(out.routeVersionId, out.points, out.profile);
 }
 
 // ---------------------------------------------------------------- UC12 vị trí xe
@@ -440,11 +586,14 @@ export async function recordPosition(tripId, user, { lat, lon, observedAt, accur
   if (!t) throw notFound('Không tìm thấy chuyến');
   ensureOwner(t, user);
   if (t.status !== 'in_progress') throw conflict('Chỉ gửi vị trí khi chuyến đang giao');
+  // Vị trí sai số quá lớn (thường là định vị theo mạng di động) bỏ luôn, không làm lệch vị trí xe và giờ dự kiến
+  if (accuracyM != null && accuracyM > config.positionMaxAccuracyM) return { dropped: true };
   // Vị trí cũ đến muộn vẫn được lưu nhưng không thay vị trí mới hơn, vì vị trí hiện tại luôn lấy theo observed_at lớn nhất
   await query(
     `INSERT INTO vehicle_positions (trip_id, latitude, longitude, observed_at, accuracy_m, source, client_event_id)
      VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (client_event_id) DO NOTHING`,
     [tripId, lat, lon, observedAt, accuracyM, source, clientEventId]);
+  return { dropped: false };
 }
 
 // ---------------------------------------------------------------- UC10.1 thiết bị Driver nhận tuyến mới
@@ -459,13 +608,20 @@ export async function acknowledgeRoute(tripId, user, { routeVersionId, clientEve
     ensureOwner(t, user);
     if (await findReplay(c, tripId, 'route_acknowledged', clientEventId, fp)) return;
     if (t.status !== 'in_progress') throw conflict('Chuyến không ở trạng thái đang giao');
-    if (t.current_route_version !== routeVersionId) throw stale('Đã có phiên bản tuyến mới hơn, tải lại chuyến');
+    if (t.current_route_version !== routeVersionId) throw stale('Tuyến vừa được cập nhật thêm, tải lại chuyến');
     await c.query('UPDATE trips SET driver_ack_route_version = $2 WHERE id = $1', [tripId, routeVersionId]);
     await addEvent(c, { tripId, actorId: user.id, type: 'route_acknowledged', clientEventId, fp, payload: { routeVersionId } });
   });
 }
 
 // ---------------------------------------------------------------- UC14 báo về kho
+
+/** Chốt chuyến và giải phóng đơn, xe, Driver. actorId để trống là hệ thống tự chốt. */
+async function finishTrip(c, tripId, actorId, payload, ids = {}) {
+  await c.query('DELETE FROM active_assignments WHERE trip_id = $1', [tripId]);
+  await c.query(`UPDATE trips SET status = 'closed', closed_at = now(), state_version = state_version + 1 WHERE id = $1`, [tripId]);
+  await addEvent(c, { tripId, actorId, type: 'trip_closed', payload, ...ids });
+}
 
 export async function returnTrip(tripId, user, { returnedOrderIds, clientEventId, fp }) {
   return transaction(async c => {
@@ -474,7 +630,8 @@ export async function returnTrip(tripId, user, { returnedOrderIds, clientEventId
     if (await findReplay(c, tripId, 'trip_returned', clientEventId, fp)) return;
     if (t.status !== 'in_progress') throw conflict('Chuyến không ở trạng thái đang giao');
     const stops = (await c.query(
-      `SELECT s.id, s.order_id, s.status, o.code FROM trip_stops s JOIN orders o ON o.id = s.order_id WHERE s.trip_id = $1`, [tripId])).rows;
+      `SELECT s.id, s.order_id, s.status, o.code FROM trip_stops s JOIN orders o ON o.id = s.order_id
+        WHERE s.trip_id = $1 AND s.status <> 'removed'`, [tripId])).rows;
     const pending = stops.filter(s => s.status === 'pending');
     // Báo cáo chỉ được nhận khi mọi điểm đã có kết quả được máy chủ xác nhận (mục 3.5)
     if (pending.length) throw conflict(`Còn ${pending.length} điểm chưa có kết quả`, { pendingOrderCodes: pending.map(s => s.code) });
@@ -483,32 +640,86 @@ export async function returnTrip(tripId, user, { returnedOrderIds, clientEventId
     if (wrong.length) throw badRequest('Chỉ khai báo các kiện chưa giao được');
     await c.query(`UPDATE trips SET status = 'awaiting_reconciliation', returned_at = now(), state_version = state_version + 1 WHERE id = $1`, [tripId]);
     await addEvent(c, { tripId, actorId: user.id, type: 'trip_returned', clientEventId, fp, payload: { returnedOrderIds, failedOrderIds: failed } });
+    // Giao hết, không có hàng mang về: không còn gì để đối chiếu, hệ thống tự chốt và giải phóng xe, Driver ngay
+    if (!failed.length) await finishTrip(c, tripId, null, { auto: true, requeue: [], returnToSender: [], lost: [] });
+  });
+}
+
+// ---------------------------------------------------------------- kết thúc chuyến do sự cố
+
+/**
+ * Dispatcher kết thúc chuyến đang giao khi xe hỏng, Driver ốm, mất điện thoại…: mọi điểm chưa giao thành chưa giao được
+ * với lý do INCIDENT_REASON do Dispatcher ghi, chuyến chuyển sang chờ đối chiếu như khi Driver báo về kho.
+ * Hàng mang về được coi là mọi kiện chưa giao được; kiện không về tới kho thì khi đối chiếu chọn Thất lạc.
+ */
+export async function abortTrip(tripId, user, { note, clientEventId, fp }) {
+  return transaction(async c => {
+    const t = await lockTrip(c, tripId);
+    if (await findReplay(c, tripId, 'trip_aborted', clientEventId, fp)) return;
+    if (t.status !== 'in_progress') throw conflict('Chỉ kết thúc do sự cố được chuyến đang giao');
+    const stops = (await c.query(`SELECT id, order_id, status FROM trip_stops WHERE trip_id = $1 AND status <> 'removed' FOR UPDATE`, [tripId])).rows;
+    const pending = stops.filter(s => s.status === 'pending');
+    for (const s of pending) {
+      await c.query(
+        `INSERT INTO delivery_attempts (stop_id, client_event_id, result, reason, note, occurred_at, recorded_by)
+         VALUES ($1, $2, 'failed', $3, $4, now(), $5)`, [s.id, randomUUID(), INCIDENT_REASON, note, user.id]);
+    }
+    const pendingIds = pending.map(s => s.id);
+    await c.query(`UPDATE trip_stops SET status = 'failed' WHERE id = ANY($1)`, [pendingIds]);
+    await c.query(`UPDATE orders SET status = 'needs_action', version = version + 1 WHERE id = ANY($1)`, [pending.map(s => s.order_id)]);
+    const failed = stops.filter(s => s.status !== 'delivered').map(s => s.order_id);
+    await c.query(`UPDATE trips SET status = 'awaiting_reconciliation', returned_at = now(), state_version = state_version + 1 WHERE id = $1`, [tripId]);
+    await addEvent(c, {
+      tripId, actorId: user.id, type: 'trip_aborted', clientEventId, fp,
+      payload: { reason: INCIDENT_REASON, note, stopIds: pendingIds, orderIds: pending.map(s => s.order_id), failedOrderIds: failed, returnedOrderIds: failed },
+    });
   });
 }
 
 // ---------------------------------------------------------------- UC09 đối chiếu và chốt chuyến
 
+/**
+ * Đơn chưa giao được mặc định giao lại (vào kế hoạch sau) nếu kiện đã mang về kho và chưa quá config.maxDeliveryAttempts lần;
+ * Dispatcher chỉ phải chọn cho ngoại lệ. Kiện không có trong báo cáo hàng mang về chỉ chọn được Thất lạc.
+ */
 export async function closeTrip(tripId, user, { stateVersion, goodsMatched, decisions, clientEventId, fp }) {
   return transaction(async c => {
     const t = await lockTrip(c, tripId);
     if (await findReplay(c, tripId, 'trip_closed', clientEventId, fp)) return;
     if (t.status !== 'awaiting_reconciliation') throw conflict('Chuyến không ở trạng thái chờ đối chiếu');
     if (t.state_version !== stateVersion) throw stale('Dữ liệu chuyến đã thay đổi, tải lại trước khi chốt');
-    const stops = (await c.query('SELECT order_id, status FROM trip_stops WHERE trip_id = $1', [tripId])).rows;
+    const stops = (await c.query(
+      `SELECT s.order_id, s.status, o.code,
+              (SELECT count(*)::int FROM trip_stops f WHERE f.order_id = s.order_id AND f.status = 'failed') AS attempts
+         FROM trip_stops s JOIN orders o ON o.id = s.order_id WHERE s.trip_id = $1 AND s.status <> 'removed'`, [tripId])).rows;
     if (stops.some(s => s.status === 'pending')) throw conflict('Còn điểm chưa có kết quả, chưa thể chốt chuyến');
-    const failed = stops.filter(s => s.status === 'failed').map(s => s.order_id);
+    const report = (await c.query(
+      `SELECT payload FROM trip_events WHERE trip_id = $1 AND event_type IN ('trip_returned', 'trip_aborted') ORDER BY id DESC LIMIT 1`,
+      [tripId])).rows[0]?.payload;
+    const returned = new Set((report?.returnedOrderIds ?? []).map(Number));
     const byOrder = new Map(decisions.map(d => [Number(d?.orderId), d?.decision]));
-    const missing = failed.filter(id => !['requeue', 'cancel'].includes(byOrder.get(id)));
-    if (missing.length) throw conflict(`Còn ${missing.length} đơn chưa có quyết định`, { orderIds: missing });
+    const chosen = { requeue: [], return_to_sender: [], lost: [] };
+    const undecided = [];
+    const notReturned = [];
+    for (const s of stops.filter(x => x.status === 'failed')) {
+      let d = DECISIONS.includes(byOrder.get(s.order_id)) ? byOrder.get(s.order_id) : null;
+      if (!d && returned.has(s.order_id) && s.attempts < config.maxDeliveryAttempts) d = 'requeue';
+      if (!d) undecided.push(s);
+      else if (d !== 'lost' && !returned.has(s.order_id)) notReturned.push(s);
+      else chosen[d].push(s.order_id);
+    }
+    if (notReturned.length) {
+      throw conflict(`Kiện ${notReturned.map(s => s.code).join(', ')} không có trong báo cáo hàng mang về, chỉ chọn được Thất lạc`,
+        { orderIds: notReturned.map(s => s.order_id) });
+    }
+    if (undecided.length) throw conflict(`Còn ${undecided.length} đơn chưa có quyết định`, { orderIds: undecided.map(s => s.order_id) });
     if (goodsMatched !== true) throw conflict('Hàng thực tế tại kho chưa được xác nhận khớp với báo cáo');
-    const requeue = failed.filter(id => byOrder.get(id) === 'requeue');
-    const cancel = failed.filter(id => byOrder.get(id) === 'cancel');
-    await c.query(`UPDATE orders SET status = 'pending', version = version + 1 WHERE id = ANY($1)`, [requeue]);
-    await c.query(`UPDATE orders SET status = 'cancelled', version = version + 1 WHERE id = ANY($1)`, [cancel]);
+    await c.query(`UPDATE orders SET status = 'pending', version = version + 1 WHERE id = ANY($1)`, [chosen.requeue]);
+    await c.query(`UPDATE orders SET status = 'return_to_sender', version = version + 1 WHERE id = ANY($1)`, [chosen.return_to_sender]);
+    await c.query(`UPDATE orders SET status = 'lost', version = version + 1 WHERE id = ANY($1)`, [chosen.lost]);
     // Chốt chuyến mới giải phóng đơn, xe và Driver
-    await c.query('DELETE FROM active_assignments WHERE trip_id = $1', [tripId]);
-    await c.query(`UPDATE trips SET status = 'closed', closed_at = now(), state_version = state_version + 1 WHERE id = $1`, [tripId]);
-    await addEvent(c, { tripId, actorId: user.id, type: 'trip_closed', clientEventId, fp, payload: { requeue, cancel, goodsMatched: true } });
+    await finishTrip(c, tripId, user.id,
+      { requeue: chosen.requeue, returnToSender: chosen.return_to_sender, lost: chosen.lost, goodsMatched: true }, { clientEventId, fp });
   });
 }
 
@@ -518,8 +729,8 @@ export async function revokeTrip(tripId, user, { stateVersion, goodsReturned, cl
   return transaction(async c => {
     const t = await lockTrip(c, tripId);
     if (await findReplay(c, tripId, 'trip_revoked', clientEventId, fp)) return;
-    if (t.status === 'in_progress') throw conflict('Driver đã bắt đầu chuyến, không thể thu hồi');
-    if (t.status !== 'assigned') throw conflict('Chỉ thu hồi được chuyến đã giao nhưng chưa xuất phát');
+    if (t.status === 'in_progress') throw conflict('Tài xế đã bắt đầu chuyến, không thể thu hồi');
+    if (t.status !== 'assigned') throw conflict('Chỉ thu hồi được chuyến đã phân nhưng chưa xuất phát');
     if (t.state_version !== stateVersion) throw stale('Dữ liệu chuyến đã thay đổi, tải lại trước khi thu hồi');
     if (goodsReturned !== true) throw conflict('Cần đối chiếu lại hàng đã bàn giao trước khi thu hồi');
     const orderIds = await tripOrderIds(c, tripId);
@@ -528,6 +739,38 @@ export async function revokeTrip(tripId, user, { stateVersion, goodsReturned, cl
     await c.query(`UPDATE trips SET status = 'revoked', closed_at = now(), state_version = state_version + 1 WHERE id = $1`, [tripId]);
     await addEvent(c, { tripId, actorId: user.id, type: 'trip_revoked', clientEventId, fp, payload: { orderIds } });
   });
+}
+
+// ---------------------------------------------------------------- bỏ đơn thiếu khỏi chuyến
+
+/**
+ * Hàng thiếu khi xuất phát (Driver báo không khớp): Dispatcher bỏ các đơn thiếu khỏi chuyến chưa xuất phát. Đơn bỏ ra về
+ * chờ xếp, chuyến có phiên bản tuyến mới gồm các điểm còn lại theo thứ tự cũ; Driver kiểm lại hàng rồi bắt đầu chuyến.
+ */
+export async function removeOrders(tripId, user, { orderIds, stateVersion, clientEventId, fp }) {
+  const out = await transaction(async c => {
+    const t = await lockTrip(c, tripId);
+    if (await findReplay(c, tripId, 'orders_removed', clientEventId, fp)) return null;
+    if (t.status !== 'assigned') throw conflict('Chỉ bỏ đơn khỏi chuyến chưa xuất phát');
+    if (t.state_version !== stateVersion) throw stale('Dữ liệu chuyến đã thay đổi, tải lại trước khi bỏ đơn');
+    const order = await currentOrder(c, t);
+    if (orderIds.some(id => !order.some(s => s.order_id === id))) throw badRequest('Có đơn không thuộc chuyến này');
+    const keep = order.filter(s => !orderIds.includes(s.order_id));
+    if (!keep.length) throw conflict('Không thể bỏ hết đơn khỏi chuyến, hãy thu hồi chuyến');
+    await c.query(`UPDATE trip_stops SET status = 'removed' WHERE trip_id = $1 AND order_id = ANY($2)`, [tripId, orderIds]);
+    await c.query('DELETE FROM active_assignments WHERE trip_id = $1 AND order_id = ANY($2)', [tripId, orderIds]);
+    await c.query(`UPDATE orders SET status = 'pending', version = version + 1 WHERE id = ANY($1)`, [orderIds]);
+    const depot = await depotOf(c, t);
+    const profile = await profileOf(c, t);
+    const points = [depot, ...keep.map(stopPoint), depot];
+    const v = await addRouteVersion(c, t, { reason: 'orders_removed', sequence: keep.map(s => s.id), objectiveSeconds: await sequenceSeconds(points, profile) });
+    await addEvent(c, {
+      tripId, actorId: user.id, type: 'orders_removed', clientEventId, fp,
+      payload: { orderIds, orderCodes: order.filter(s => orderIds.includes(s.order_id)).map(s => s.code), ...v },
+    });
+    return { ...v, points, profile };
+  });
+  if (out) fillGeometryLater(out.routeVersionId, out.points, out.profile);
 }
 
 // ---------------------------------------------------------------- UC07 điều chỉnh tuyến còn lại
@@ -551,7 +794,7 @@ export async function evaluateTripReroute(tripId) {
   const trip = await loadTrip(tripId);
   if (!trip) throw notFound('Không tìm thấy chuyến');
   if (trip.status !== 'in_progress') throw conflict('Chỉ đánh giá đổi tuyến khi chuyến đang giao');
-  if (trip.needsAck) throw conflict('Thiết bị Driver chưa nhận tuyến hiện hành, chưa đánh giá thêm');
+  if (trip.needsAck) throw conflict('Thiết bị tài xế chưa nhận tuyến hiện hành, chưa đánh giá thêm');
   if (!trip.position) throw conflict('Chưa có vị trí xe để đánh giá');
   if (ageSeconds(trip.position.observedAt) > config.reroute.maxPositionAgeSeconds) {
     throw conflict(`Vị trí xe cũ hơn ${config.reroute.maxPositionAgeSeconds} giây, chưa đánh giá được`);
@@ -640,7 +883,7 @@ export async function applyReroute(tripId, eventId) {
     if (t.state_version !== p.stateVersion || t.current_route_version !== p.routeVersionId) {
       throw stale('Chuyến vừa thay đổi (điểm đã giao hoặc tuyến mới), cần đánh giá lại');
     }
-    if (t.driver_ack_route_version !== t.current_route_version) throw conflict('Thiết bị Driver chưa nhận tuyến hiện hành');
+    if (t.driver_ack_route_version !== t.current_route_version) throw conflict('Thiết bị tài xế chưa nhận tuyến hiện hành');
     if (ageSeconds(ev.created_at) > config.reroute.maxEvaluationAgeSeconds) {
       throw stale(`Kết quả đánh giá đã cũ hơn ${config.reroute.maxEvaluationAgeSeconds} giây, cần đánh giá lại`);
     }

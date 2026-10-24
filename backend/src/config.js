@@ -39,6 +39,25 @@ export const config = {
     // các chặng còn lại và chặng từ vị trí xe chỉ được lấy khi phát hiện tăng thời gian
     checkIntervalSeconds: num('REROUTE_CHECK_SECONDS', 120),
   },
+
+  // Việc cần xử lý trên màn hình Tổng quan của Dispatcher
+  monitor: {
+    // Vị trí xe cũ hơn ngần này thì báo; Driver mở ứng dụng chỉ đường làm vị trí tạm dừng nên không báo ngay
+    stalePositionSeconds: num('POSITION_STALE_SECONDS', 180),
+    // Chuyến đã phân nhưng chưa xuất phát quá ngần này phút
+    assignedIdleMinutes: num('ASSIGNED_IDLE_MINUTES', 30),
+    // Giờ về kho dự kiến trễ hơn kế hoạch quá ngần này phút
+    lateMinutes: num('TRIP_LATE_MINUTES', 10),
+    // Lần giao chưa thành công trong ngần này phút gần nhất, để gọi khách khi Driver còn ở gần
+    failedAlertMinutes: num('FAILED_ALERT_MINUTES', 30),
+  },
+
+  // Số lần giao chưa thành công tối đa của một đơn được tự xếp lại; quá số này Dispatcher phải quyết định
+  maxDeliveryAttempts: num('MAX_DELIVERY_ATTEMPTS', 3),
+  // Vị trí có sai số lớn hơn ngần này mét thì bỏ, không lưu
+  positionMaxAccuracyM: num('POSITION_MAX_ACCURACY_M', 100),
+  // Kết quả ghi khi xe cách điểm giao xa hơn ngần này mét thì đánh dấu trên chi tiết chuyến
+  podMaxDistanceM: num('POD_MAX_DISTANCE_M', 200),
 };
 
 export function checkConfig() {

@@ -34,7 +34,7 @@ export default function VehiclesPage() {
   const columns = COLUMNS.map(c => ({
     ...c,
     render: {
-      plate: v => <div className="col"><span className="strong">{v.plate}</span><span className="caption muted">{v.driver?.name ?? 'Chưa có Driver'}</span></div>,
+      plate: v => <div className="col"><span className="strong">{v.plate}</span><span className="caption muted">{v.driver?.name ?? 'Chưa có tài xế'}</span></div>,
       type: v => <div className="row" style={{ gap: 8 }}>{v.type === 'motorcycle' ? <Bike size={18} /> : <Truck size={18} />}{VEHICLE_TYPE[v.type]}</div>,
       capacity: v => kg(v.capacityKg),
       status: v => v.status !== 'active' ? <Badge tone="warning">Bảo trì</Badge> : v.activeTrip ? <Badge tone="purple">Đang chạy chuyến</Badge> : <Badge tone="success">Sẵn sàng</Badge>,

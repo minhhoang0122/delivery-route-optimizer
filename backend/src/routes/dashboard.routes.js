@@ -1,4 +1,5 @@
-// Tổng quan ca làm việc của Dispatcher (D01): chỉ số, việc cần xử lý, chuyến đang giao.
+// Tổng quan ca làm việc của Dispatcher (D01): chỉ số, việc cần xử lý (vị trí cũ, chuyến trễ, chuyến chưa xuất phát,
+// lần giao chưa thành công vừa xảy ra, chờ đối chiếu, hàng không khớp), chuyến đang giao.
 import { Router } from 'express';
 import { requireRole } from '../auth.js';
 import { config } from '../config.js';
@@ -21,17 +22,36 @@ router.get('/', async (_req, res) => {
   for (const id of ids) trips.push(await loadTrip(id));
 
   const now = Date.now();
-  const maxAge = config.reroute.maxPositionAgeSeconds * 1000;
+  const m = config.monitor;
   const todo = [];
   for (const t of trips) {
-    if (t.status === 'in_progress' && (!t.position || now - new Date(t.position.observedAt).getTime() > maxAge)) {
-      todo.push({ type: 'stale_position', tripId: t.id, tripCode: t.code, plate: t.vehicle.plate, observedAt: t.position?.observedAt ?? null });
+    const base = { tripId: t.id, tripCode: t.code, plate: t.vehicle.plate, driverName: t.driver.name, driverPhone: t.driver.phone };
+    if (t.status === 'in_progress' && (!t.position || now - new Date(t.position.observedAt).getTime() > m.stalePositionSeconds * 1000)) {
+      todo.push({ type: 'stale_position', ...base, observedAt: t.position?.observedAt ?? null });
+    }
+    // Trễ so với kế hoạch: giờ về kho dự kiến muộn hơn giờ về theo tuyến ban đầu, hoặc quá giới hạn thời lượng chuyến
+    const overShift = t.status === 'in_progress' && t.etaReturn && t.shiftEndAt && t.etaReturn > t.shiftEndAt;
+    if (t.status === 'in_progress' && ((t.lateSeconds ?? 0) > m.lateMinutes * 60 || overShift)) {
+      todo.push({ type: 'late', ...base, etaReturn: t.etaReturn, plannedReturnAt: t.plannedReturnAt, shiftEndAt: t.shiftEndAt, lateSeconds: t.lateSeconds, overShift: Boolean(overShift) });
+    }
+    if (t.status === 'assigned' && now - new Date(t.createdAt).getTime() > m.assignedIdleMinutes * 60_000) {
+      todo.push({ type: 'not_started', ...base, createdAt: t.createdAt });
+    }
+    // Lần giao chưa thành công vừa xảy ra: gọi khách khi tài xế còn ở gần
+    if (t.status === 'in_progress') {
+      for (const s of t.stops) {
+        if (s.status !== 'failed' || now - new Date(s.attempt.occurredAt).getTime() > m.failedAlertMinutes * 60_000) continue;
+        todo.push({
+          type: 'failed_attempt', ...base, stopId: s.id, orderCode: s.order.code, recipientName: s.order.recipientName,
+          phone: s.order.phone, address: s.order.address, reason: s.attempt.reason, occurredAt: s.attempt.occurredAt,
+        });
+      }
     }
     if (t.status === 'awaiting_reconciliation') {
-      todo.push({ type: 'reconcile', tripId: t.id, tripCode: t.code, failed: t.progress.failed, returnedAt: t.returnedAt });
+      todo.push({ type: 'reconcile', ...base, failed: t.progress.failed, returnedAt: t.returnedAt, aborted: Boolean(t.returnReport?.aborted) });
     }
     if (t.loadingMismatch) {
-      todo.push({ type: 'loading_mismatch', tripId: t.id, tripCode: t.code, missingOrderIds: t.loadingMismatch.missingOrderIds });
+      todo.push({ type: 'loading_mismatch', ...base, missingOrderIds: t.loadingMismatch.missingOrderIds });
     }
   }
   const inProgress = trips.filter(t => t.status === 'in_progress');
@@ -47,8 +67,9 @@ router.get('/', async (_req, res) => {
       stopsTotal: inProgress.reduce((s, t) => s + t.progress.total, 0),
       awaitingReconciliation: trips.filter(t => t.status === 'awaiting_reconciliation').length,
       assigned: trips.filter(t => t.status === 'assigned').length,
-      warnings: todo.filter(x => x.type === 'stale_position' || x.type === 'loading_mismatch').length,
+      warnings: todo.filter(x => ['stale_position', 'loading_mismatch', 'late', 'not_started'].includes(x.type)).length,
     },
+    thresholds: { stalePositionSeconds: m.stalePositionSeconds, assignedIdleMinutes: m.assignedIdleMinutes, lateMinutes: m.lateMinutes },
     todo,
     trips,
     serverTime: new Date(),

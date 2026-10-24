@@ -36,6 +36,19 @@ async function routeVersionPoints(rv) {
     if (ev.proposedStopIds.some(id => !byId.has(id))) return null;
     return [ev.position, ...ev.proposedStopIds.map(id => byId.get(id)), depot];
   }
+  if (rv.reason === 'deferred') {
+    // Giao sau: từ vị trí xe (hoặc điểm vừa xử lý) lúc Driver dời điểm, qua các điểm còn lại theo thứ tự mới rồi về kho
+    const ev = (await query(
+      `SELECT payload FROM trip_events WHERE trip_id = $1 AND event_type = 'stop_deferred' AND (payload->>'routeVersionId')::int = $2
+        ORDER BY id DESC LIMIT 1`, [rv.trip_id, rv.id])).rows[0]?.payload;
+    if (!ev?.start || !ev.stopIds?.length) return null;
+    const stops = (await query(
+      `SELECT s.id, o.latitude AS lat, o.longitude AS lon FROM trip_stops s JOIN orders o ON o.id = s.order_id WHERE s.id = ANY($1)`,
+      [ev.stopIds])).rows;
+    const byId = new Map(stops.map(s => [s.id, s]));
+    if (ev.stopIds.some(id => !byId.has(id))) return null;
+    return [ev.start, ...ev.stopIds.map(id => byId.get(id)), depot];
+  }
   const stops = (await query(
     `SELECT o.latitude AS lat, o.longitude AS lon FROM route_stops rs
        JOIN trip_stops s ON s.id = rs.stop_id JOIN orders o ON o.id = s.order_id

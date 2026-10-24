@@ -4,7 +4,7 @@ import { Router } from 'express';
 import { requireRole } from '../auth.js';
 import { query, transaction } from '../db.js';
 import { badRequest, conflict, notFound } from '../errors.js';
-import { integer, number, oneOf, paramId, text } from '../validate.js';
+import { integer, mobilePhone, number, oneOf, paramId, servicePoint, text } from '../validate.js';
 import { ACTIVE_STATUSES, tripCode } from '../services/trips.js';
 
 const router = Router();
@@ -29,8 +29,8 @@ const toDriver = r => ({
 const DRIVERS = `
   SELECT d.*, u.username, u.status AS account_status, v.plate, v.vehicle_type, v.capacity_kg,
          t.id AS trip_id, t.status AS trip_status,
-         (SELECT count(*) FROM trip_stops s WHERE s.trip_id = t.id AND s.status <> 'pending') AS done,
-         (SELECT count(*) FROM trip_stops s WHERE s.trip_id = t.id) AS total
+         (SELECT count(*) FROM trip_stops s WHERE s.trip_id = t.id AND s.status IN ('delivered', 'failed')) AS done,
+         (SELECT count(*) FROM trip_stops s WHERE s.trip_id = t.id AND s.status <> 'removed') AS total
     FROM drivers d
     JOIN users u ON u.id = d.user_id
     LEFT JOIN vehicles v ON v.id = d.default_vehicle_id
@@ -38,7 +38,7 @@ const DRIVERS = `
 
 async function loadDriver(id) {
   const { rows } = await query(`${DRIVERS} WHERE d.id = $2`, [ACTIVE_STATUSES, id]);
-  if (!rows[0]) throw notFound('Không tìm thấy Driver');
+  if (!rows[0]) throw notFound('Không tìm thấy tài xế');
   return rows[0];
 }
 
@@ -64,12 +64,12 @@ async function checkVehicleFree(vehicleId, driverId) {
 }
 
 router.post('/drivers', async (req, res) => {
-  const userId = integer(req.body?.userId, 'tài khoản Driver');
+  const userId = integer(req.body?.userId, 'tài khoản tài xế');
   const fullName = text(req.body?.fullName, 'họ tên', { max: 100 });
-  const phone = text(req.body?.phone, 'số điện thoại', { required: false, max: 20 });
+  const phone = mobilePhone(req.body?.phone, 'số điện thoại', { required: false });
   const vehicleId = integer(req.body?.defaultVehicleId, 'xe thường dùng', { required: false });
   const u = (await query('SELECT role FROM users WHERE id = $1', [userId])).rows[0];
-  if (!u || u.role !== 'driver') throw badRequest('Tài khoản được chọn không có vai trò Driver');
+  if (!u || u.role !== 'driver') throw badRequest('Tài khoản được chọn không có vai trò tài xế');
   await checkVehicleFree(vehicleId, null);
   const { rows } = await query(
     'INSERT INTO drivers (user_id, full_name, phone, default_vehicle_id) VALUES ($1, $2, $3, $4) RETURNING id',
@@ -81,16 +81,16 @@ router.post('/drivers', async (req, res) => {
 router.put('/drivers/:id', async (req, res) => {
   const id = paramId(req);
   const fullName = text(req.body?.fullName, 'họ tên', { max: 100 });
-  const phone = text(req.body?.phone, 'số điện thoại', { required: false, max: 20 });
+  const phone = mobilePhone(req.body?.phone, 'số điện thoại', { required: false });
   const vehicleId = integer(req.body?.defaultVehicleId, 'xe thường dùng', { required: false });
   const status = oneOf(req.body?.status, 'trạng thái', ['active', 'inactive']);
   await transaction(async c => {
     // Khóa dòng Driver như lúc giao chuyến (commitPlan), để sửa hồ sơ và giao chuyến đồng thời không cùng thành công
     const cur = (await c.query('SELECT default_vehicle_id FROM drivers WHERE id = $1 FOR UPDATE', [id])).rows[0];
-    if (!cur) throw notFound('Không tìm thấy Driver');
+    if (!cur) throw notFound('Không tìm thấy tài xế');
     const trip = (await c.query('SELECT id FROM trips WHERE driver_id = $1 AND status = ANY($2) LIMIT 1', [id, ACTIVE_STATUSES])).rows[0];
     if (trip && (status !== 'active' || vehicleId !== cur.default_vehicle_id)) {
-      throw conflict(`Driver đang giữ chuyến ${tripCode(trip.id)}, chưa thể ngừng hoạt động hoặc đổi xe`);
+      throw conflict(`Tài xế đang giữ chuyến ${tripCode(trip.id)}, chưa thể ngừng hoạt động hoặc đổi xe`);
     }
     await checkVehicleFree(vehicleId, id);
     await c.query('UPDATE drivers SET full_name = $2, phone = $3, default_vehicle_id = $4, status = $5 WHERE id = $1',
@@ -129,12 +129,15 @@ router.get('/vehicles', async (_req, res) => {
   res.json({ vehicles: rows.map(toVehicle) });
 });
 
+// Tải trọng hợp lý theo loại xe (kg)
+const CAPACITY = { motorcycle: { min: 5, max: 200 }, small_truck: { min: 100, max: 2500 } };
+
 function readVehicle(body) {
   const type = oneOf(body?.type, 'loại xe', ['motorcycle', 'small_truck']);
   return {
     plate: text(body?.plate, 'biển số', { max: 20 }),
     type,
-    capacityKg: number(body?.capacityKg, 'tải trọng', { gt: 0, max: 99999 }),
+    capacityKg: number(body?.capacityKg, 'tải trọng', CAPACITY[type]),
     // Cấu hình định tuyến đi theo loại xe: xe máy dùng motorcycle, xe tải nhỏ dùng truck
     routingProfile: type === 'motorcycle' ? 'motorcycle' : 'truck',
   };
@@ -205,8 +208,7 @@ router.put('/depots/:id', async (req, res) => {
   const d = {
     name: text(req.body?.name, 'tên kho', { max: 100 }),
     address: text(req.body?.address, 'địa chỉ', { max: 255 }),
-    lat: number(req.body?.lat, 'vĩ độ', { min: -90, max: 90 }),
-    lon: number(req.body?.lon, 'kinh độ', { min: -180, max: 180 }),
+    ...servicePoint(req.body?.lat, req.body?.lon, 'Vị trí kho'),
     openingHours: text(req.body?.openingHours, 'giờ mở cửa', { required: false, max: 50 }),
   };
   const cur = (await query('SELECT * FROM depots WHERE id = $1', [id])).rows[0];

@@ -1,21 +1,25 @@
 // Ứng dụng Driver: xem nhiệm vụ (UC10), ghi nhận thiết bị đã nhận tuyến mới (UC10.1, ứng dụng tự gửi), bắt đầu chuyến (UC11), gửi vị trí (UC12),
-// ghi kết quả (UC13), báo về kho (UC14), xem lại chuyến của mình (UC15).
+// ghi kết quả (UC13), giao sau (dời điểm xuống cuối tuyến), báo về kho (UC14), xem lại chuyến của mình (UC15).
 // Driver chỉ đọc và thao tác trên chuyến được giao cho chính mình.
 import { Router } from 'express';
 import { requireRole } from '../auth.js';
 import { query } from '../db.js';
 import { badRequest, forbidden, notFound } from '../errors.js';
 import { eventPayload, fingerprint, requireEventId } from '../idempotency.js';
-import { acknowledgeRoute, ACTIVE_STATUSES, loadTrip, recordAttempt, recordPosition, returnTrip, startTrip, tripCode } from '../services/trips.js';
+import {
+  acknowledgeRoute, ACTIVE_STATUSES, deferStop, INCIDENT_REASON, loadTrip, recordAttempt, recordPosition, returnTrip, startTrip, tripCode,
+} from '../services/trips.js';
 import { idList, integer, number, oneOf, paramId, text, timestamp } from '../validate.js';
 
 const router = Router();
 router.use(requireRole('driver'));
 
-export const FAIL_REASONS = ['Vắng nhà', 'Không liên lạc được', 'Sai địa chỉ', 'Khách từ chối nhận', 'Khác'];
+// Lý do Driver chọn khi chưa giao được; INCIDENT_REASON chỉ do Dispatcher ghi khi kết thúc chuyến do sự cố
+export const DRIVER_FAIL_REASONS = ['Vắng nhà', 'Không liên lạc được', 'Sai địa chỉ', 'Khách từ chối nhận', 'Khác'];
+export const FAIL_REASONS = [...DRIVER_FAIL_REASONS, INCIDENT_REASON];
 
 function requireProfile(req) {
-  if (!req.user.driver_id) throw forbidden('Tài khoản chưa có hồ sơ Driver. Liên hệ Dispatcher.');
+  if (!req.user.driver_id) throw forbidden('Tài khoản chưa có hồ sơ tài xế. Liên hệ điều phối viên.');
   return req.user.driver_id;
 }
 
@@ -37,7 +41,7 @@ router.get('/trips', async (req, res) => {
   const driverId = requireProfile(req);
   const { rows } = await query(
     `SELECT t.id, t.status, t.created_at, t.started_at, t.returned_at, t.closed_at,
-            count(s.id) AS total,
+            count(s.id) FILTER (WHERE s.status <> 'removed') AS total,
             count(s.id) FILTER (WHERE s.status = 'delivered') AS delivered,
             count(s.id) FILTER (WHERE s.status = 'failed') AS failed
        FROM trips t LEFT JOIN trip_stops s ON s.trip_id = t.id
@@ -84,7 +88,7 @@ router.post('/trips/:id/stops/:stopId/attempts', async (req, res) => {
   const id = paramId(req);
   const clientEventId = requireEventId(req.body);
   const result = oneOf(req.body?.result, 'kết quả', ['delivered', 'failed']);
-  const reason = result === 'failed' ? oneOf(req.body?.reason, 'lý do chưa giao được', FAIL_REASONS) : null;
+  const reason = result === 'failed' ? oneOf(req.body?.reason, 'lý do chưa giao được', DRIVER_FAIL_REASONS) : null;
   const note = text(req.body?.note, 'ghi chú', { required: reason === 'Khác', max: 255 });
   const occurredAt = timestamp(req.body?.occurredAt, 'thời điểm', { required: false }) ?? new Date();
   if (occurredAt.getTime() > Date.now() + 60_000) throw badRequest('Thời điểm ghi kết quả ở tương lai');
@@ -92,6 +96,14 @@ router.post('/trips/:id/stops/:stopId/attempts', async (req, res) => {
     result, reason, note, occurredAt, clientEventId, fp: fingerprint(eventPayload(req.body)),
   });
   res.status(out.replayed ? 200 : 201).json({ replayed: out.replayed, trip: await loadTrip(id) });
+});
+
+// Giao sau: khách chưa nhận được lúc này, điểm xuống cuối các điểm còn lại
+router.post('/trips/:id/stops/:stopId/defer', async (req, res) => {
+  const id = paramId(req);
+  const clientEventId = requireEventId(req.body);
+  await deferStop(id, paramId(req, 'stopId'), req.user, { clientEventId, fp: fingerprint({ stopId: paramId(req, 'stopId'), ...eventPayload(req.body) }) });
+  res.json({ trip: await loadTrip(id) });
 });
 
 router.post('/trips/:id/route-ack', async (req, res) => {

@@ -15,7 +15,7 @@ const NAV = {
       ['/dispatcher/failed-orders', 'Đơn chưa giao được'],
     ],
     [
-      ['/dispatcher/drivers', 'Driver'],
+      ['/dispatcher/drivers', 'Tài xế'],
       ['/dispatcher/vehicles', 'Phương tiện'],
       ['/dispatcher/depot', 'Kho'],
     ],

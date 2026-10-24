@@ -1,14 +1,14 @@
 // D01 Tổng quan ca làm việc: chỉ số, việc cần xử lý, chuyến đang giao và bản đồ xe đang chạy.
-import { ClipboardCheck, Clock, Navigation, Package, Route, TriangleAlert, CircleCheck } from 'lucide-react'
+import { ClipboardCheck, Clock, Hourglass, Navigation, Package, PhoneCall, Route, Timer, TriangleAlert, CircleCheck } from 'lucide-react'
 import { Link, useNavigate } from 'react-router'
 import { api } from '../../api.js'
 import MapView, { Legend, MapOverlay } from '../../components/MapView.jsx'
-import { CONGESTION_HEX, isStale, NO_ROAD_LEGEND, tripLayers } from '../../components/tripMap.js'
+import { CONGESTION_HEX, isStale, NO_ROAD_LEGEND, staleAfter, tripLayers } from '../../components/tripMap.js'
 import { Badge, Button, Card, Dot, ErrorBox, Loading, Metric, PageHeader, Progress, StatusBadge } from '../../components/ui.jsx'
-import { ago, longDate, routeHex, time, TRIP_STATUS } from '../../format.js'
+import { ago, duration, longDate, routeHex, time, TRIP_STATUS } from '../../format.js'
 import { LIVE_MS, useLoad, useNow } from '../../hooks.js'
 
-function TodoItem({ icon: Icon, tone, title, desc, action, to }) {
+function TodoItem({ icon: Icon, tone, title, desc, action, to, phone }) {
   const navigate = useNavigate()
   return (
     <div className="todo">
@@ -17,6 +17,7 @@ function TodoItem({ icon: Icon, tone, title, desc, action, to }) {
         <span className="strong">{title}</span>
         <span className="caption secondary">{desc}</span>
       </div>
+      {phone && <a className="btn secondary" href={`tel:${phone.replace(/\s/g, '')}`}>{phone}</a>}
       <Button variant="ghost" onClick={() => navigate(to)}>{action}</Button>
     </div>
   )
@@ -31,9 +32,13 @@ export default function DashboardPage() {
   const layers = active.map(t => tripLayers(t, { now, label: ago(t.position?.observedAt, now) }))
 
   // Mỗi loại việc có cách hiển thị riêng; chỉ dựng đúng loại của việc đang xét
+  const staleText = duration(data?.thresholds?.stalePositionSeconds)
   const TODO = {
-    stale_position: x => ({ icon: Clock, tone: 'tone-warning-bg', title: `Vị trí xe ${x.plate} cũ hơn 30 giây`, desc: x.observedAt ? `Cập nhật lần cuối ${ago(x.observedAt, now)}` : 'Chưa nhận được vị trí nào', action: 'Xem chuyến', to: `/dispatcher/trips/${x.tripId}` }),
-    reconcile: x => ({ icon: ClipboardCheck, tone: 'tone-warning-bg', title: `${x.tripCode} chờ đối chiếu`, desc: `${x.failed} đơn chưa giao được · về kho lúc ${time(x.returnedAt)}`, action: 'Đối chiếu', to: `/dispatcher/trips/${x.tripId}/reconcile` }),
+    stale_position: x => ({ icon: Clock, tone: 'tone-warning-bg', title: `Vị trí xe ${x.plate} cũ hơn ${staleText}`, desc: x.observedAt ? `Cập nhật lần cuối ${ago(x.observedAt, now)}` : 'Chưa nhận được vị trí nào', action: 'Xem chuyến', to: `/dispatcher/trips/${x.tripId}` }),
+    late: x => ({ icon: Timer, tone: 'tone-warning-bg', title: `${x.tripCode} trễ so với kế hoạch`, desc: `Dự kiến về kho ${time(x.etaReturn)} · kế hoạch ${time(x.overShift ? x.shiftEndAt : x.plannedReturnAt)}`, action: 'Xem chuyến', to: `/dispatcher/trips/${x.tripId}` }),
+    not_started: x => ({ icon: Hourglass, tone: 'tone-warning-bg', title: `${x.tripCode} chưa xuất phát`, desc: `${x.driverName} · phân chuyến lúc ${time(x.createdAt)}`, action: 'Xem chuyến', to: `/dispatcher/trips/${x.tripId}`, phone: x.driverPhone }),
+    failed_attempt: x => ({ icon: PhoneCall, tone: 'tone-danger-bg', title: `${x.orderCode} chưa giao được · ${x.reason}`, desc: `${x.recipientName} · ${x.tripCode} · ${time(x.occurredAt)}`, action: 'Xem chuyến', to: `/dispatcher/trips/${x.tripId}`, phone: x.phone }),
+    reconcile: x => ({ icon: ClipboardCheck, tone: 'tone-warning-bg', title: `${x.tripCode} chờ đối chiếu`, desc: `${x.failed} đơn chưa giao được · ${x.aborted ? 'kết thúc do sự cố' : 'về kho'} lúc ${time(x.returnedAt)}`, action: 'Đối chiếu', to: `/dispatcher/trips/${x.tripId}/reconcile` }),
     loading_mismatch: x => ({ icon: TriangleAlert, tone: 'tone-danger-bg', title: `${x.tripCode}: hàng không khớp khi xuất phát`, desc: `Thiếu ${x.missingOrderIds.length} kiện so với danh sách`, action: 'Xem chuyến', to: `/dispatcher/trips/${x.tripId}` }),
   }
   const todo = (data?.todo ?? []).filter(x => TODO[x.type]).map(x => TODO[x.type](x))
@@ -47,7 +52,7 @@ export default function DashboardPage() {
         <div className="grid-metrics">
           <Metric label="Đơn chờ xếp" value={m.pendingOrders} hint={`${m.truckOnlyOrders} đơn chỉ cho phép xe tải`} icon={Package} />
           <Metric label="Chuyến đang giao" value={m.tripsInProgress} hint={`${m.stopsDone}/${m.stopsTotal} điểm đã xử lý · ${m.assigned} chuyến chờ xuất phát`} icon={Navigation} />
-          <Metric label="Chờ đối chiếu" value={m.awaitingReconciliation} hint={`${m.needsActionOrders} đơn chưa giao được chờ quyết định`} icon={ClipboardCheck} tone={m.awaitingReconciliation ? 'warning' : undefined} />
+          <Metric label="Chờ đối chiếu" value={m.awaitingReconciliation} hint={`${m.needsActionOrders} đơn chưa giao được`} icon={ClipboardCheck} tone={m.awaitingReconciliation ? 'warning' : undefined} />
           <Metric label="Cảnh báo" value={m.warnings} icon={TriangleAlert} tone={m.warnings ? 'warning' : undefined} />
         </div>
       )}
@@ -65,7 +70,7 @@ export default function DashboardPage() {
                   <Dot color={routeHex(t.vehicle.id)} />
                   <div className="col grow">
                     <span><span className="mono strong">{t.code}</span> · {t.driver.name}</span>
-                    {t.status === 'in_progress' && isStale(t.position, now)
+                    {t.status === 'in_progress' && isStale(t.position, now, staleAfter(t))
                       ? <span className="caption warning row" style={{ gap: 4 }}><Clock size={12} /> Vị trí {t.position ? `cũ ${ago(t.position.observedAt, now).replace(' trước', '')}` : 'chưa có'}</span>
                       : <StatusBadge map={TRIP_STATUS} value={t.status} />}
                   </div>

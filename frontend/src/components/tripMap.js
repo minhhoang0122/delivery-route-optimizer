@@ -1,7 +1,9 @@
 // Chuyển dữ liệu chuyến thành lớp vẽ cho MapView.
 import { routeHex } from '../format.js'
 
-const STALE_MS = 30_000
+// Ngưỡng vị trí cũ lấy theo Backend (trip.staleAfterSeconds, POSITION_STALE_SECONDS); 180 giây khi chưa có dữ liệu chuyến
+const DEFAULT_STALE_SECONDS = 180
+export const staleAfter = trip => trip?.staleAfterSeconds ?? DEFAULT_STALE_SECONDS
 
 /** Đổi GeoJSON LineString sang mảng [vĩ độ, kinh độ] cho Leaflet (GeoJSON ghi kinh độ trước). */
 export const geoToLatLngs = g => (g?.coordinates ? g.coordinates.map(([lon, lat]) => [lat, lon]) : null)
@@ -62,10 +64,11 @@ export function tripLayers(trip, { now = Date.now(), opacity = 0.85, label } = {
     ? [{
       key: trip.id, heading: heading(trip.trail),
       lat: trip.position.lat, lon: trip.position.lon, color,
-      stale: now - new Date(trip.position.observedAt).getTime() > STALE_MS,
+      stale: isStale(trip.position, now, staleAfter(trip)),
       label,
     }] : []
   return { routes, stops, vehicles, depot: trip.depot, noRoad: !geom }
 }
 
-export const isStale = (position, now = Date.now()) => !position || now - new Date(position.observedAt).getTime() > STALE_MS
+export const isStale = (position, now = Date.now(), seconds = DEFAULT_STALE_SECONDS) =>
+  !position || now - new Date(position.observedAt).getTime() > seconds * 1000

@@ -1,32 +1,38 @@
-// D11 Chi tiết chuyến và lần hệ thống tự đổi tuyến (UC06, UC07), E09 Thu hồi chuyến (UC16), nhật ký thao tác (NFR08).
-import { ClipboardCheck, Lock, Phone, Route, TrafficCone, Undo2 } from 'lucide-react'
+// D11 Chi tiết chuyến và lần hệ thống tự đổi tuyến (UC06, UC07), E09 Thu hồi chuyến (UC16), nhật ký thao tác (NFR08),
+// bỏ đơn thiếu khỏi chuyến chưa xuất phát, kết thúc chuyến do sự cố.
+import { ClipboardCheck, Lock, OctagonX, PackageMinus, Phone, Route, TrafficCone, Undo2 } from 'lucide-react'
 import { useState } from 'react'
 import { Link, useParams } from 'react-router'
 import { api, newEventId } from '../../api.js'
 import MapView, { Legend, MapOverlay } from '../../components/MapView.jsx'
-import { CONGESTION_HEX, congestionRoutes, geoToLatLngs, isStale, NO_ROAD_LEGEND, noRoadRoute, stopState, tripLayers } from '../../components/tripMap.js'
-import { Alert, Badge, Button, Card, Checkbox, Dialog, ErrorBox, KeyValue, Loading, LoadError, PageHeader, Stat, StatusBadge, StopItem } from '../../components/ui.jsx'
-import { ago, dateTime, duration, kg, km, percent, routeHex, time, TRIP_STATUS, VEHICLE_TYPE } from '../../format.js'
+import { CONGESTION_HEX, congestionRoutes, geoToLatLngs, isStale, NO_ROAD_LEGEND, noRoadRoute, staleAfter, stopState, tripLayers } from '../../components/tripMap.js'
+import { Alert, Badge, Button, Card, Checkbox, Dialog, ErrorBox, Field, KeyValue, Loading, LoadError, PageHeader, Stat, StatusBadge, StopItem } from '../../components/ui.jsx'
+import { ago, dateTime, distance, duration, kg, km, percent, routeHex, routeUpdate, time, TRIP_STATUS, VEHICLE_TYPE } from '../../format.js'
 import { LIVE_MS, useAction, useLoad, useNow } from '../../hooks.js'
 
 const EVENT_LABEL = {
-  trip_assigned: 'Giao chuyến', trip_started: 'Bắt đầu chuyến', route_replanned: 'Tự đổi tuyến', route_acknowledged: 'Thiết bị Driver đã nhận tuyến mới',
+  trip_assigned: 'Phân chuyến', trip_started: 'Bắt đầu chuyến', route_replanned: 'Tự đổi tuyến', route_acknowledged: 'Thiết bị tài xế đã nhận tuyến mới',
   attempt_recorded: 'Ghi kết quả giao', trip_returned: 'Báo về kho', trip_closed: 'Chốt chuyến', trip_revoked: 'Thu hồi chuyến',
   loading_mismatch: 'Hàng không khớp khi xuất phát', reroute_evaluated: 'Đánh giá đổi tuyến',
+  trip_aborted: 'Kết thúc chuyến do sự cố', stop_deferred: 'Giao sau', orders_removed: 'Bỏ đơn thiếu khỏi chuyến',
 }
 
 function eventDetail(e, stopsById, versionNo) {
   const p = e.payload || {}
   switch (e.type) {
-    case 'trip_assigned': return `${p.orderIds?.length} đơn · tuyến phiên bản 1 · ${duration(p.objectiveSeconds)}`
-    case 'attempt_recorded': return `${stopsById.get(p.stopId)?.order.code ?? ''} · ${p.result === 'delivered' ? 'giao thành công' : `chưa giao được (${p.reason})`}`
-    case 'route_replanned': return `Phiên bản ${p.fromVersion} → ${p.toVersion} · tiết kiệm ${duration(p.savingSeconds)}`
+    case 'trip_assigned': return `${p.orderIds?.length} đơn · ${duration(p.objectiveSeconds)}`
+    case 'attempt_recorded': return `${stopsById.get(p.stopId)?.order.code ?? ''} · ${p.result === 'delivered' ? 'giao thành công' : `chưa giao được (${p.reason})`}${p.distanceM != null ? ` · cách điểm giao ${distance(p.distanceM)}` : ''}`
+    case 'route_replanned': return `${routeUpdate(p.toVersion)} · tiết kiệm ${duration(p.savingSeconds)}`
     case 'reroute_evaluated': return p.valid ? `Thứ tự hiện tại ${duration(p.currentSeconds)}, thứ tự mới ${duration(p.proposedSeconds)}` : p.reason
-    case 'route_acknowledged': return versionNo.get(p.routeVersionId) ? `Phiên bản ${versionNo.get(p.routeVersionId)}` : ''
+    case 'route_acknowledged': return versionNo.get(p.routeVersionId) ? routeUpdate(versionNo.get(p.routeVersionId)) : ''
     case 'loading_mismatch': return `Thiếu ${p.missingOrderIds?.length ?? 0} kiện`
     case 'trip_returned': return `Mang về ${p.returnedOrderIds?.length ?? 0} kiện`
-    case 'trip_closed': return `${p.requeue?.length ?? 0} đơn chuyển kế hoạch sau, ${p.cancel?.length ?? 0} đơn hủy`
+    case 'trip_closed': return p.auto ? 'Giao hết, hệ thống tự chốt'
+      : [`${p.requeue?.length ?? 0} giao lại`, p.returnToSender?.length && `${p.returnToSender.length} chuyển hoàn`, p.lost?.length && `${p.lost.length} thất lạc`].filter(Boolean).join(', ')
     case 'trip_revoked': return `${p.orderIds?.length ?? 0} đơn trở về chờ xếp`
+    case 'trip_aborted': return `${p.orderIds?.length ?? 0} điểm chưa giao${p.note ? ` · ${p.note}` : ''}`
+    case 'stop_deferred': return `${stopsById.get(p.stopId)?.order.code ?? ''} xuống cuối tuyến · ${routeUpdate(p.toVersion)} · tài xế yêu cầu`
+    case 'orders_removed': return `${(p.orderCodes ?? []).join(', ')} · ${routeUpdate(p.toVersion)}`
     default: return ''
   }
 }
@@ -57,12 +63,12 @@ function ReplanCard({ trip }) {
   const kept = newSeq.get(r.nextStopId)
   const title = (
     <div className="row"><span className="icon-wrap tone-info"><Route size={18} /></span>
-      <div className="col"><h3 className="h4">Hệ thống đã đổi tuyến</h3><span className="caption muted">Phiên bản {r.fromVersion} → {r.toVersion} · {time(r.at)}</span></div>
+      <div className="col"><h3 className="h4">Hệ thống đã đổi tuyến</h3><span className="caption muted">{routeUpdate(r.toVersion)} · {time(r.at)}</span></div>
     </div>
   )
   const status = r.received
-    ? <Badge tone="success">Driver đã nhận tuyến mới{r.receivedAt ? ` · ${time(r.receivedAt)}` : ''}</Badge>
-    : <Badge tone="warning">Chờ thiết bị Driver nhận</Badge>
+    ? <Badge tone="success">Tài xế đã nhận tuyến mới{r.receivedAt ? ` · ${time(r.receivedAt)}` : ''}</Badge>
+    : <Badge tone="warning">Chờ thiết bị tài xế nhận</Badge>
 
   return (
     <Card tone="brand" title={title} extra={status}>
@@ -88,6 +94,8 @@ export default function TripDetailPage() {
   const now = useNow()
   const [revoke, setRevoke] = useState(false)
   const [goodsBack, setGoodsBack] = useState(false)
+  const [abort, setAbort] = useState(null)
+  const [remove, setRemove] = useState(null)
   const action = useAction()
   if (loading && !data) return <Loading />
   const t = data?.trip
@@ -95,39 +103,55 @@ export default function TripDetailPage() {
   const byId = new Map(t.stops.map(s => [s.id, s]))
   const versionNo = new Map(t.routeVersions.map(v => [v.id, v.versionNo]))
   const layers = tripLayers(t, { now, label: t.position ? ago(t.position.observedAt, now) : undefined })
-  const stale = t.status === 'in_progress' && isStale(t.position, now)
+  const stale = t.status === 'in_progress' && isStale(t.position, now, staleAfter(t))
 
   async function doRevoke() {
     const ok = await action.run(() => api(`/trips/${t.id}/revoke`, { method: 'POST', body: { clientEventId: newEventId(), stateVersion: t.stateVersion, goodsReturned: goodsBack } }))
     if (ok) { setRevoke(false); reload() }
   }
+  async function doAbort() {
+    const ok = await action.run(() => api(`/trips/${t.id}/abort`, { method: 'POST', body: { clientEventId: abort.id, note: abort.note.trim() || undefined } }))
+    if (ok) { setAbort(null); reload() }
+  }
+  async function doRemove() {
+    const ok = await action.run(() => api(`/trips/${t.id}/remove-orders`, { method: 'POST', body: { clientEventId: remove.id, stateVersion: t.stateVersion, orderIds: [...remove.ids] } }))
+    if (ok) { setRemove(null); reload() }
+  }
+  const pendingCount = t.stops.filter(s => s.status === 'pending').length
+  const missing = t.loadingMismatch?.missingOrderIds ?? []
 
   return (
     <>
       <PageHeader title={`Chuyến ${t.code}`} badge={<StatusBadge map={TRIP_STATUS} value={t.status} />}
-        subtitle={`${t.driver.name} · ${VEHICLE_TYPE[t.vehicle.type]} ${t.vehicle.plate} · ${t.startedAt ? `Xuất phát ${time(t.startedAt)}` : `Giao chuyến lúc ${time(t.createdAt)}`}`}
+        subtitle={`${t.driver.name} · ${VEHICLE_TYPE[t.vehicle.type]} ${t.vehicle.plate} · ${t.startedAt ? `Xuất phát ${time(t.startedAt)}` : `Phân chuyến lúc ${time(t.createdAt)}`}`}
         actions={<>
-          {t.driver.phone && <a className="btn secondary" href={`tel:${t.driver.phone.replace(/\s/g, '')}`}><Phone size={18} /> Gọi Driver</a>}
+          {t.driver.phone && <a className="btn secondary" href={`tel:${t.driver.phone.replace(/\s/g, '')}`}><Phone size={18} /> Gọi tài xế</a>}
+          {t.status === 'assigned' && missing.length > 0 && (
+            <Button variant="secondary" icon={PackageMinus} onClick={() => { action.setError(null); setRemove({ id: newEventId(), ids: new Set(missing) }) }}>Bỏ đơn thiếu khỏi chuyến</Button>
+          )}
           {t.status === 'assigned' && <Button variant="danger" icon={Undo2} onClick={() => { action.setError(null); setGoodsBack(false); setRevoke(true) }}>Thu hồi chuyến</Button>}
+          {t.status === 'in_progress' && <Button variant="danger" icon={OctagonX} onClick={() => { action.setError(null); setAbort({ id: newEventId(), note: '' }) }}>Kết thúc chuyến do sự cố</Button>}
           {t.status === 'awaiting_reconciliation' && <Link className="btn primary" to={`/dispatcher/trips/${t.id}/reconcile`}><ClipboardCheck size={18} /> Đối chiếu và chốt chuyến</Link>}
         </>} />
       <ErrorBox error={error} onRetry={reload} />
-      {t.status === 'assigned' && !t.loadingMismatch && <Alert tone="info" title={`Driver chưa bắt đầu chuyến · ${t.stops.length} kiện chờ bàn giao`} />}
+      {t.status === 'assigned' && !t.loadingMismatch && <Alert tone="info" title={`Tài xế chưa bắt đầu chuyến · ${t.stops.length} kiện chờ bàn giao`} />}
       {t.loadingMismatch && (
         <Alert tone="danger" title="Hàng thực nhận không khớp danh sách">
-          Driver báo thiếu {t.loadingMismatch.missingOrderIds.map(oid => t.stops.find(s => s.order.id === oid)?.order.code).join(', ')} lúc {time(t.loadingMismatch.reportedAt)}.
+          Tài xế báo thiếu {t.loadingMismatch.missingOrderIds.map(oid => t.stops.find(s => s.order.id === oid)?.order.code).join(', ')} lúc {time(t.loadingMismatch.reportedAt)}.
         </Alert>
       )}
-      {stale && <Alert tone="warning" title={`Vị trí xe ${t.vehicle.plate} cũ hơn 30 giây`}>Cập nhật lần cuối {ago(t.position?.observedAt, now)}.</Alert>}
+      {stale && <Alert tone="warning" title={`Vị trí xe ${t.vehicle.plate} cũ hơn ${duration(staleAfter(t))}`}>Cập nhật lần cuối {ago(t.position?.observedAt, now)}.</Alert>}
+      {t.abortReport && <Alert tone="danger" title={`Kết thúc do sự cố lúc ${time(t.abortReport.reportedAt)}`}>{t.abortReport.note}</Alert>}
 
       <div className="grid-split">
-        <Card title={`Điểm dừng (${t.progress.done}/${t.progress.total})`} extra={<span className="caption muted">Phiên bản tuyến {t.routeVersion?.versionNo}</span>}>
+        <Card title={`Điểm dừng (${t.progress.done}/${t.progress.total})`} extra={<span className="caption muted">{routeUpdate(t.routeVersion?.versionNo)}</span>}>
           <div className="stack-sm" style={{ maxHeight: 640, overflowY: 'auto' }}>
             {t.stops.map(s => (
               <StopItem key={s.id} state={stopState(s, t.nextStopId)} seq={s.seq} name={s.order.recipientName} address={s.order.address}
                 meta={s.attempt
                   ? `${s.attempt.result === 'delivered' ? 'Đã giao' : s.attempt.reason} ${time(s.attempt.occurredAt)} · ${s.order.code} · ${kg(s.order.weightKg)}${s.attempt.note ? ` · ${s.attempt.note}` : ''}`
-                  : `${s.eta ? `Dự kiến ${time(s.eta)} · ` : ''}${s.order.code} · ${kg(s.order.weightKg)}`} />
+                  : `${s.eta ? `Dự kiến ${time(s.eta)} · ` : ''}${s.order.code} · ${kg(s.order.weightKg)}${s.deferred ? ' · Giao sau' : ''}`}
+                right={s.attempt?.farFromStop ? <Badge tone="warning">Ghi cách điểm giao {distance(s.attempt.distanceM)}</Badge> : undefined} />
             ))}
           </div>
         </Card>
@@ -169,6 +193,33 @@ export default function TripDetailPage() {
                     <div className="stack-sm">
             <KeyValue label="Hàng đã bàn giao" value={`${t.stops.length} kiện · ${kg(t.loadKg)}`} />
             <Checkbox label="Đã nhận lại đủ hàng tại kho" checked={goodsBack} onChange={setGoodsBack} />
+          </div>
+          <ErrorBox error={action.error} />
+        </Dialog>
+      )}
+      {abort && (
+        <Dialog tone="danger" title={`Kết thúc chuyến ${t.code} do sự cố?`} confirmLabel="Kết thúc chuyến" busy={action.busy}
+          onCancel={() => setAbort(null)} onConfirm={doAbort}>
+          <div className="stack-sm">
+            <KeyValue label="Điểm chưa giao" value={`${pendingCount} điểm`} />
+            <Field label="Ghi chú">
+              <textarea className="textarea" value={abort.note} onChange={e => setAbort({ ...abort, note: e.target.value })} maxLength={255} placeholder="Ví dụ: xe hỏng ở Nguyễn Văn Linh" />
+            </Field>
+          </div>
+          <ErrorBox error={action.error} />
+        </Dialog>
+      )}
+      {remove && (
+        <Dialog title="Bỏ đơn thiếu khỏi chuyến?" confirmLabel="Bỏ đơn" busy={action.busy} confirmDisabled={!remove.ids.size}
+          onCancel={() => setRemove(null)} onConfirm={doRemove}>
+          <div className="stack-sm">
+            {missing.map(oid => {
+              const s = t.stops.find(x => x.order.id === oid)
+              return s && (
+                <Checkbox key={oid} label={`${s.order.code} · ${s.order.recipientName} · ${kg(s.order.weightKg)}`} checked={remove.ids.has(oid)}
+                  onChange={on => { const ids = new Set(remove.ids); if (on) ids.add(oid); else ids.delete(oid); setRemove({ ...remove, ids }) }} />
+              )
+            })}
           </div>
           <ErrorBox error={action.error} />
         </Dialog>

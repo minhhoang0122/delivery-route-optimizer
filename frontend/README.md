@@ -1,10 +1,11 @@
 # Frontend: Web App ReactJS
 
-Giao diện cho Administrator, Dispatcher (máy tính) và Driver (điện thoại), dựng theo file Figma "Điều hành giao hàng – UI".
+Giao diện cho quản trị viên, điều phối viên (máy tính) và tài xế (điện thoại), dựng theo file Figma "Điều hành giao hàng – UI".
 
 ```
 npm install
 npm run dev        # http://localhost:5173, /api chuyển tiếp tới Backend ở cổng 3000
+npm run dev:phone  # mở cho điện thoại cùng mạng LAN qua HTTPS tự ký: https://<IP máy tính>:5173 (xem README gốc)
 npm run lint
 npm run build
 ```

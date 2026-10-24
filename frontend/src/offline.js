@@ -37,21 +37,32 @@ export const subscribe = fn => { listeners.add(fn); return () => listeners.delet
 export const listOutbox = async () =>
   ((await tx('outbox', 'readonly', s => s.getAll())) || []).sort((a, b) => a.createdAt.localeCompare(b.createdAt))
 
+/** Thời gian Driver còn hoàn tác được kết quả vừa ghi, trước khi thiết bị gửi lên máy chủ. */
+export const UNDO_MS = 10_000
+
 /**
  * Thêm thao tác vào hàng đợi. item: { clientEventId, userId, path, body, tripId, stopId, kind, label }
  * userId: người tạo thao tác; đăng xuất rồi người khác đăng nhập trên cùng máy thì thao tác vẫn được giữ nhưng không gửi.
+ * holdMs: giữ trên máy ngần ấy mili giây rồi mới gửi (để hoàn tác); đóng ứng dụng trong lúc giữ thì lần mở sau vẫn gửi.
  */
-export async function enqueue(item) {
-  await tx('outbox', 'readwrite', s => s.put({ ...item, createdAt: new Date().toISOString(), state: 'pending', error: null }))
+export async function enqueue(item, { holdMs = 0 } = {}) {
+  const now = Date.now()
+  await tx('outbox', 'readwrite', s => s.put({
+    ...item, createdAt: new Date(now).toISOString(), sendAfter: holdMs ? new Date(now + holdMs).toISOString() : null, state: 'pending', error: null,
+  }))
   notify()
 }
+
+/** Thao tác còn trong thời gian hoàn tác. */
+export const isHeld = (item, now = Date.now()) => Boolean(item.sendAfter) && item.state === 'pending' && Date.parse(item.sendAfter) > now
 
 async function update(id, patch) {
   const all = await listOutbox()
   const cur = all.find(x => x.clientEventId === id)
-  if (!cur) return
+  if (!cur) return false
   await tx('outbox', 'readwrite', s => s.put({ ...cur, ...patch }))
   notify()
+  return true
 }
 
 export async function removeItem(id) {
@@ -91,7 +102,10 @@ export function flush({ userId, retryFailed = false } = {}) {
     try {
       for (const item of await listOwnOutbox(userId)) {
         if (item.state === 'failed' && !retryFailed) continue
-        await update(item.clientEventId, { state: 'sending' })
+        // Còn trong thời gian hoàn tác: chưa gửi, các thao tác sau vẫn gửi bình thường
+        if (isHeld(item)) continue
+        // Driver vừa hoàn tác (thao tác đã bị xóa khỏi hàng đợi) thì không gửi
+        if (!(await update(item.clientEventId, { state: 'sending' }))) continue
         try {
           await api(item.path, { method: 'POST', body: item.body })
           await removeItem(item.clientEventId)

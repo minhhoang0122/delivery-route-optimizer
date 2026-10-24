@@ -8,14 +8,13 @@ import { requireAuth, requireRole } from '../auth.js';
 import { loadDepot } from '../services/planning.js';
 import { geocode, hasKey, mapTile } from '../services/tomtom.js';
 import { badRequest } from '../errors.js';
-import { text } from '../validate.js';
+import { inServiceArea, SERVICE_AREA as AREA, text } from '../validate.js';
 
 const router = Router();
 const CACHE = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '.cache', 'tiles');
 
 // Đường dẫn ô bản đồ không cần đăng nhập, nên chỉ lấy ô TomTom quanh Đà Nẵng để người ngoài không dùng hết hạn mức.
 // Từ mức thu phóng 11 trở lên, ô nằm ngoài khung này chuyển sang OpenStreetMap.
-const AREA = { south: 15.85, north: 16.25, west: 107.85, east: 108.40 };
 const tileX = (lon, z) => Math.floor(((lon + 180) / 360) * 2 ** z);
 const tileY = (lat, z) => {
   const r = (lat * Math.PI) / 180;
@@ -49,7 +48,8 @@ router.get('/geocode', requireAuth, requireRole('dispatcher'), async (req, res) 
   if (!hasKey()) return res.json({ results: [], message: 'Chưa cấu hình khóa TomTom, hãy chọn vị trí trên bản đồ' });
   const depot = await loadDepot();
   const results = await geocode(`${q}, Đà Nẵng`, depot && { lat: depot.latitude, lon: depot.longitude });
-  res.json({ results });
+  // Chỉ trả các vị trí trong khu vực phục vụ, vì đơn ngoài khu vực không lưu được
+  res.json({ results: results.filter(r => inServiceArea(r.lat, r.lon)) });
 });
 
 export default router;

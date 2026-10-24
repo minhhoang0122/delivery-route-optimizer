@@ -52,10 +52,10 @@ export default function DriversPage() {
   const takenBy = new Map(drivers.filter(d => d.defaultVehicle).map(d => [d.defaultVehicle.id, d.id]))
   return (
     <>
-      <PageHeader title="Driver"
+      <PageHeader title="Tài xế"
         actions={<Button icon={Plus} disabled={!data?.availableAccounts.length}
-          title={data?.availableAccounts.length ? '' : 'Không còn tài khoản Driver nào chưa có hồ sơ'}
-          onClick={() => { action.setError(null); setEdit({ userId: data.availableAccounts[0].id, fullName: data.availableAccounts[0].fullName ?? '', phone: '', defaultVehicleId: '', status: 'active' }) }}>Thêm Driver</Button>} />
+          title={data?.availableAccounts.length ? '' : 'Không còn tài khoản tài xế nào chưa có hồ sơ'}
+          onClick={() => { action.setError(null); setEdit({ userId: data.availableAccounts[0].id, fullName: data.availableAccounts[0].fullName ?? '', phone: '', defaultVehicleId: '', status: 'active' }) }}>Thêm tài xế</Button>} />
       <Chips value={filter} onChange={setFilter} items={[
         { value: 'all', label: 'Tất cả', count: drivers.length },
         { value: 'ready', label: 'Sẵn sàng', count: drivers.filter(d => driverState(d) === 'ready').length },
@@ -66,9 +66,9 @@ export default function DriversPage() {
       {loading && !data ? <TableSkeleton columns={COLUMNS} /> : <Table columns={columns} rows={shown} empty="Chưa có Driver" />}
 
       {edit && (
-        <Dialog title={edit.id ? 'Sửa hồ sơ Driver' : 'Thêm Driver'} confirmLabel="Lưu" busy={action.busy} onCancel={() => setEdit(null)} onConfirm={save}>
+        <Dialog title={edit.id ? 'Sửa hồ sơ tài xế' : 'Thêm tài xế'} confirmLabel="Lưu" busy={action.busy} onCancel={() => setEdit(null)} onConfirm={save}>
           {!edit.id && (
-            <Field label="Tài khoản Driver">
+            <Field label="Tài khoản tài xế">
               <select className="select" value={edit.userId} onChange={e => {
                 const a = data.availableAccounts.find(x => x.id === Number(e.target.value))
                 setEdit({ ...edit, userId: e.target.value, fullName: a?.fullName ?? edit.fullName })
@@ -84,7 +84,7 @@ export default function DriversPage() {
               <option value="">Chưa gán</option>
               {data.vehicles.map(v => (
                 <option key={v.id} value={v.id} disabled={takenBy.has(v.id) && takenBy.get(v.id) !== edit.id}>
-                  {v.plate} · {VEHICLE_TYPE[v.type]} {takenBy.has(v.id) && takenBy.get(v.id) !== edit.id ? '(đã có Driver)' : ''}
+                  {v.plate} · {VEHICLE_TYPE[v.type]} {takenBy.has(v.id) && takenBy.get(v.id) !== edit.id ? '(đã có tài xế)' : ''}
                 </option>
               ))}
             </select>

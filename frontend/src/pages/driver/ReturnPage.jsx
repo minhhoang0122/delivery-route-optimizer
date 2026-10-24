@@ -1,5 +1,5 @@
-// R06 Báo về kho (UC14): Driver khai báo hàng còn lại. Báo cáo chỉ được nhận khi mọi kết quả đã được máy chủ xác nhận,
-// và không tự chốt chuyến; Dispatcher đối chiếu rồi mới chốt.
+// R06 Báo về kho (UC14): Driver khai báo hàng mang về, mặc định là mọi kiện chưa giao được. Báo cáo chỉ được nhận khi mọi
+// kết quả đã được máy chủ xác nhận. Giao hết thì hệ thống tự chốt chuyến; còn kiện chưa giao được thì Dispatcher đối chiếu rồi mới chốt.
 import { ChevronLeft, Warehouse } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
@@ -13,7 +13,8 @@ import { useAction } from '../../hooks.js'
 export default function ReturnPage() {
   const navigate = useNavigate()
   const { trip, rawTrip, outbox, setTrip, error, reload } = useDriver()
-  const [checked, setChecked] = useState(() => new Set())
+  // null: chưa sửa, mặc định đánh dấu mang về mọi kiện chưa giao được
+  const [picked, setPicked] = useState(null)
   const action = useAction()
   const eventId = useRef(newEventId())
   if (trip === undefined) return <DriverScreen title="Báo về kho">{error ? <ErrorBox error={error} onRetry={reload} /> : <Loading />}</DriverScreen>
@@ -22,6 +23,7 @@ export default function ReturnPage() {
     return <DriverScreen title="Báo về kho" back={back}><Alert tone="info" title="Không có chuyến đang giao để báo về kho" /></DriverScreen>
   }
   const failed = trip.stops.filter(s => s.status === 'failed')
+  const checked = picked ?? new Set(failed.map(s => s.order.id))
   const delivered = trip.stops.filter(s => s.status === 'delivered')
   // Kết quả máy chủ đã từ chối không còn chờ gửi; điểm đó vẫn được tính vào serverPending
   const waiting = outbox.filter(x => x.tripId === trip.id && x.state !== 'failed').length
@@ -56,7 +58,7 @@ export default function ReturnPage() {
                   <input type="checkbox" checked={checked.has(s.order.id)} onChange={e => {
                     const n = new Set(checked)
                     if (e.target.checked) n.add(s.order.id); else n.delete(s.order.id)
-                    setChecked(n)
+                    setPicked(n)
                   }} />
                   <span>{s.order.code} · {s.order.recipientName}</span>
                 </span>

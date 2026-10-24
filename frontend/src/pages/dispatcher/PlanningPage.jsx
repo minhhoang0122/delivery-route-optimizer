@@ -160,20 +160,20 @@ function PlanningForm({ opt, runs, initial }) {
             </div>
           </Card>
 
-          <Card title="Xe và Driver" extra={<span className="caption muted">Đã chọn {vehicles.size}/{opt.vehicles.length}</span>} style={{ flex: '0 1 360px' }}>
+          <Card title="Xe và tài xế" extra={<span className="caption muted">Đã chọn {vehicles.size}/{opt.vehicles.length}</span>} style={{ flex: '0 1 360px' }}>
             <div className="stack-sm">
               {opt.vehicles.map(v => {
                 const on = vehicles.has(v.id)
                 return (
                   <div key={v.id} className="col" style={{ padding: 12, borderRadius: 3, border: `1px solid ${on ? 'var(--ink)' : 'var(--line)'}`, background: v.problem ? 'var(--subtle)' : 'var(--surface)' }}>
                     <div className="row between">
-                      <Checkbox label={v.driver?.name ?? 'Chưa có Driver'} checked={on} disabled={computing || Boolean(v.problem)} onChange={x => toggle(vehicles, setVehicles, v.id, x)} />
+                      <Checkbox label={v.driver?.name ?? 'Chưa có tài xế'} checked={on} disabled={computing || Boolean(v.problem)} onChange={x => toggle(vehicles, setVehicles, v.id, x)} />
                       {v.problem ? <Badge tone="warning">{v.status !== 'active' ? 'Bảo trì' : 'Không sẵn sàng'}</Badge>
-                        : <span className="row caption strong secondary" style={{ gap: 6 }}><Dot color={routeHex(v.id)} size={8} /> Xe {v.id}</span>}
+                        : <span className="row caption strong secondary" style={{ gap: 6 }}><Dot color={routeHex(v.id)} size={8} /> {v.plate}</span>}
                     </div>
                     <div className="row muted" style={{ paddingLeft: 26, gap: 6, opacity: v.problem ? 0.7 : 1 }}>
                       {v.type === 'motorcycle' ? <Bike size={16} /> : <Truck size={16} />}
-                      <span className="caption">{VEHICLE_TYPE[v.type]} {v.plate} · {kg(v.capacityKg)}</span>
+                      <span className="caption">{VEHICLE_TYPE[v.type]} · {kg(v.capacityKg)}</span>
                     </div>
                     {v.problem && <span className="caption warning" style={{ paddingLeft: 26 }}>{v.problem}</span>}
                   </div>

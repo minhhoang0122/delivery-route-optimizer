@@ -22,7 +22,7 @@ router.post('/login', async (req, res) => {
   if (!user || !ok) {
     throw new HttpError(401, 'INVALID_CREDENTIALS', 'Tên đăng nhập hoặc mật khẩu không đúng');
   }
-  if (user.status === 'locked') throw new HttpError(403, 'ACCOUNT_LOCKED', 'Tài khoản đã bị khóa. Liên hệ Administrator.');
+  if (user.status === 'locked') throw new HttpError(403, 'ACCOUNT_LOCKED', 'Tài khoản đã bị khóa. Liên hệ quản trị viên.');
   await query('UPDATE users SET last_login_at = now() WHERE id = $1', [user.id]);
   res.json({ token: signToken(user), user: publicUser(user) });
 });

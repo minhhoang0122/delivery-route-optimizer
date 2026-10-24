@@ -1,11 +1,12 @@
-// Theo dõi chuyến (UC06, gồm lần hệ thống tự đổi tuyến gần nhất của UC07), đối chiếu và chốt chuyến (UC08, UC09), thu hồi (UC16). Dispatcher.
+// Theo dõi chuyến (UC06, gồm lần hệ thống tự đổi tuyến gần nhất của UC07), đối chiếu và chốt chuyến (UC08, UC09), thu hồi (UC16),
+// bỏ đơn thiếu khỏi chuyến chưa xuất phát và kết thúc chuyến do sự cố. Dispatcher.
 import { Router } from 'express';
 import { requireRole } from '../auth.js';
 import { query } from '../db.js';
 import { notFound } from '../errors.js';
 import { eventPayload, fingerprint, requireEventId } from '../idempotency.js';
-import { ACTIVE_STATUSES, closeTrip, loadTrip, revokeTrip } from '../services/trips.js';
-import { integer, oneOf, paramId } from '../validate.js';
+import { abortTrip, ACTIVE_STATUSES, closeTrip, loadTrip, removeOrders, revokeTrip } from '../services/trips.js';
+import { idList, integer, oneOf, paramId, text } from '../validate.js';
 
 const router = Router();
 router.use(requireRole('dispatcher'));
@@ -48,6 +49,29 @@ router.post('/:id/close', async (req, res) => {
     stateVersion: integer(req.body?.stateVersion, 'phiên bản chuyến'),
     goodsMatched: req.body?.goodsMatched === true,
     decisions: Array.isArray(req.body?.decisions) ? req.body.decisions : [],
+    clientEventId, fp: fingerprint(eventPayload(req.body)),
+  });
+  res.json({ trip: await loadTrip(id, { withEvents: true }) });
+});
+
+// Hàng thiếu lúc xuất phát: bỏ các đơn thiếu khỏi chuyến, đơn về chờ xếp, tài xế xuất phát với phần còn lại
+router.post('/:id/remove-orders', async (req, res) => {
+  const id = paramId(req);
+  const clientEventId = requireEventId(req.body);
+  await removeOrders(id, req.user, {
+    orderIds: idList(req.body?.orderIds, 'đơn'),
+    stateVersion: integer(req.body?.stateVersion, 'phiên bản chuyến'),
+    clientEventId, fp: fingerprint(eventPayload(req.body)),
+  });
+  res.json({ trip: await loadTrip(id, { withEvents: true }) });
+});
+
+// Xe hỏng, tài xế ốm, mất điện thoại…: các điểm chưa giao thành chưa giao được, chuyến chờ đối chiếu
+router.post('/:id/abort', async (req, res) => {
+  const id = paramId(req);
+  const clientEventId = requireEventId(req.body);
+  await abortTrip(id, req.user, {
+    note: text(req.body?.note, 'ghi chú', { required: false, max: 255 }),
     clientEventId, fp: fingerprint(eventPayload(req.body)),
   });
   res.json({ trip: await loadTrip(id, { withEvents: true }) });

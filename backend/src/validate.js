@@ -65,3 +65,27 @@ export function paramId(req, name = 'id') {
   if (!Number.isInteger(n) || n <= 0) throw badRequest('Mã không hợp lệ');
   return n;
 }
+
+// Khu vực phục vụ quanh Đà Nẵng, dùng chung cho tọa độ đơn, kho và ô bản đồ TomTom (map.routes.js)
+export const SERVICE_AREA = { south: 15.85, north: 16.25, west: 107.85, east: 108.40 };
+export const inServiceArea = (lat, lon) =>
+  lat >= SERVICE_AREA.south && lat <= SERVICE_AREA.north && lon >= SERVICE_AREA.west && lon <= SERVICE_AREA.east;
+
+/** Vĩ độ và kinh độ của một vị trí trong khu vực phục vụ. */
+export function servicePoint(latValue, lonValue, label = 'vị trí') {
+  const lat = number(latValue, 'vĩ độ', { min: -90, max: 90 });
+  const lon = number(lonValue, 'kinh độ', { min: -180, max: 180 });
+  if (!inServiceArea(lat, lon)) throw badRequest(`${label} nằm ngoài khu vực phục vụ Đà Nẵng`);
+  return { lat, lon };
+}
+
+/** Chỉ giữ chữ số của số điện thoại (+84 đổi về 0), để so sánh hai số. */
+export const phoneDigits = v => String(v ?? '').replace(/[\s.()-]/g, '').replace(/^\+84/, '0');
+
+// Số di động Việt Nam: 0 (hoặc +84) rồi đầu số 3, 5, 7, 8, 9 và 8 chữ số; cho phép dấu cách, chấm, gạch nối
+const MOBILE = /^0[35789]\d{8}$/;
+export function mobilePhone(value, label, { required = true } = {}) {
+  const v = text(value, label, { required, max: 20 });
+  if (v !== null && !MOBILE.test(phoneDigits(v))) throw badRequest(`${label} không phải số di động Việt Nam hợp lệ`);
+  return v;
+}

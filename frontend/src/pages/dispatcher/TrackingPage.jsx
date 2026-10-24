@@ -3,17 +3,17 @@ import { ChevronRight, LocateFixed, Navigation, Route, TriangleAlert } from 'luc
 import { Link, useSearchParams } from 'react-router'
 import { api } from '../../api.js'
 import MapView, { Legend, MapOverlay } from '../../components/MapView.jsx'
-import { CONGESTION_HEX, isStale, NO_ROAD_LEGEND, tripLayers } from '../../components/tripMap.js'
+import { CONGESTION_HEX, isStale, NO_ROAD_LEGEND, staleAfter, tripLayers } from '../../components/tripMap.js'
 import { Card, Chips, Dot, Empty, ErrorBox, Loading, PageHeader, Progress, Stat, StatusBadge } from '../../components/ui.jsx'
 import { ago, dateTime, duration, routeHex, time, TRIP_STATUS, VEHICLE_TYPE } from '../../format.js'
 import { LIVE_MS, useLoad, useNow } from '../../hooks.js'
 
 const FILTERS = [
-  ['in_progress', 'Đang giao'], ['assigned', 'Đã giao chuyến'], ['awaiting_reconciliation', 'Chờ đối chiếu'], ['closed,revoked', 'Đã kết thúc'],
+  ['in_progress', 'Đang giao'], ['assigned', 'Chờ xuất phát'], ['awaiting_reconciliation', 'Chờ đối chiếu'], ['closed,revoked', 'Đã kết thúc'],
 ]
 
 function TripCard({ t, now }) {
-  const stale = t.status === 'in_progress' && isStale(t.position, now)
+  const stale = t.status === 'in_progress' && isStale(t.position, now, staleAfter(t))
   const next = t.stops.find(s => s.id === t.nextStopId)
   const color = routeHex(t.vehicle.id)
   const href = t.status === 'awaiting_reconciliation' ? `/dispatcher/trips/${t.id}/reconcile` : `/dispatcher/trips/${t.id}`
@@ -34,10 +34,10 @@ function TripCard({ t, now }) {
           <div style={{ width: 140 }}><Stat label="Dự kiến về kho" valueClass="strong" value={time(t.etaReturn)} /></div>
         </div>
       )}
-      {t.status === 'assigned' && <span className="caption muted">Giao chuyến lúc {time(t.createdAt)} · {duration(t.routeVersion?.objectiveSeconds)} di chuyển dự kiến</span>}
-      {t.status === 'awaiting_reconciliation' && <span className="caption warning strong">Về kho lúc {time(t.returnedAt)} · {t.progress.failed} đơn chưa giao được</span>}
+      {t.status === 'assigned' && <span className="caption muted">Phân chuyến lúc {time(t.createdAt)} · {duration(t.routeVersion?.objectiveSeconds)} di chuyển dự kiến</span>}
+      {t.status === 'awaiting_reconciliation' && <span className="caption warning strong">{t.returnReport?.aborted ? 'Kết thúc do sự cố' : 'Về kho'} lúc {time(t.returnedAt)} · {t.progress.failed} đơn chưa giao được</span>}
       {['closed', 'revoked'].includes(t.status) && <span className="caption muted">Kết thúc lúc {dateTime(t.closedAt)}</span>}
-      {t.needsAck && <div className="row tile info" style={{ flexDirection: 'row', gap: 8 }}><Route size={16} className="brand" /><span className="caption strong brand">Chờ thiết bị Driver nhận tuyến mới</span></div>}
+      {t.needsAck && <div className="row tile info" style={{ flexDirection: 'row', gap: 8 }}><Route size={16} className="brand" /><span className="caption strong brand">Chờ thiết bị tài xế nhận tuyến mới</span></div>}
       {t.loadingMismatch && <div className="row tile danger" style={{ flexDirection: 'row', gap: 8 }}><TriangleAlert size={16} className="danger" /><span className="caption strong danger">Hàng không khớp khi xuất phát</span></div>}
       {stale ? (
         <div className="row tile" style={{ flexDirection: 'row', gap: 8, background: 'var(--warn-bg)' }}>
@@ -66,7 +66,7 @@ export default function TrackingPage() {
   // Bản đồ vẽ các chuyến đang lọc; mục "Đã kết thúc" thì vẫn hiện các xe đang chạy
   const onMap = filter === 'in_progress' || filter === 'closed,revoked' ? moving : trips
   const layers = onMap.map(t => tripLayers(t, { now, opacity: 0.5, label: t.position ? ago(t.position.observedAt, now) : undefined }))
-  const staleTrip = moving.find(t => isStale(t.position, now))
+  const staleTrip = moving.find(t => isStale(t.position, now, staleAfter(t)))
 
   return (
     <>
@@ -89,7 +89,7 @@ export default function TrackingPage() {
             <MapOverlay><Legend items={[...onMap.map(t => ({ color: routeHex(t.vehicle.id), label: t.code })), { color: '#2b7a3b', label: 'Đã giao' }, { color: '#c0392b', label: 'Chưa giao được' }, ...(onMap.some(t => t.congestion?.length) ? [{ color: CONGESTION_HEX, label: 'Ùn tắc', line: true }] : []), ...(layers.some(l => l.noRoad) ? [NO_ROAD_LEGEND] : [])]} /></MapOverlay>
           )}
           {staleTrip && (
-            <MapOverlay position="bottom-left"><span className="map-chip warning"><TriangleAlert size={16} /> Xe {staleTrip.vehicle.plate}: vị trí cũ hơn 30 giây</span></MapOverlay>
+            <MapOverlay position="bottom-left"><span className="map-chip warning"><TriangleAlert size={16} /> Xe {staleTrip.vehicle.plate}: vị trí cũ hơn {duration(staleAfter(staleTrip))}</span></MapOverlay>
           )}
         </MapView>
         </div>

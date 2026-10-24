@@ -1,5 +1,5 @@
 // D09 Bản nháp kế hoạch và UC05 Duyệt, giao chuyến.
-// Bản nháp chưa giữ chỗ đơn, xe và Driver; bấm Giao chuyến thì Backend kiểm tra lại và ghi trong một transaction.
+// Bản nháp chưa giữ chỗ đơn, xe và Driver; bấm Phân chuyến thì Backend kiểm tra lại và ghi trong một transaction.
 import { ChevronRight, Clock, RefreshCw, TriangleAlert } from 'lucide-react'
 import { useMemo, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router'
@@ -33,10 +33,10 @@ export default function PlanDraftPage() {
       const color = routeHex(r.vehicleId)
       const pts = r.orderIds.map(oid => byOrder.get(oid))
       routes.push(r.geometry ? { points: geoToLatLngs(r.geometry), color } : noRoadRoute([depot, ...pts.map(o => [o.lat, o.lon]), depot]))
-      pts.forEach((o, i) => stops.push({ lat: o.lat, lon: o.lon, label: i + 1, color, title: `Xe ${r.vehicleId} · ${i + 1}. ${o.code} · ${o.recipientName}` }))
+      pts.forEach((o, i) => stops.push({ lat: o.lat, lon: o.lon, label: i + 1, color, title: `${byVehicle.get(r.vehicleId)?.plate ?? ''} · ${i + 1}. ${o.code} · ${o.recipientName}` }))
     }
     return { routes, stops }
-  }, [result, snap, byOrder])
+  }, [result, snap, byOrder, byVehicle])
 
   if (loading && !data) return <Loading />
   if (!run) return <LoadError error={error} onRetry={reload} notFound="Không tìm thấy bản nháp" back="/dispatcher/planning" />
@@ -66,8 +66,8 @@ export default function PlanDraftPage() {
         subtitle={`Tạo lúc ${time(run.createdAt)} bởi ${run.createdBy}`}
         actions={<>
           <Button variant="secondary" icon={RefreshCw} onClick={() => navigate(`/dispatcher/planning?from=${run.id}`)}>Tính lại</Button>
-          {run.status === 'draft' && <Button onClick={() => { action.setError(null); setConfirm(true) }} disabled={!routes.length}>Giao chuyến</Button>}
-          {run.status === 'committed' && <Link className="btn primary" to="/dispatcher/trips">Xem chuyến đã giao</Link>}
+          {run.status === 'draft' && <Button onClick={() => { action.setError(null); setConfirm(true) }} disabled={!routes.length}>Phân chuyến</Button>}
+          {run.status === 'committed' && <Link className="btn primary" to="/dispatcher/trips">Xem chuyến đã phân</Link>}
         </>} />
       {run.status === 'failed' && <ErrorBox error={{ message: result?.error || 'Lần tính thất bại' }} />}
       {run.status === 'superseded' && (
@@ -77,7 +77,7 @@ export default function PlanDraftPage() {
       <div className="row top wrap" style={{ gap: 24 }}>
         <div style={{ flex: '1 1 560px', minWidth: 0 }}>
           <MapView height={720} depot={{ ...snap.depot }} routes={layers.routes} stops={layers.stops} fitKey={run.id}>
-            <MapOverlay><Legend items={[...routes.map(r => ({ color: routeHex(r.vehicleId), label: `Xe ${r.vehicleId}` })), { color: '#0f172a', label: snap.depot.name }, ...(routes.some(r => !r.geometry) ? [NO_ROAD_LEGEND] : [])]} /></MapOverlay>
+            <MapOverlay><Legend items={[...routes.map(r => ({ color: routeHex(r.vehicleId), label: byVehicle.get(r.vehicleId)?.plate ?? '' })), { color: '#0f172a', label: snap.depot.name }, ...(routes.some(r => !r.geometry) ? [NO_ROAD_LEGEND] : [])]} /></MapOverlay>
             {matrixNote && <MapOverlay position="bottom-left"><span className="map-chip"><Clock size={16} /> {matrixNote}</span></MapOverlay>}
           </MapView>
         </div>
@@ -91,9 +91,9 @@ export default function PlanDraftPage() {
           </Card>
           <Card compact title="Tổng thời gian di chuyển" extra={saved > 0 && <Badge tone="success">−{duration(saved)}</Badge>}>
             <div className="row">
-              <div className="tile grow" style={{ border: '1px solid var(--line)' }}><span className="caption muted">Ban đầu</span><span className="body-large strong secondary">{duration(result?.stats?.insertionSeconds)}</span></div>
+              <div className="tile grow" style={{ border: '1px solid var(--line)' }}><span className="caption muted">Xếp lần đầu</span><span className="body-large strong secondary">{duration(result?.stats?.insertionSeconds)}</span></div>
               <ChevronRight size={20} className="muted" />
-              <div className="tile success grow"><span className="caption secondary">Sau tối ưu</span><span className="body-large strong success">{duration(total)}</span></div>
+              <div className="tile success grow"><span className="caption secondary">Sau khi sắp xếp lại</span><span className="body-large strong success">{duration(total)}</span></div>
             </div>
           </Card>
           <Card compact title="Tuyến theo xe" extra={<span className="caption muted">{routes.length} xe · {placed} điểm</span>}>
@@ -104,8 +104,8 @@ export default function PlanDraftPage() {
                   <div key={r.vehicleId} className="row" style={{ padding: '6px 0', borderBottom: i < routes.length - 1 ? '1px solid var(--line)' : 0 }}>
                     <Dot color={routeHex(r.vehicleId)} size={12} />
                     <div className="col grow">
-                      <span className="strong">Xe {r.vehicleId} · {v.driverName}</span>
-                      <span className="caption muted">{VEHICLE_TYPE[v.type]} {v.plate}</span>
+                      <span className="strong">{v.plate} · {v.driverName}</span>
+                      <span className="caption muted">{VEHICLE_TYPE[v.type]}</span>
                     </div>
                     <div className="col" style={{ width: 198, gap: 6 }}>
                       <div className="row between"><span className="medium">{r.orderIds.length} đơn · {duration(r.seconds)}</span><span className="caption muted">{km(r.distanceM)}</span></div>
@@ -132,7 +132,7 @@ export default function PlanDraftPage() {
         </div>
       </div>
       {confirm && (
-        <Dialog title={`Giao ${routes.length} chuyến cho Driver?`} confirmLabel="Giao chuyến" busy={action.busy} onCancel={() => setConfirm(false)} onConfirm={commit}>
+        <Dialog title={`Phân ${routes.length} chuyến cho tài xế?`} confirmLabel="Phân chuyến" busy={action.busy} onCancel={() => setConfirm(false)} onConfirm={commit}>
           {unassigned.length > 0 && <p>{unassigned.length} đơn chưa xếp vẫn chờ xếp.</p>}
           <ErrorBox error={action.error} />
         </Dialog>

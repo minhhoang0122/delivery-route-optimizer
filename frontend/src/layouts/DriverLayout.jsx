@@ -6,7 +6,7 @@ import { NavLink, Outlet, useLocation } from 'react-router'
 import { api, newEventId } from '../api.js'
 import { useAuth } from '../auth.jsx'
 import ErrorBoundary from '../components/ErrorBoundary.jsx'
-import { cacheGet, cacheSet, dropSettled, enqueue, flush, listOwnOutbox, subscribe } from '../offline.js'
+import { cacheGet, cacheSet, dropSettled, enqueue, flush, isHeld, listOwnOutbox, subscribe } from '../offline.js'
 import { DriverContext, useDriver } from './driverContext.js'
 
 
@@ -36,9 +36,31 @@ function useShareLocation(trip) {
         setState(s => ({ ...s, status: 'failed' }))
       }
     }, err => setState(s => ({ ...s, status: err.code === 1 ? 'denied' : 'unavailable' })), { enableHighAccuracy: true, maximumAge: 5000, timeout: 20000 })
-    return () => navigator.geolocation.clearWatch(watch)
+    // Driver mở ứng dụng chỉ đường thì trình duyệt ngừng lấy vị trí; quay lại thì gửi ngay vị trí đầu tiên lấy được.
+    // Dispatcher chỉ thấy cảnh báo khi vị trí cũ quá ngưỡng của Backend (POSITION_STALE_SECONDS), không báo ngay
+    const onVisible = () => { if (document.visibilityState === 'visible') lastSent.current = 0 }
+    document.addEventListener('visibilitychange', onVisible)
+    return () => { navigator.geolocation.clearWatch(watch); document.removeEventListener('visibilitychange', onVisible) }
   }, [tripId])
   return 'geolocation' in navigator ? state : { ...state, status: 'unavailable' }
+}
+
+/** Giữ màn hình sáng khi chuyến đang giao (Screen Wake Lock). Trình duyệt tự nhả khi ứng dụng bị ẩn nên xin lại khi hiện lại. */
+function useWakeLock(active) {
+  useEffect(() => {
+    if (!active || !('wakeLock' in navigator)) return undefined
+    let lock = null
+    let stopped = false
+    const request = () => {
+      if (document.visibilityState !== 'visible' || (lock && !lock.released)) return
+      navigator.wakeLock.request('screen')
+        .then(l => { if (stopped) l.release().catch(() => {}); else lock = l })
+        .catch(() => {})
+    }
+    request()
+    document.addEventListener('visibilitychange', request)
+    return () => { stopped = true; document.removeEventListener('visibilitychange', request); lock?.release().catch(() => {}) }
+  }, [active])
 }
 
 function DriverProvider({ children }) {
@@ -111,14 +133,24 @@ function DriverProvider({ children }) {
         const clientEventId = newEventId()
         return enqueue({
           clientEventId, userId, kind: 'route_ack', tripId: trip.id, body: { clientEventId, routeVersionId: rv.id },
-          path: `/driver/trips/${trip.id}/route-ack`, label: `Tuyến phiên bản ${rv.versionNo}`,
+          path: `/driver/trips/${trip.id}/route-ack`, label: 'Nhận tuyến mới',
         })
       })
       .then(() => sync())
       .catch(() => {})
   }, [trip, userId, sync])
 
+  // Kết quả đang trong thời gian hoàn tác: gửi ngay khi hết thời gian, không chờ chu kỳ 10 giây
+  useEffect(() => {
+    const held = outbox.filter(x => isHeld(x))
+    if (!held.length) return undefined
+    const wait = Math.max(0, Math.min(...held.map(x => Date.parse(x.sendAfter))) - Date.now()) + 100
+    const id = setTimeout(() => { if (navigator.onLine) sync() }, wait)
+    return () => clearTimeout(id)
+  }, [outbox, sync])
+
   const location = useShareLocation(trip)
+  useWakeLock(trip?.status === 'in_progress')
 
   // Kết quả đã lưu trên máy nhưng chưa được máy chủ xác nhận: hiển thị tạm trên điểm dừng, kèm trạng thái chờ gửi.
   // Kết quả máy chủ đã từ chối (failed) không được hiển thị như đã xử lý, để Driver ghi lại điểm đó

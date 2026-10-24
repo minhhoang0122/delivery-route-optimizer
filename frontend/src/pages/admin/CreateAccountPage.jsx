@@ -31,9 +31,9 @@ export default function CreateAccountPage() {
             </Field>
             <Field label="Vai trò">
               <select className="select" value={form.role} onChange={set('role')}>
-                <option value="driver">Driver</option>
-                <option value="dispatcher">Dispatcher</option>
-                <option value="administrator">Administrator</option>
+                <option value="driver">Tài xế</option>
+                <option value="dispatcher">Điều phối viên</option>
+                <option value="administrator">Quản trị viên</option>
               </select>
             </Field>
             <Field label="Mật khẩu ban đầu" helper="Ít nhất 8 ký tự">

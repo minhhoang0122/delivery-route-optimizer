@@ -1,4 +1,5 @@
-// D04 Đơn chưa giao được (UC08): đơn chỉ quay về danh sách chờ hoặc bị hủy sau khi đối chiếu và chốt chuyến.
+// D04 Đơn chưa giao được (UC08): đơn chỉ quay về danh sách chờ, chuyển hoàn hoặc ghi thất lạc sau khi đối chiếu và chốt chuyến.
+// Chưa quá số lần giao tối đa thì mặc định giao lại; quá số lần thì Dispatcher phải quyết định.
 import { useNavigate } from 'react-router'
 import { api } from '../../api.js'
 import { Alert, Badge, Button, ErrorBox, PageHeader, Table, TableSkeleton } from '../../components/ui.jsx'
@@ -28,13 +29,13 @@ export default function FailedOrdersPage() {
       code: o => <span className="strong">{o.code}</span>,
       recipient: o => <div className="col"><span className="strong">{o.recipientName}</span><span className="caption muted">{o.phone}</span></div>,
       trip: o => o.trip.code,
-      attempt: o => o.attemptNo,
+      attempt: o => `${o.attemptNo}/${data.maxDeliveryAttempts}`,
       reason: o => <div className="col"><span className="strong">{o.reason}</span>{o.note && <span className="caption muted">{o.note}</span>}</div>,
       time: o => time(o.occurredAt),
-      status: () => <Badge tone="warning">Cần xử lý</Badge>,
+      status: o => (o.attemptNo >= data.maxDeliveryAttempts ? <Badge tone="warning">Cần quyết định</Badge> : <Badge>Giao lại</Badge>),
       actions: o => o.trip.status === 'awaiting_reconciliation'
         ? <Button variant="ghost" onClick={() => navigate(`/dispatcher/trips/${o.trip.id}/reconcile`)}>Đối chiếu chuyến</Button>
-        : <span className="caption muted">Chờ Driver về kho</span>,
+        : <span className="caption muted">Chờ tài xế về kho</span>,
     }[c.key],
   }))
 
@@ -42,7 +43,7 @@ export default function FailedOrdersPage() {
     <>
       <PageHeader title="Đơn chưa giao được" />
       {orders.length > 0 && (
-        <Alert tone="info" title={`${orders.length} đơn đang chờ quyết định`}>
+        <Alert tone="info" title={`${orders.length} đơn chưa giao được`}>
           Chuyến {trips.join(', ')}
         </Alert>
       )}

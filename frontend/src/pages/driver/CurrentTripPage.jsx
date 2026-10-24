@@ -1,5 +1,5 @@
 // R01 Chuyến hiện tại, R02 Bắt đầu chuyến (kiểm hàng), R02b Hàng không khớp, R05 Mất mạng (UC10, UC10.1, UC11, UC12).
-import { CircleCheck, LocateFixed, Navigation, Package, Phone, RefreshCw, WifiOff } from 'lucide-react'
+import { CircleCheck, Info, LocateFixed, Navigation, Package, Phone, RefreshCw, Undo2, WifiOff } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { api, newEventId } from '../../api.js'
@@ -9,7 +9,7 @@ import { Alert, Button, Empty, ErrorBox, Loading, StatusBadge, StopItem } from '
 import { stopState } from '../../components/tripMap.js'
 import { ago, kg, time, TRIP_STATUS, VEHICLE_TYPE } from '../../format.js'
 import { useAction, useNow } from '../../hooks.js'
-import { removeItem } from '../../offline.js'
+import { isHeld, removeItem } from '../../offline.js'
 
 const mapsLink = o => `https://www.google.com/maps/dir/?api=1&destination=${o.lat},${o.lon}`
 
@@ -21,8 +21,13 @@ function NextStopCard({ stop, total }) {
       <div className="col">
         <span className="driver-title">{o.recipientName}</span>
         <span className="body-large secondary">{o.address}</span>
-        <span className="row secondary" style={{ gap: 8 }}><Package size={16} className="muted" />{kg(o.weightKg)}{stop.eta ? ` · Dự kiến ${time(stop.eta)}` : ''}</span>
+        <span className="row secondary" style={{ gap: 8 }}><Package size={16} className="muted" />{kg(o.weightKg)}{stop.eta ? ` · Dự kiến ${time(stop.eta)}` : ''}{stop.deferred ? ' · Giao sau' : ''}</span>
       </div>
+      {o.note && (
+        <div className="row top" style={{ padding: 8, borderRadius: 3, background: 'var(--warn-bg)', gap: 8 }}>
+          <Info size={16} className="warning" /><span className="body-large">{o.note}</span>
+        </div>
+      )}
       <div className="row">
         <a className="btn secondary large" href={`tel:${o.phone.replace(/\s/g, '')}`}><Phone size={18} /> Gọi</a>
         <a className="btn secondary large grow" href={mapsLink(o)} target="_blank" rel="noreferrer"><Navigation size={18} /> Chỉ đường</a>
@@ -79,11 +84,11 @@ function AssignedScreen({ trip, vehicle, onStarted }) {
       </section>
       {ok && <div className="alert success"><CircleCheck size={20} className="alert-icon" /><span className="strong">{all}/{all} kiện khớp với danh sách</span></div>}
       {!ok && checked.size > 0 && (
-        <Button variant="secondary" block onClick={start} loading={action.busy}>Báo thiếu hàng cho Dispatcher</Button>
+        <Button variant="secondary" block onClick={start} loading={action.busy}>Báo thiếu hàng cho điều phối viên</Button>
       )}
       {missing?.some(id => !checked.has(id)) && (
         <Alert tone="danger" title="Hàng không khớp danh sách">
-          Thiếu kiện {missing.map(id => trip.stops.find(s => s.order.id === id)?.order.code).join(', ')} · đã báo Dispatcher
+          Thiếu kiện {missing.map(id => trip.stops.find(s => s.order.id === id)?.order.code).join(', ')} · đã báo điều phối viên
         </Alert>
       )}
       {action.error && !missing && <ErrorBox error={action.error} />}
@@ -119,10 +124,10 @@ export default function CurrentTripPage() {
   if (trip.status === 'awaiting_reconciliation') {
     return (
       <DriverScreen title={`Chuyến ${trip.code}`} subtitle={`${vehicle} · ${trip.progress.done}/${total} điểm`}>
-        <Alert tone="info" title="Đã báo về kho, chờ Dispatcher chốt chuyến" />
+        <Alert tone="info" title={trip.returnReport?.aborted ? 'Chuyến đã kết thúc do sự cố, chờ điều phối viên chốt chuyến' : 'Đã báo về kho, chờ điều phối viên chốt chuyến'} />
         <section className="card" style={{ gap: 8 }}>
           <div className="row between"><span className="h4">Kết quả chuyến</span><StatusBadge map={TRIP_STATUS} value={trip.status} large /></div>
-          <span className="secondary">{trip.progress.delivered} giao thành công · {trip.progress.failed} chưa giao được · về kho lúc {time(trip.returnedAt)}</span>
+          <span className="secondary">{trip.progress.delivered} giao thành công · {trip.progress.failed} chưa giao được · {trip.returnReport?.aborted ? 'kết thúc' : 'về kho'} lúc {time(trip.returnedAt)}</span>
         </section>
       </DriverScreen>
     )
@@ -185,10 +190,17 @@ export default function CurrentTripPage() {
               <div key={x.clientEventId} className="stack-sm">
                 <StopItem state={stopState(s)} seq={s.seq} name={s.order.recipientName} address={s.order.address}
                   meta={x.body.result === 'delivered' ? `Giao lúc ${time(x.body.occurredAt)} · ${kg(s.order.weightKg)}` : `${x.body.reason} · ${kg(s.order.weightKg)}`} />
-                <div className="row" style={{ paddingLeft: 12, gap: 8 }}>
-                  <span className={`sync ${x.state === 'sending' ? 'sending' : 'pending'}`}>{x.state === 'sending' ? 'Đang gửi' : 'Chờ gửi'}</span>
-                  <span className="caption muted">Lưu trên máy lúc {time(x.createdAt)}</span>
-                </div>
+                {isHeld(x, now) ? (
+                  <div className="row between" style={{ paddingLeft: 12, gap: 8 }}>
+                    <span className="sync pending">Gửi sau {Math.ceil((Date.parse(x.sendAfter) - now) / 1000)} giây</span>
+                    <Button variant="secondary" icon={Undo2} onClick={() => removeItem(x.clientEventId).catch(() => {})}>Hoàn tác</Button>
+                  </div>
+                ) : (
+                  <div className="row" style={{ paddingLeft: 12, gap: 8 }}>
+                    <span className={`sync ${x.state === 'sending' ? 'sending' : 'pending'}`}>{x.state === 'sending' ? 'Đang gửi' : 'Chờ gửi'}</span>
+                    <span className="caption muted">Lưu trên máy lúc {time(x.createdAt)}</span>
+                  </div>
+                )}
               </div>
             )
           })}
@@ -200,7 +212,7 @@ export default function CurrentTripPage() {
         <>
           <div className="row between"><span className="h4">Các điểm còn lại</span><span className="caption muted">{rest.length} điểm</span></div>
           {rest.map(s => <StopItem key={s.id} state="pending" seq={s.seq} name={s.order.recipientName} address={s.order.address}
-            meta={`${s.eta ? `Dự kiến ${time(s.eta)} · ` : ''}${kg(s.order.weightKg)}`} onClick={() => navigate(`/driver/stops/${s.id}`)} />)}
+            meta={`${s.eta ? `Dự kiến ${time(s.eta)} · ` : ''}${kg(s.order.weightKg)}${s.deferred ? ' · Giao sau' : ''}`} onClick={() => navigate(`/driver/stops/${s.id}`)} />)}
         </>
       )}
       {trip.stops.some(s => s.status !== 'pending' && !s.queued) && (

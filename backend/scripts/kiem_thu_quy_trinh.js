@@ -2,6 +2,8 @@
 // Chạy trên cơ sở dữ liệu vừa nạp mẫu (npm run seed -- --reset) khi Backend đang chạy:
 //   npm run test:flow
 // Phần tự đổi tuyến gọi thẳng bước kiểm tra định kỳ của Backend (cùng biến PG*), cần REROUTE_COOLDOWN_SECONDS > 0.
+// Ngoài luồng chính còn kiểm tra: bỏ đơn thiếu khỏi chuyến, giao sau, kết thúc chuyến do sự cố, thất lạc, chuyển hoàn,
+// tự chốt chuyến giao hết, tối đa số lần giao lại, việc cần xử lý của Dispatcher và kiểm tra dữ liệu nhập.
 // Biến API_BASE đổi địa chỉ Backend (mặc định http://localhost:3000/api).
 // Kịch bản ghi dữ liệu thật vào cơ sở dữ liệu, chỉ chạy trên cơ sở dữ liệu thử: phải đặt FLOW_TEST_ALLOW=1
 // cùng PGDATABASE/PGPORT của cơ sở dữ liệu thử (biến đặt sẵn trong môi trường được ưu tiên hơn file .env).
@@ -93,7 +95,7 @@ check(commit3.status === 409, 'giao lại bản nháp đã giao bị từ chối
 const tripIds = commit.data.tripIds;
 
 const trips = (await api(disp, 'GET', '/trips?status=active')).data.trips;
-check(trips.length === tripIds.length && trips.every(t => t.status === 'assigned'), `${trips.length} chuyến ở trạng thái đã giao`);
+check(trips.length === tripIds.length && trips.every(t => t.status === 'assigned'), `${trips.length} chuyến chờ xuất phát`);
 const byDriver = {};
 for (const [u, tok] of Object.entries(drv)) {
   const cur = (await api(tok, 'GET', '/driver/current-trip')).data.trip;
@@ -111,14 +113,36 @@ const miss = await api(drv[uB], 'POST', `/driver/trips/${tB.id}/start`, { client
 check(miss.status === 409 && miss.data.error.details.missingOrderIds.length === 1, 'hàng thiếu thì không cho xuất phát');
 const dash = (await api(disp, 'GET', '/dashboard')).data;
 check(dash.todo.some(x => x.type === 'loading_mismatch'), 'Dispatcher thấy cảnh báo hàng không khớp');
+const thr = dash.thresholds;
+const idleExpected = trips.filter(t => Date.now() - new Date(t.createdAt).getTime() > thr.assignedIdleMinutes * 60_000).length;
+check(dash.todo.filter(x => x.type === 'not_started').length === idleExpected,
+  `chuyến đã phân chưa xuất phát quá ${thr.assignedIdleMinutes} phút thì vào việc cần xử lý (${idleExpected} chuyến)`);
+
+console.log('Dispatcher: bỏ đơn thiếu khỏi chuyến');
+const missId = miss.data.error.details.missingOrderIds[0];
+const tBd0 = (await api(disp, 'GET', `/trips/${tB.id}`)).data.trip;
+const rmBody = { clientEventId: randomUUID(), stateVersion: tBd0.stateVersion, orderIds: [missId] };
+const rm = await api(disp, 'POST', `/trips/${tB.id}/remove-orders`, rmBody);
+const tBr = rm.data.trip;
+check(rm.status === 200 && tBr.stops.length === tB.stops.length - 1 && !tBr.stops.some(s => s.order.id === missId)
+  && tBr.routeVersion.versionNo === 2 && tBr.routeVersion.reason === 'orders_removed' && !tBr.loadingMismatch,
+  'bỏ đơn thiếu: phiên bản tuyến mới không còn đơn đó, hết cảnh báo hàng thiếu');
+check((await api(disp, 'GET', `/orders/${missId}`)).data.order.status === 'pending', 'đơn bị bỏ khỏi chuyến về chờ xếp');
+const rmAgain = await api(disp, 'POST', `/trips/${tB.id}/remove-orders`, rmBody);
+check(rmAgain.status === 200 && rmAgain.data.trip.routeVersion.versionNo === 2, 'gửi lại cùng mã không tạo thêm phiên bản tuyến');
+const rmAll = await api(disp, 'POST', `/trips/${tB.id}/remove-orders`, { clientEventId: randomUUID(), stateVersion: tBr.stateVersion, orderIds: tBr.stops.map(s => s.order.id) });
+check(rmAll.status === 409, 'không bỏ hết đơn khỏi chuyến (thu hồi chuyến thay vì bỏ đơn)');
+const stB = await api(drv[uB], 'POST', `/driver/trips/${tB.id}/start`, { clientEventId: randomUUID(), checkedOrderIds: tBr.stops.map(s => s.order.id) });
+check(stB.status === 200 && stB.data.trip.status === 'in_progress', 'tài xế kiểm đủ phần còn lại và xuất phát');
 
 console.log('Dispatcher: thu hồi chuyến chưa xuất phát');
-const tBd = (await api(disp, 'GET', `/trips/${tB.id}`)).data.trip;
-const rv = await api(disp, 'POST', `/trips/${tB.id}/revoke`, { clientEventId: randomUUID(), stateVersion: tBd.stateVersion, goodsReturned: true });
+const tC = byDriver[uC];
+const tCd = (await api(disp, 'GET', `/trips/${tC.id}`)).data.trip;
+const rv = await api(disp, 'POST', `/trips/${tC.id}/revoke`, { clientEventId: randomUUID(), stateVersion: tCd.stateVersion, goodsReturned: true });
 check(rv.status === 200 && rv.data.trip.status === 'revoked', 'thu hồi chuyến');
-check((await api(drv[uB], 'POST', `/driver/trips/${tB.id}/start`, { clientEventId: randomUUID(), checkedOrderIds: tB.stops.map(s => s.order.id) })).status === 409, 'chuyến đã thu hồi không bắt đầu được');
+check((await api(drv[uC], 'POST', `/driver/trips/${tC.id}/start`, { clientEventId: randomUUID(), checkedOrderIds: tC.stops.map(s => s.order.id) })).status === 409, 'chuyến đã thu hồi không bắt đầu được');
 const pend = (await api(disp, 'GET', '/orders?status=pending')).data.orders;
-check(tB.stops.every(s => pend.some(o => o.id === s.order.id)), 'đơn của chuyến thu hồi trở về chờ xếp');
+check(tC.stops.every(s => pend.some(o => o.id === s.order.id)), 'đơn của chuyến thu hồi trở về chờ xếp');
 
 const startId = randomUUID();
 const st = await api(drv[uA], 'POST', `/driver/trips/${tA.id}/start`, { clientEventId: startId, checkedOrderIds: tA.stops.map(s => s.order.id) });
@@ -127,33 +151,48 @@ const st2 = await api(drv[uA], 'POST', `/driver/trips/${tA.id}/start`, { clientE
 check(st2.status === 200, 'gửi lại lệnh bắt đầu với cùng mã vẫn trả kết quả đã lưu');
 const tAd = (await api(disp, 'GET', `/trips/${tA.id}`)).data.trip;
 check((await api(disp, 'POST', `/trips/${tA.id}/revoke`, { clientEventId: randomUUID(), stateVersion: tAd.stateVersion, goodsReturned: true })).status === 409, 'chuyến đã xuất phát không thu hồi được');
+check((await api(disp, 'POST', `/trips/${tA.id}/remove-orders`, { clientEventId: randomUUID(), stateVersion: tAd.stateVersion, orderIds: [tA.stops[0].order.id] })).status === 409, 'chuyến đã xuất phát không bỏ đơn được');
 check((await api(disp, 'PATCH', `/vehicles/${tA.vehicle.id}/status`, { status: 'inactive' })).status === 409, 'xe đang chạy chuyến không báo bảo trì được');
 const drvEdit = await api(disp, 'PUT', `/drivers/${tA.driver.id}`, { fullName: tA.driver.name, phone: tA.driver.phone, defaultVehicleId: tA.vehicle.id, status: 'inactive' });
-check(drvEdit.status === 409, 'Driver đang giữ chuyến không ngừng hoạt động được');
+check(drvEdit.status === 409, 'tài xế đang giữ chuyến không ngừng hoạt động được');
 
 console.log('Driver: vị trí và kết quả giao');
-const pos = (lat, lon, t = new Date()) => api(drv[uA], 'POST', `/driver/trips/${tA.id}/positions`, { clientEventId: randomUUID(), lat, lon, observedAt: t.toISOString(), accuracyM: 8, source: 'simulator' });
+const pos = (lat, lon, t = new Date(), accuracyM = 8) => api(drv[uA], 'POST', `/driver/trips/${tA.id}/positions`, { clientEventId: randomUUID(), lat, lon, observedAt: t.toISOString(), accuracyM, source: 'simulator' });
 check((await pos(16.0544, 108.2022)).status === 204, 'gửi vị trí');
 await pos(16.0, 108.0, new Date(Date.now() - 120_000));
+check((await pos(16.1, 108.25, new Date(), 500)).status === 204, 'vị trí sai số 500 m được nhận nhưng bỏ');
 let cur = (await api(drv[uA], 'GET', '/driver/current-trip')).data.trip;
-check(Math.abs(cur.position.lat - 16.0544) < 1e-6, 'vị trí cũ đến muộn không thay vị trí mới');
+check(Math.abs(cur.position.lat - 16.0544) < 1e-6, 'vị trí cũ đến muộn và vị trí sai số lớn không thay vị trí mới');
+const serverNow = new Date(cur.serverTime).getTime();
+const pendingNow = cur.stops.filter(s => s.status === 'pending');
+check(pendingNow.every(s => s.eta && new Date(s.eta).getTime() >= serverNow - 1000) && new Date(cur.etaReturn).getTime() >= serverNow - 1000,
+  'giờ dự kiến của mọi điểm và giờ về kho không ở quá khứ');
 const stops = cur.stops;
 const s1 = stops[0];
+const before = await api(drv[uA], 'POST', `/driver/trips/${tA.id}/stops/${s1.id}/attempts`, { clientEventId: randomUUID(), result: 'delivered', occurredAt: new Date(new Date(cur.startedAt).getTime() - 600_000).toISOString() });
+check(before.status === 400, 'thời điểm ghi kết quả trước lúc bắt đầu chuyến bị từ chối');
 const aId = randomUUID();
 const a1 = await api(drv[uA], 'POST', `/driver/trips/${tA.id}/stops/${s1.id}/attempts`, { clientEventId: aId, result: 'delivered' });
 check(a1.status === 201, 'giao thành công điểm 1');
+const pod = a1.data.trip.stops.find(s => s.id === s1.id).attempt;
+check(Number.isInteger(pod.distanceM) && pod.farFromStop === pod.distanceM > 200, `lưu khoảng cách từ vị trí xe tới điểm giao lúc ghi (${pod.distanceM} m, đánh dấu khi quá 200 m)`);
 const a1b = await api(drv[uA], 'POST', `/driver/trips/${tA.id}/stops/${s1.id}/attempts`, { clientEventId: aId, result: 'delivered' });
 check(a1b.status === 200 && a1b.data.replayed, 'gửi lại cùng mã không tạo kết quả thứ hai');
 const a1other = await api(drv[uB], 'POST', `/driver/trips/${tA.id}/stops/${s1.id}/attempts`, { clientEventId: aId, result: 'delivered' });
-check(a1other.status === 403, 'Driver khác gửi lại mã thao tác của chuyến không phải của mình bị từ chối');
+check(a1other.status === 403, 'tài xế khác gửi lại mã thao tác của chuyến không phải của mình bị từ chối');
 const a1c = await api(drv[uA], 'POST', `/driver/trips/${tA.id}/stops/${s1.id}/attempts`, { clientEventId: aId, result: 'failed', reason: 'Vắng nhà' });
 check(a1c.status === 409, 'cùng mã khác nội dung bị báo xung đột');
 const a1d = await api(drv[uA], 'POST', `/driver/trips/${tA.id}/stops/${s1.id}/attempts`, { clientEventId: randomUUID(), result: 'failed', reason: 'Vắng nhà' });
 check(a1d.status === 409, 'điểm đã có kết quả cuối không nhận kết quả mới');
 const noReason = await api(drv[uA], 'POST', `/driver/trips/${tA.id}/stops/${stops[1].id}/attempts`, { clientEventId: randomUUID(), result: 'failed' });
 check(noReason.status === 400, 'chưa giao được thì bắt buộc lý do');
+const incidentReason = await api(drv[uA], 'POST', `/driver/trips/${tA.id}/stops/${stops[1].id}/attempts`, { clientEventId: randomUUID(), result: 'failed', reason: 'Sự cố xe/tài xế' });
+check(incidentReason.status === 400, 'tài xế không chọn được lý do "Sự cố xe/tài xế" (chỉ điều phối viên ghi)');
 const a2 = await api(drv[uA], 'POST', `/driver/trips/${tA.id}/stops/${stops[1].id}/attempts`, { clientEventId: randomUUID(), result: 'failed', reason: 'Vắng nhà', note: 'Gọi 2 lần không nghe máy' });
 check(a2.status === 201, 'ghi chưa giao được kèm lý do');
+const dashF = (await api(disp, 'GET', '/dashboard')).data;
+const fa = dashF.todo.find(x => x.type === 'failed_attempt' && x.stopId === stops[1].id);
+check(fa && fa.phone === stops[1].order.phone && fa.reason === 'Vắng nhà', 'lần giao chưa thành công vừa xảy ra vào việc cần xử lý, kèm số điện thoại khách');
 const early = await api(drv[uA], 'POST', `/driver/trips/${tA.id}/return`, { clientEventId: randomUUID(), returnedOrderIds: [stops[1].order.id] });
 check(early.status === 409, 'báo về kho khi còn điểm chưa có kết quả bị từ chối');
 
@@ -179,19 +218,23 @@ if (stops.length - 2 >= 3) {
   const lr = t1.lastReplan;
   console.log(`     ${JSON.stringify(c1)} T=${lr?.currentSeconds}s T2=${lr?.proposedSeconds}s G=${lr?.savingSeconds}s`);
   check(t1.routeVersion.versionNo === t0.routeVersion.versionNo + 1 && t1.routeVersion.reason === 'replan' && t1.needsAck,
-    'ùn tắc phía trước: hệ thống tự áp dụng tuyến mới, chờ thiết bị Driver nhận');
+    'ùn tắc phía trước: hệ thống tự áp dụng tuyến mới, chờ thiết bị tài xế nhận');
   check(lr?.proposedStopIds[0] === lr?.nextStopId && t1.nextStopId === t0.nextStopId, 'điểm kế tiếp giữ nguyên');
   check(lr?.savingSeconds >= config.reroute.minSavingSeconds && lr.proposedSeconds < lr.currentSeconds && lr.slowLegs.length > 0 && !lr.received,
     'chi tiết chuyến có thời gian trước và sau, tiết kiệm, chặng chậm, chưa nhận');
   check(t1.events.some(e => e.type === 'route_replanned' && e.actorName == null), 'nhật ký ghi hệ thống đổi tuyến, không có người duyệt');
+  const dashL = (await api(disp, 'GET', '/dashboard')).data;
+  const lateExpected = (t1.lateSeconds ?? 0) > dashL.thresholds.lateMinutes * 60 || Boolean(t1.shiftEndAt && t1.etaReturn && new Date(t1.etaReturn) > new Date(t1.shiftEndAt));
+  check(dashL.todo.some(x => x.type === 'late' && x.tripId === tA.id) === lateExpected,
+    `chuyến trễ so với kế hoạch vào việc cần xử lý khi về kho dự kiến muộn hơn ${dashL.thresholds.lateMinutes} phút (trễ ${t1.lateSeconds} giây)`);
   console.log('     ' + incident(4));
   await here();
   const c2 = await checkNow();
-  check((await view()).routeVersion.id === t1.routeVersion.id && c2?.reason === 'needs_ack', 'chưa đổi thêm khi thiết bị Driver chưa nhận tuyến hiện hành');
+  check((await view()).routeVersion.id === t1.routeVersion.id && c2?.reason === 'needs_ack', 'chưa đổi thêm khi thiết bị tài xế chưa nhận tuyến hiện hành');
   const again2 = await applyReroute(tA.id, lr.evaluationEventId).catch(e => e);
   check(again2?.status === 409, 'một kết quả đánh giá không áp dụng hai lần');
   const ack = await api(drv[uA], 'POST', `/driver/trips/${tA.id}/route-ack`, { clientEventId: randomUUID(), routeVersionId: t1.routeVersion.id });
-  check(ack.status === 200 && !ack.data.trip.needsAck && ack.data.trip.lastReplan?.received, 'thiết bị Driver nhận tuyến mới');
+  check(ack.status === 200 && !ack.data.trip.needsAck && ack.data.trip.lastReplan?.received, 'thiết bị tài xế nhận tuyến mới');
   await here();
   const c3 = await checkNow();
   check((await view()).routeVersion.id === t1.routeVersion.id && c3?.reason === 'cooldown',
@@ -201,6 +244,41 @@ if (stops.length - 2 >= 3) {
   check(c1?.reason === 'few_stops', 'còn ít hơn 3 điểm thì không xét đổi tuyến');
 }
 
+console.log('Driver: giao sau; Dispatcher: kết thúc chuyến do sự cố');
+let vb = (await api(drv[uB], 'GET', '/driver/current-trip')).data.trip;
+if (vb.stops.filter(s => s.status === 'pending').length >= 2) {
+  const first = vb.nextStopId;
+  const df = await api(drv[uB], 'POST', `/driver/trips/${tB.id}/stops/${first}/defer`, { clientEventId: randomUUID() });
+  const left = df.data.trip?.stops.filter(s => s.status === 'pending') ?? [];
+  check(df.status === 200 && left.at(-1)?.id === first && df.data.trip.nextStopId === left[0].id && df.data.trip.nextStopId !== first
+    && df.data.trip.routeVersion.reason === 'deferred' && !df.data.trip.needsAck && df.data.trip.stops.find(s => s.id === first).deferred,
+  'giao sau: điểm xuống cuối, điểm kế tiếp là điểm đứng sau, thiết bị đã có tuyến mới');
+  const evD = (await api(disp, 'GET', `/trips/${tB.id}`)).data.trip.events.find(e => e.type === 'stop_deferred');
+  check(evD && evD.actorName == null, 'nhật ký ghi hệ thống cập nhật tuyến khi giao sau, điều phối viên không phải duyệt');
+  check((await api(drv[uB], 'POST', `/driver/trips/${tB.id}/stops/${first}/defer`, { clientEventId: randomUUID() })).status === 409,
+    'điểm đã ở cuối tuyến thì không giao sau thêm');
+  vb = df.data.trip;
+}
+const dB = await api(drv[uB], 'POST', `/driver/trips/${tB.id}/stops/${vb.nextStopId}/attempts`, { clientEventId: randomUUID(), result: 'delivered' });
+check(dB.status === 201, 'giao thành công một điểm trước khi gặp sự cố');
+const pendingB = dB.data.trip.stops.filter(s => s.status === 'pending').map(s => s.id);
+const ab = await api(disp, 'POST', `/trips/${tB.id}/abort`, { clientEventId: randomUUID(), note: 'Xe hỏng giữa đường' });
+const tBa = ab.data.trip;
+check(ab.status === 200 && tBa.status === 'awaiting_reconciliation'
+  && pendingB.every(id => { const s = tBa.stops.find(x => x.id === id); return s.status === 'failed' && s.attempt.reason === 'Sự cố xe/tài xế' && s.attempt.recordedByRole === 'dispatcher'; }),
+'kết thúc chuyến do sự cố: điểm chưa giao thành chưa giao được, lý do "Sự cố xe/tài xế" do điều phối viên ghi');
+const failedB = tBa.stops.filter(s => s.status === 'failed').map(s => s.order.id).sort();
+check(tBa.returnReport?.aborted && [...tBa.returnReport.returnedOrderIds].sort().join() === failedB.join(), 'hàng mang về là mọi kiện chưa giao được');
+check((await api(drv[uB], 'POST', `/driver/trips/${tB.id}/stops/${pendingB[0]}/attempts`, { clientEventId: randomUUID(), result: 'delivered' })).status === 409,
+  'tài xế không ghi thêm kết quả sau khi chuyến kết thúc do sự cố');
+check((await api(disp, 'GET', '/dashboard')).data.todo.some(x => x.type === 'reconcile' && x.tripId === tB.id && x.aborted), 'chuyến kết thúc do sự cố chờ đối chiếu');
+const lostB = failedB[0];
+const closeB = await api(disp, 'POST', `/trips/${tB.id}/close`, { clientEventId: randomUUID(), stateVersion: tBa.stateVersion, goodsMatched: true, decisions: [{ orderId: lostB, decision: 'lost' }] });
+check(closeB.status === 200 && closeB.data.trip.status === 'closed', 'đối chiếu chuyến sự cố: chỉ chọn cho kiện thất lạc, còn lại tự giao lại');
+const ordersB = (await api(disp, 'GET', '/orders')).data.orders;
+check(ordersB.find(o => o.id === lostB).status === 'lost' && failedB.filter(id => id !== lostB).every(id => ordersB.find(o => o.id === id).status === 'pending'),
+  'kiện thất lạc chuyển trạng thái Thất lạc, các kiện khác về chờ xếp');
+
 console.log('Driver: hoàn tất và báo về kho');
 cur = (await api(drv[uA], 'GET', '/driver/current-trip')).data.trip;
 const sDup = cur.stops.find(x => x.status === 'pending');
@@ -208,30 +286,92 @@ const dupBody = { clientEventId: randomUUID(), result: 'delivered' };
 const dup = await Promise.all([1, 2, 3, 4].map(() => api(drv[uA], 'POST', `/driver/trips/${tA.id}/stops/${sDup.id}/attempts`, dupBody)));
 check(dup.every(x => x.status === 200 || x.status === 201) && dup.filter(x => !x.data.replayed).length === 1,
   'nhiều lần gửi cùng mã đến đồng thời: một lần ghi, các lần sau nhận lại kết quả (' + dup.map(x => x.status).join(', ') + ')');
-for (const s of cur.stops.filter(x => x.status === 'pending' && x.id !== sDup.id)) {
-  await api(drv[uA], 'POST', `/driver/trips/${tA.id}/stops/${s.id}/attempts`, { clientEventId: randomUUID(), result: 'delivered' });
+// Điểm cuối chưa giao được và tài xế không mang kiện đó về: kiện chỉ còn quyết định Thất lạc
+const restA = cur.stops.filter(x => x.status === 'pending' && x.id !== sDup.id);
+const sLost = restA.at(-1);
+for (const s of restA) {
+  await api(drv[uA], 'POST', `/driver/trips/${tA.id}/stops/${s.id}/attempts`, s === sLost
+    ? { clientEventId: randomUUID(), result: 'failed', reason: 'Khách từ chối nhận' } : { clientEventId: randomUUID(), result: 'delivered' });
 }
 const ret = await api(drv[uA], 'POST', `/driver/trips/${tA.id}/return`, { clientEventId: randomUUID(), returnedOrderIds: [stops[1].order.id] });
-check(ret.status === 200 && ret.data.trip.status === 'awaiting_reconciliation', 'báo về kho, chờ đối chiếu');
-const busyStart = await api(drv[uA], 'GET', '/driver/current-trip');
-check(busyStart.data.trip.status === 'awaiting_reconciliation', 'báo về kho chưa tự chốt chuyến');
+check(ret.status === 200 && ret.data.trip.status === 'awaiting_reconciliation', 'báo về kho, có kiện chưa giao được thì chờ đối chiếu');
 
 console.log('Dispatcher: đối chiếu và chốt chuyến');
 let tr = (await api(disp, 'GET', `/trips/${tA.id}`)).data.trip;
-const noDec = await api(disp, 'POST', `/trips/${tA.id}/close`, { clientEventId: randomUUID(), stateVersion: tr.stateVersion, goodsMatched: true, decisions: [] });
-check(noDec.status === 409, 'thiếu quyết định cho đơn chưa giao thì chưa chốt');
-const notMatched = await api(disp, 'POST', `/trips/${tA.id}/close`, { clientEventId: randomUUID(), stateVersion: tr.stateVersion, goodsMatched: false, decisions: [{ orderId: stops[1].order.id, decision: 'requeue' }] });
+const closeA = decisions => api(disp, 'POST', `/trips/${tA.id}/close`, { clientEventId: randomUUID(), stateVersion: tr.stateVersion, goodsMatched: true, decisions });
+if (sLost) {
+  check((await closeA([])).status === 409, 'kiện không có trong báo cáo hàng mang về phải có quyết định');
+  const requeueLost = await closeA([{ orderId: sLost.order.id, decision: 'requeue' }]);
+  check(requeueLost.status === 409 && /Thất lạc/.test(requeueLost.data.error.message), 'không giao lại được kiện không có trong báo cáo hàng mang về');
+  check((await closeA([{ orderId: sLost.order.id, decision: 'return_to_sender' }])).status === 409, 'không chuyển hoàn được kiện không có trong báo cáo hàng mang về');
+}
+const lostDecision = sLost ? [{ orderId: sLost.order.id, decision: 'lost' }] : [];
+const notMatched = await api(disp, 'POST', `/trips/${tA.id}/close`, { clientEventId: randomUUID(), stateVersion: tr.stateVersion, goodsMatched: false, decisions: lostDecision });
 check(notMatched.status === 409, 'hàng chưa khớp thì chưa chốt');
-const nullDec = await api(disp, 'POST', `/trips/${tA.id}/close`, { clientEventId: randomUUID(), stateVersion: tr.stateVersion, goodsMatched: true, decisions: [null] });
-check(nullDec.status === 409, 'quyết định rỗng bị báo thiếu, không lỗi máy chủ');
-const close = await api(disp, 'POST', `/trips/${tA.id}/close`, { clientEventId: randomUUID(), stateVersion: tr.stateVersion, goodsMatched: true, decisions: [{ orderId: stops[1].order.id, decision: 'requeue' }] });
-check(close.status === 200 && close.data.trip.status === 'closed', 'chốt chuyến');
+if (sLost) {
+  const nullDec = await api(disp, 'POST', `/trips/${tA.id}/close`, { clientEventId: randomUUID(), stateVersion: tr.stateVersion, goodsMatched: true, decisions: [null] });
+  check(nullDec.status === 409, 'quyết định rỗng bị bỏ qua, không lỗi máy chủ');
+}
+const close = await closeA(lostDecision);
+check(close.status === 200 && close.data.trip.status === 'closed', 'chốt chuyến: kiện mang về không cần chọn, mặc định giao lại');
 const o2 = (await api(disp, 'GET', `/orders/${stops[1].order.id}`)).data.order;
-check(o2.status === 'pending', 'đơn chưa giao được trở về chờ xếp sau khi chốt');
+check(o2.status === 'pending', 'đơn chưa giao được đã mang về trở về chờ xếp sau khi chốt');
+if (sLost) check((await api(disp, 'GET', `/orders/${sLost.order.id}`)).data.order.status === 'lost', 'kiện không mang về được ghi Thất lạc');
 const hist = (await api(drv[uA], 'GET', '/driver/trips')).data.trips;
-check(hist.some(h => h.id === tA.id && h.status === 'closed'), 'Driver xem lại chuyến đã chốt');
+check(hist.some(h => h.id === tA.id && h.status === 'closed'), 'tài xế xem lại chuyến đã chốt');
 const opt2 = (await api(disp, 'GET', '/planning/options')).data;
-check(!opt2.vehicles.find(v => v.id === tA.vehicle.id).problem, 'xe và Driver được giải phóng sau khi chốt');
+check(!opt2.vehicles.find(v => v.id === tA.vehicle.id).problem, 'xe và tài xế được giải phóng sau khi chốt');
+
+const uD = Object.keys(byDriver)[3];
+if (uD) {
+  console.log('Hệ thống: tự chốt chuyến giao hết');
+  const tD = byDriver[uD];
+  await api(drv[uD], 'POST', `/driver/trips/${tD.id}/start`, { clientEventId: randomUUID(), checkedOrderIds: tD.stops.map(s => s.order.id) });
+  for (const s of tD.stops) await api(drv[uD], 'POST', `/driver/trips/${tD.id}/stops/${s.id}/attempts`, { clientEventId: randomUUID(), result: 'delivered' });
+  const retD = await api(drv[uD], 'POST', `/driver/trips/${tD.id}/return`, { clientEventId: randomUUID(), returnedOrderIds: [] });
+  check(retD.status === 200 && retD.data.trip.status === 'closed' && retD.data.trip.closeReport?.auto, 'giao hết, không có hàng mang về: hệ thống tự chốt chuyến');
+  const evC = (await api(disp, 'GET', `/trips/${tD.id}`)).data.trip.events.find(e => e.type === 'trip_closed');
+  check(evC && evC.actorName == null, 'nhật ký ghi hệ thống chốt chuyến');
+  check(!(await api(disp, 'GET', '/planning/options')).data.vehicles.find(v => v.id === tD.vehicle.id).problem, 'xe và tài xế được giải phóng ngay');
+}
+
+console.log('Hệ thống: tối đa số lần giao lại');
+// Đơn đã giao không thành công một lần (chuyến đầu); giao lại bằng xe và tài xế vừa giải phóng cho tới khi đạt số lần tối đa
+const retryOrder = stops[1].order.id;
+for (let n = 2; n <= tr.maxDeliveryAttempts; n++) {
+  let rr = (await api(disp, 'POST', '/planning/runs', { clientEventId: randomUUID(), orderIds: [retryOrder], vehicleIds: [tA.vehicle.id], maxRouteMinutes: 0 })).data.run;
+  for (let i = 0; i < 60 && rr.status === 'running'; i++) {
+    await new Promise(res => setTimeout(res, 300));
+    rr = (await api(disp, 'GET', `/planning/runs/${rr.id}`)).data.run;
+  }
+  const cm = await api(disp, 'POST', `/planning/runs/${rr.id}/commit`, { clientEventId: randomUUID() });
+  const tid = cm.data.tripIds?.[0];
+  const tt = (await api(drv[uA], 'GET', '/driver/current-trip')).data.trip;
+  await api(drv[uA], 'POST', `/driver/trips/${tid}/start`, { clientEventId: randomUUID(), checkedOrderIds: [retryOrder] });
+  await api(drv[uA], 'POST', `/driver/trips/${tid}/stops/${tt.stops[0].id}/attempts`, { clientEventId: randomUUID(), result: 'failed', reason: 'Vắng nhà' });
+  await api(drv[uA], 'POST', `/driver/trips/${tid}/return`, { clientEventId: randomUUID(), returnedOrderIds: [retryOrder] });
+  const tv = (await api(disp, 'GET', `/trips/${tid}`)).data.trip;
+  const cl = await api(disp, 'POST', `/trips/${tid}/close`, { clientEventId: randomUUID(), stateVersion: tv.stateVersion, goodsMatched: true, decisions: [] });
+  if (n < tr.maxDeliveryAttempts) {
+    check(cl.status === 200 && (await api(disp, 'GET', `/orders/${retryOrder}`)).data.order.status === 'pending', `lần giao thứ ${n} chưa thành công: tự giao lại`);
+  } else {
+    check(cl.status === 409 && tv.stops[0].order.failedAttempts === n, `lần giao thứ ${n} (tối đa) chưa thành công: điều phối viên phải quyết định`);
+    const cl2 = await api(disp, 'POST', `/trips/${tid}/close`, { clientEventId: randomUUID(), stateVersion: tv.stateVersion, goodsMatched: true, decisions: [{ orderId: retryOrder, decision: 'return_to_sender' }] });
+    check(cl2.status === 200 && (await api(disp, 'GET', `/orders/${retryOrder}`)).data.order.status === 'return_to_sender', 'chọn Chuyển hoàn: đơn chuyển trạng thái chuyển hoàn');
+  }
+}
+
+console.log('Dispatcher: kiểm tra dữ liệu nhập');
+const ok = { code: 'DH-9001', recipientName: 'Nguyễn Văn Thử', phone: '0905 123 456', address: '12 Lê Duẩn, Hải Châu, Đà Nẵng', lat: 16.07, lon: 108.22, weightKg: 2, vehicleTypes: ['motorcycle', 'small_truck'] };
+check((await api(disp, 'POST', '/orders', { ...ok, phone: '028 3822 1234' })).status === 400, 'số điện thoại không phải số di động Việt Nam bị từ chối');
+check((await api(disp, 'POST', '/orders', { ...ok, lat: 21.03, lon: 105.85 })).status === 400, 'vị trí ngoài khu vực phục vụ Đà Nẵng bị từ chối');
+check((await api(disp, 'POST', '/orders', { ...ok, weightKg: 5000 })).status === 400, 'khối lượng vượt tải trọng lớn nhất của xe đang hoạt động bị từ chối');
+check((await api(disp, 'POST', '/orders', { ...ok, weightKg: 120, vehicleTypes: ['motorcycle'] })).status === 400, 'đơn chỉ cho xe máy nặng hơn xe máy lớn nhất bị từ chối');
+check((await api(disp, 'POST', '/orders', ok)).status === 201, 'đơn hợp lệ được lưu');
+const dupOrder = await api(disp, 'POST', '/orders', { ...ok, code: 'DH-9002', phone: '+84905123456' });
+check(dupOrder.status === 409 && dupOrder.data.error.code === 'DUPLICATE_ORDER', 'đơn trùng người nhận, địa chỉ, số điện thoại đang chờ xếp thì cảnh báo');
+check((await api(disp, 'POST', '/orders', { ...ok, code: 'DH-9002', allowDuplicate: true })).status === 201, 'xác nhận vẫn lưu thì lưu đơn trùng');
+check((await api(disp, 'POST', '/vehicles', { plate: '43B9-999.99', type: 'motorcycle', capacityKg: 800 })).status === 400, 'tải trọng ngoài khoảng hợp lý của loại xe bị từ chối');
 
 console.log(fails ? `\n${fails}/${total} kiểm tra thất bại` : `\nTất cả ${total} kiểm tra đạt`);
 const { pool } = await import('../src/db.js');
