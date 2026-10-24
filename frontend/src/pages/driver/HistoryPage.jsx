@@ -29,7 +29,7 @@ export default function HistoryPage() {
           <div className="row">
             <div className="col grow">
               <span className="body-large strong">{t.code}</span>
-              <span className="secondary">{t.total} điểm · {t.delivered} giao thành công{t.failed ? ` · ${t.failed} chưa giao được` : ''}</span>
+              <span className="secondary">{t.total} đơn · {t.delivered} giao thành công{t.failed ? ` · ${t.failed} chưa giao được` : ''}</span>
             </div>
             <ChevronRight size={20} className="muted" />
           </div>
@@ -46,7 +46,7 @@ export function HistoryDetailPage() {
   const t = data?.trip
   const back = <button type="button" className="btn ghost icon-only" onClick={() => navigate('/driver/history')} title="Quay lại"><ChevronLeft size={22} /></button>
   return (
-    <DriverScreen title={t ? `Chuyến ${t.code}` : 'Chuyến'} subtitle={t && `${VEHICLE_TYPE[t.vehicle.type]} ${t.vehicle.plate} · ${t.progress.done}/${t.progress.total} điểm`} back={back}>
+    <DriverScreen title={t ? `Chuyến ${t.code}` : 'Chuyến'} subtitle={t && `${VEHICLE_TYPE[t.vehicle.type]} ${t.vehicle.plate} · ${t.progress.done}/${t.progress.total} đơn`} back={back}>
       <LoadError error={error} onRetry={reload} notFound="Không tìm thấy chuyến" back="/driver/history" backLabel="Về lịch sử chuyến" />
       {loading && !t && <Loading />}
       {t && (

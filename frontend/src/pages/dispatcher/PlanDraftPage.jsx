@@ -115,7 +115,7 @@ export default function PlanDraftPage() {
               </div>
             </Card>
           )}
-          <Card compact title="Tuyến theo xe" extra={<span className="caption muted">{routes.length} xe · {placed} điểm</span>}>
+          <Card compact title="Tuyến theo xe" extra={<span className="caption muted">{routes.length} xe · {placed} đơn</span>}>
             <div>
               {routes.map((r, i) => {
                 const v = byVehicle.get(r.vehicleId)

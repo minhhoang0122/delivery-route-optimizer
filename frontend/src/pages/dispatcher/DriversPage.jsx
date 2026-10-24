@@ -42,7 +42,7 @@ export default function DriversPage() {
         ? <div className="row" style={{ gap: 8 }}>{d.defaultVehicle.type === 'motorcycle' ? <Bike size={18} /> : <Truck size={18} />}<div className="col"><span className="strong">{d.defaultVehicle.plate}</span><span className="caption muted">{VEHICLE_TYPE[d.defaultVehicle.type]} · {kg(d.defaultVehicle.capacityKg)}</span></div></div>
         : <span className="muted">Chưa gán</span>,
       trip: d => d.activeTrip
-        ? <Link to={`/dispatcher/trips/${d.activeTrip.id}`} className="col" style={{ color: 'inherit' }}><span className="strong">{d.activeTrip.code}</span><span className="caption muted">{d.activeTrip.status === 'awaiting_reconciliation' ? 'Chờ đối chiếu' : `${d.activeTrip.done}/${d.activeTrip.total} điểm`}</span></Link>
+        ? <Link to={`/dispatcher/trips/${d.activeTrip.id}`} className="col" style={{ color: 'inherit' }}><span className="strong">{d.activeTrip.code}</span><span className="caption muted">{d.activeTrip.status === 'awaiting_reconciliation' ? 'Chờ đối chiếu' : `${d.activeTrip.done}/${d.activeTrip.total} đơn`}</span></Link>
         : <span className="muted">Không có</span>,
       status: d => { const [l, t] = STATE[driverState(d)]; return <Badge tone={t}>{l}</Badge> },
       actions: d => <Button variant="ghost" onClick={() => { action.setError(null); setEdit({ id: d.id, userId: d.userId, fullName: d.fullName, phone: d.phone ?? '', defaultVehicleId: d.defaultVehicle?.id ?? '', status: d.status }) }}>Sửa hồ sơ</Button>,

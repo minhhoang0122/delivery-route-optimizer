@@ -51,7 +51,7 @@ export default function DashboardPage() {
       {m && (
         <div className="grid-metrics">
           <Metric label="Đơn chờ xếp" value={m.pendingOrders} hint={`${m.truckOnlyOrders} đơn chỉ cho phép xe tải`} icon={Package} />
-          <Metric label="Chuyến đang giao" value={m.tripsInProgress} hint={`${m.stopsDone}/${m.stopsTotal} điểm đã xử lý · ${m.assigned} chuyến chờ xuất phát`} icon={Navigation} />
+          <Metric label="Chuyến đang giao" value={m.tripsInProgress} hint={`${m.stopsDone}/${m.stopsTotal} đơn đã xử lý · ${m.assigned} chuyến chờ xuất phát`} icon={Navigation} />
           <Metric label="Chờ đối chiếu" value={m.awaitingReconciliation} hint={`${m.needsActionOrders} đơn chưa giao được`} icon={ClipboardCheck} tone={m.awaitingReconciliation ? 'warning' : undefined} />
           <Metric label="Cảnh báo" value={m.warnings} icon={TriangleAlert} tone={m.warnings ? 'warning' : undefined} />
         </div>

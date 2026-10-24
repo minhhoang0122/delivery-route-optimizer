@@ -65,7 +65,7 @@ function AssignedScreen({ trip, vehicle, onStarted }) {
   }
 
   return (
-    <DriverScreen title={`Chuyến ${trip.code}`} subtitle={`${vehicle} · ${all} điểm`}
+    <DriverScreen title={`Chuyến ${trip.code}`} subtitle={`${vehicle} · ${all} đơn`}
       footer={<Button size="large" block icon={Navigation} disabled={!ok} loading={action.busy} onClick={start}>Bắt đầu chuyến</Button>}>
       <section className="card" style={{ gap: 8 }}>
         <div className="row between">
@@ -127,7 +127,7 @@ export default function CurrentTripPage() {
 
   if (trip.status === 'awaiting_reconciliation') {
     return (
-      <DriverScreen title={`Chuyến ${trip.code}`} subtitle={`${vehicle} · ${trip.progress.done}/${total} điểm`}>
+      <DriverScreen title={`Chuyến ${trip.code}`} subtitle={`${vehicle} · ${trip.progress.done}/${total} đơn`}>
         <Alert tone="info" title={trip.returnReport?.aborted ? 'Chuyến đã kết thúc do sự cố, chờ điều phối viên chốt chuyến' : 'Đã báo về kho, chờ điều phối viên chốt chuyến'} />
         <section className="card" style={{ gap: 8 }}>
           <div className="row between"><span className="h4">Kết quả chuyến</span><StatusBadge map={TRIP_STATUS} value={trip.status} large /></div>
@@ -157,7 +157,7 @@ export default function CurrentTripPage() {
   const [LocIcon, locTone, locText] = locationNote
 
   return (
-    <DriverScreen title={`Chuyến ${trip.code}`} subtitle={`${vehicle} · ${trip.progress.done}/${total} điểm`}
+    <DriverScreen title={`Chuyến ${trip.code}`} subtitle={`${vehicle} · ${trip.progress.done}/${total} đơn`}
       footer={<>
         {allDone
           ? <>
@@ -200,7 +200,7 @@ export default function CurrentTripPage() {
       )}
       {queued.filter(x => x.state !== 'failed').length > 0 && (
         <>
-          <div className="row between"><span className="h4">Kết quả chờ gửi</span><span className="caption muted">{waiting} điểm</span></div>
+          <div className="row between"><span className="h4">Kết quả chờ gửi</span><span className="caption muted">{waiting} đơn</span></div>
           {queued.filter(x => x.state !== 'failed').map(x => {
             const s = trip.stops.find(y => y.id === x.stopId)
             return s && (
@@ -227,7 +227,7 @@ export default function CurrentTripPage() {
       {allDone && <Alert tone="success" title="Đã xử lý hết các điểm" />}
       {rest.length > 0 && (
         <>
-          <div className="row between"><span className="h4">Các điểm còn lại</span><span className="caption muted">{rest.length} điểm</span></div>
+          <div className="row between"><span className="h4">Các điểm còn lại</span><span className="caption muted">{rest.length} đơn</span></div>
           {rest.map(s => <StopItem key={s.id} state="pending" seq={s.seq} name={s.order.recipientName} address={s.order.address}
             meta={`${s.eta ? `Dự kiến ${time(s.eta)} · ` : ''}${kg(s.order.weightKg)} · ${parcels(s.order.parcels)}${s.deferred ? ' · Giao sau' : ''}`}
             right={<Appointment stop={s} />} onClick={() => navigate(`/driver/stops/${s.id}`)} />)}

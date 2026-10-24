@@ -32,7 +32,7 @@ function eventDetail(e, stopsById, versionNo) {
     case 'trip_closed': return p.auto ? 'Giao hết, hệ thống tự chốt'
       : [`${p.requeue?.length ?? 0} giao lại`, p.returnToSender?.length && `${p.returnToSender.length} chuyển hoàn`, p.lost?.length && `${p.lost.length} thất lạc`].filter(Boolean).join(', ')
     case 'trip_revoked': return `${p.orderIds?.length ?? 0} đơn trở về chờ xếp`
-    case 'trip_aborted': return `${p.orderIds?.length ?? 0} điểm chưa giao${p.note ? ` · ${p.note}` : ''}`
+    case 'trip_aborted': return `${p.orderIds?.length ?? 0} đơn chưa giao${p.note ? ` · ${p.note}` : ''}`
     case 'stop_deferred': return `${stopsById.get(p.stopId)?.order.code ?? ''} xuống cuối tuyến · ${routeUpdate(p.toVersion)} · tài xế yêu cầu`
     case 'orders_removed': return `${(p.orderCodes ?? []).join(', ')} · ${routeUpdate(p.toVersion)}`
     case 'route_resequenced': return `${TRIGGER[p.trigger] ?? p.trigger}${p.trigger === 'out_of_order' && stopsById.get(p.stopId) ? ` (${stopsById.get(p.stopId).order.code})` : ''} · ${routeUpdate(p.toVersion)} · ${duration(p.proposedSeconds)}`
@@ -167,7 +167,7 @@ export default function TripDetailPage() {
         <div className="stack">
           <Card compact>
             <div className="row top wrap" style={{ gap: 16 }}>
-              <Stat label="Đã xử lý" valueClass="h4" value={`${t.progress.done}/${t.progress.total} điểm`} />
+              <Stat label="Đã xử lý" valueClass="h4" value={`${t.progress.done}/${t.progress.total} đơn`} />
               <Stat sep label="Giao thành công" valueClass="h4" valueTone="success" value={t.progress.delivered} />
               <Stat sep label="Chưa giao được" valueClass="h4" valueTone="danger" value={t.progress.failed} />
               <Stat sep label={t.status === 'in_progress' ? 'Vị trí cập nhật' : 'Tổng khối lượng'} valueClass="h4" valueTone={stale ? 'warning' : ''}
@@ -210,7 +210,7 @@ export default function TripDetailPage() {
         <Dialog tone="danger" title={`Kết thúc chuyến ${t.code} do sự cố?`} confirmLabel="Kết thúc chuyến" busy={action.busy}
           onCancel={() => setAbort(null)} onConfirm={doAbort}>
           <div className="stack-sm">
-            <KeyValue label="Điểm chưa giao" value={`${pendingCount} điểm`} />
+            <KeyValue label="Đơn chưa giao" value={`${pendingCount} đơn`} />
             <Field label="Ghi chú">
               <textarea className="textarea" value={abort.note} onChange={e => setAbort({ ...abort, note: e.target.value })} maxLength={255} placeholder="Ví dụ: xe hỏng ở Nguyễn Văn Linh" />
             </Field>

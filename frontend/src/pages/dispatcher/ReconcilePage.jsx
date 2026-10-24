@@ -42,7 +42,7 @@ export default function ReconcilePage() {
   const goods = matched && !unresolved.length
   const blockers = [
     t.status !== 'awaiting_reconciliation' && (t.status === 'closed' ? null : 'Tài xế chưa báo về kho'),
-    pending.length > 0 && `Còn ${pending.length} điểm chưa có kết quả`,
+    pending.length > 0 && `Còn ${pending.length} đơn chưa có kết quả`,
     undecided.length > 0 && `Chưa chọn xử lý cho ${undecided.length} đơn`,
     !goods && failed.length > 0 && 'Chưa xác nhận hàng khớp',
     !goods && failed.length === 0 && 'Chưa xác nhận không có sai lệch',
@@ -124,7 +124,7 @@ export default function ReconcilePage() {
         </div>
       </div>
       {pending.length > 0 && (
-        <Card title="Điểm chưa có kết quả" extra={<span className="caption muted">{t.progress.done}/{t.progress.total} điểm đã có kết quả</span>}>
+        <Card title="Đơn chưa có kết quả" extra={<span className="caption muted">{t.progress.done}/{t.progress.total} đơn đã có kết quả</span>}>
           {pending.map(s => <StopItem key={s.id} state="pending" seq={s.seq} name={s.order.recipientName} address={s.order.address} meta={`${s.order.code} · ${kg(s.order.weightKg)} · chưa có kết quả`} />)}
         </Card>
       )}

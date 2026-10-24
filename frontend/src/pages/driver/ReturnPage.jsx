@@ -35,10 +35,10 @@ export default function ReturnPage() {
   }
 
   return (
-    <DriverScreen title={`Chuyến ${trip.code}`} subtitle={`${VEHICLE_TYPE[trip.vehicle.type]} ${trip.vehicle.plate} · ${trip.progress.done}/${trip.stops.length} điểm`} back={back}
+    <DriverScreen title={`Chuyến ${trip.code}`} subtitle={`${VEHICLE_TYPE[trip.vehicle.type]} ${trip.vehicle.plate} · ${trip.progress.done}/${trip.stops.length} đơn`} back={back}
       footer={<Button size="large" block loading={action.busy} disabled={waiting > 0 || serverPending > 0} onClick={send}>Gửi báo cáo về kho</Button>}>
       <section className="card" style={{ gap: 12 }}>
-        <div className="row between"><span className="h4">Kết quả chuyến</span><span className="caption muted">{trip.stops.length - serverPending}/{trip.stops.length} điểm</span></div>
+        <div className="row between"><span className="h4">Kết quả chuyến</span><span className="caption muted">{trip.stops.length - serverPending}/{trip.stops.length} đơn</span></div>
         <div className="row top">
           <div className="tile success grow" style={{ border: 0, padding: 12 }}><span className="metric-value success">{delivered.length}</span><span className="medium secondary">Giao thành công</span></div>
           <div className="tile danger grow" style={{ padding: 12 }}><span className="metric-value danger">{failed.length}</span><span className="medium secondary">Chưa giao được</span></div>

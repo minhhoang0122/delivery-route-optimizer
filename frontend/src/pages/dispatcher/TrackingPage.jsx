@@ -26,7 +26,7 @@ function TripCard({ t, now }) {
       <span className="secondary">{t.driver.name} · {VEHICLE_TYPE[t.vehicle.type]} {t.vehicle.plate}</span>
       <div className="row">
         <Progress value={t.progress.done / t.progress.total} width="75%" color={color} />
-        <span className="caption strong secondary nowrap">{t.progress.done}/{t.progress.total} điểm</span>
+        <span className="caption strong secondary nowrap">{t.progress.done}/{t.progress.total} đơn</span>
       </div>
       {t.status === 'in_progress' && (
         <div className="row top">
