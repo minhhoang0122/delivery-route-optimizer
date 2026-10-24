@@ -175,7 +175,7 @@ export default function TripDetailPage() {
             </div>
           </Card>
           {t.status === 'in_progress' && t.lastReplan && <ReplanCard trip={t} />}
-          <Card compact title="Tuyến dự kiến" extra={<span className="caption muted">{duration(t.routeVersion?.objectiveSeconds)} · {km(t.routeVersion?.distanceM)}{t.etaReturn ? ` · về kho ${time(t.etaReturn)}` : ''}</span>}>
+          <Card compact title="Tuyến dự kiến" extra={<span className="caption muted">{[duration(t.routeVersion?.objectiveSeconds), t.routeVersion?.distanceM != null && km(t.routeVersion.distanceM), t.etaReturn && `về kho ${time(t.etaReturn)}`].filter(Boolean).join(' · ')}</span>}>
             <MapView height={360} depot={t.depot} routes={layers.routes} stops={layers.stops} vehicles={layers.vehicles} fitKey={`${t.id}-${t.routeVersion?.id}`}>
               {(t.congestion?.length > 0 || layers.noRoad) && <MapOverlay><Legend items={[...(t.congestion?.length ? [{ color: CONGESTION_HEX, label: 'Ùn tắc', line: true }] : []), ...(layers.noRoad ? [NO_ROAD_LEGEND] : [])]} /></MapOverlay>}
             </MapView>
