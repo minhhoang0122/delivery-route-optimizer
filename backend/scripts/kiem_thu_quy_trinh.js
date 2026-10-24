@@ -1,6 +1,7 @@
 // Kiểm thử nghiệp vụ và phân quyền qua API, theo các tiêu chí chấp nhận ở Bảng 3.2 và Bảng 3.3.
 // Chạy trên cơ sở dữ liệu vừa nạp mẫu (npm run seed -- --reset) khi Backend đang chạy:
 //   npm run test:flow
+// Phần tự đổi tuyến gọi thẳng bước kiểm tra định kỳ của Backend (cùng biến PG*), cần REROUTE_COOLDOWN_SECONDS > 0.
 // Biến API_BASE đổi địa chỉ Backend (mặc định http://localhost:3000/api).
 // Kịch bản ghi dữ liệu thật vào cơ sở dữ liệu, chỉ chạy trên cơ sở dữ liệu thử: phải đặt FLOW_TEST_ALLOW=1
 // cùng PGDATABASE/PGPORT của cơ sở dữ liệu thử (biến đặt sẵn trong môi trường được ưu tiên hơn file .env).
@@ -19,7 +20,8 @@ const BASE = process.env.API_BASE || `http://localhost:${process.env.PORT || 300
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PW = process.env.SEED_PASSWORD;
 let fails = 0;
-const check = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); if (!cond) fails++; };
+let total = 0;
+const check = (cond, msg) => { total++; console.log((cond ? '  ok   ' : '  FAIL ') + msg); if (!cond) fails++; };
 
 async function api(token, method, path, body) {
   const res = await fetch(BASE + path, {
@@ -155,32 +157,48 @@ check(a2.status === 201, 'ghi chưa giao được kèm lý do');
 const early = await api(drv[uA], 'POST', `/driver/trips/${tA.id}/return`, { clientEventId: randomUUID(), returnedOrderIds: [stops[1].order.id] });
 check(early.status === 409, 'báo về kho khi còn điểm chưa có kết quả bị từ chối');
 
-console.log('Dispatcher: đánh giá đổi tuyến');
-await pos(stops[1].order.lat, stops[1].order.lon);
-const ev0 = await api(disp, 'POST', `/trips/${tA.id}/reroute-evaluations`, {});
-check(ev0.status === 201 && !ev0.data.evaluation.meetsThreshold, 'dữ liệu không đổi thì không đề xuất đổi tuyến (G = ' + ev0.data.evaluation?.savingSeconds + ')');
-if (ev0.status === 201) await api(disp, 'POST', `/trips/${tA.id}/reroute-evaluations/${ev0.data.evaluation.eventId}/dismiss`, {});
-console.log('     ' + execFileSync(process.execPath, ['scripts/simulate.js', 'incident', '--trip', String(tA.id), '--factor', '4'], { cwd: ROOT, encoding: 'utf8' }).trim().split(/\r?\n/)[0]);
-await pos(stops[1].order.lat, stops[1].order.lon);
-const ev = await api(disp, 'POST', `/trips/${tA.id}/reroute-evaluations`, {});
+console.log('Hệ thống: tự đổi tuyến còn lại');
+// Gọi thẳng bước kiểm tra định kỳ của Backend trên cùng cơ sở dữ liệu, không chờ chu kỳ REROUTE_CHECK_SECONDS.
+// Kết quả được kiểm tra qua trạng thái chuyến, nên Backend đang chạy có tự kiểm tra cùng lúc thì kết quả vẫn như nhau
+const { applyReroute, periodicRerouteCheck } = await import('../src/services/trips.js');
+const { config } = await import('../src/config.js');
+const view = async () => (await api(disp, 'GET', `/trips/${tA.id}`)).data.trip;
+const checkNow = async () => (await periodicRerouteCheck()).find(x => x.tripId === tA.id);
+const incident = factor => execFileSync(process.execPath, ['scripts/simulate.js', 'incident', '--trip', String(tA.id), '--factor', String(factor)], { cwd: ROOT, encoding: 'utf8' }).trim().split(/\r?\n/)[0];
+const here = () => pos(stops[1].order.lat, stops[1].order.lon);
+await here();
+const t0 = await view();
+const c0 = await checkNow();
+const t0b = await view();
+check(t0b.routeVersion.id === t0.routeVersion.id && !t0b.lastReplan, `dữ liệu không đổi thì giữ tuyến hiện hành (${c0?.outcome} ${c0?.reason})`);
 if (stops.length - 2 >= 3) {
-  check(ev.status === 201, 'đánh giá đổi tuyến: ' + JSON.stringify(ev.data).slice(0, 200));
-  const e = ev.data.evaluation;
-  console.log(`     T=${e.currentSeconds}s T2=${e.proposedSeconds}s G=${e.savingSeconds}s đạt ngưỡng=${e.meetsThreshold} điểm kế tiếp giữ nguyên=${e.proposedStopIds[0] === e.nextStopId}`);
-  check(e.proposedStopIds[0] === e.nextStopId, 'điểm kế tiếp giữ nguyên');
-  if (e.meetsThreshold) {
-    const ap = await api(disp, 'POST', `/trips/${tA.id}/reroute-evaluations/${e.eventId}/approve`, {});
-    check(ap.status === 200 && ap.data.trip.needsAck, 'duyệt tuyến mới, chờ Driver xác nhận');
-    check((await api(disp, 'POST', `/trips/${tA.id}/reroute-evaluations`, {})).status === 409, 'chưa đánh giá thêm khi Driver chưa xác nhận');
-    const ack = await api(drv[uA], 'POST', `/driver/trips/${tA.id}/route-ack`, { clientEventId: randomUUID(), routeVersionId: ap.data.trip.routeVersion.id });
-    check(ack.status === 200 && !ack.data.trip.needsAck, 'Driver xác nhận tuyến mới');
-  } else {
-    const ap = await api(disp, 'POST', `/trips/${tA.id}/reroute-evaluations/${e.eventId}/approve`, {});
-    check(ap.status === 409, 'phương án không đạt ngưỡng không áp dụng được');
-    await api(disp, 'POST', `/trips/${tA.id}/reroute-evaluations/${e.eventId}/dismiss`, {});
-  }
+  console.log('     ' + incident(4));
+  await here();
+  const c1 = await checkNow();
+  const t1 = await view();
+  const lr = t1.lastReplan;
+  console.log(`     ${JSON.stringify(c1)} T=${lr?.currentSeconds}s T2=${lr?.proposedSeconds}s G=${lr?.savingSeconds}s`);
+  check(t1.routeVersion.versionNo === t0.routeVersion.versionNo + 1 && t1.routeVersion.reason === 'replan' && t1.needsAck,
+    'ùn tắc phía trước: hệ thống tự áp dụng tuyến mới, chờ thiết bị Driver nhận');
+  check(lr?.proposedStopIds[0] === lr?.nextStopId && t1.nextStopId === t0.nextStopId, 'điểm kế tiếp giữ nguyên');
+  check(lr?.savingSeconds >= config.reroute.minSavingSeconds && lr.proposedSeconds < lr.currentSeconds && lr.slowLegs.length > 0 && !lr.received,
+    'chi tiết chuyến có thời gian trước và sau, tiết kiệm, chặng chậm, chưa nhận');
+  check(t1.events.some(e => e.type === 'route_replanned' && e.actorName == null), 'nhật ký ghi hệ thống đổi tuyến, không có người duyệt');
+  console.log('     ' + incident(4));
+  await here();
+  const c2 = await checkNow();
+  check((await view()).routeVersion.id === t1.routeVersion.id && c2?.reason === 'needs_ack', 'chưa đổi thêm khi thiết bị Driver chưa nhận tuyến hiện hành');
+  const again2 = await applyReroute(tA.id, lr.evaluationEventId).catch(e => e);
+  check(again2?.status === 409, 'một kết quả đánh giá không áp dụng hai lần');
+  const ack = await api(drv[uA], 'POST', `/driver/trips/${tA.id}/route-ack`, { clientEventId: randomUUID(), routeVersionId: t1.routeVersion.id });
+  check(ack.status === 200 && !ack.data.trip.needsAck && ack.data.trip.lastReplan?.received, 'thiết bị Driver nhận tuyến mới');
+  await here();
+  const c3 = await checkNow();
+  check((await view()).routeVersion.id === t1.routeVersion.id && c3?.reason === 'cooldown',
+    `chưa đủ ${config.reroute.cooldownSeconds} giây sau lần đổi trước thì không đổi tuyến (${c3?.outcome} ${c3?.reason})`);
 } else {
-  check(ev.status === 409, 'ít điểm thì không đánh giá');
+  const c1 = await checkNow();
+  check(c1?.reason === 'few_stops', 'còn ít hơn 3 điểm thì không xét đổi tuyến');
 }
 
 console.log('Driver: hoàn tất và báo về kho');
@@ -215,5 +233,7 @@ check(hist.some(h => h.id === tA.id && h.status === 'closed'), 'Driver xem lại
 const opt2 = (await api(disp, 'GET', '/planning/options')).data;
 check(!opt2.vehicles.find(v => v.id === tA.vehicle.id).problem, 'xe và Driver được giải phóng sau khi chốt');
 
-console.log(fails ? `\n${fails} kiểm tra thất bại` : '\nTất cả kiểm tra đạt');
+console.log(fails ? `\n${fails}/${total} kiểm tra thất bại` : `\nTất cả ${total} kiểm tra đạt`);
+const { pool } = await import('../src/db.js');
+await pool.end();
 process.exitCode = fails ? 1 : 0;

@@ -3,9 +3,9 @@ import { ClipboardCheck, Clock, Navigation, Package, Route, TriangleAlert, Circl
 import { Link, useNavigate } from 'react-router'
 import { api } from '../../api.js'
 import MapView, { Legend, MapOverlay } from '../../components/MapView.jsx'
-import { CONGESTION_HEX, isStale, tripLayers } from '../../components/tripMap.js'
+import { CONGESTION_HEX, isStale, NO_ROAD_LEGEND, tripLayers } from '../../components/tripMap.js'
 import { Badge, Button, Card, Dot, ErrorBox, Loading, Metric, PageHeader, Progress, StatusBadge } from '../../components/ui.jsx'
-import { ago, duration, longDate, routeHex, time, TRIP_STATUS } from '../../format.js'
+import { ago, longDate, routeHex, time, TRIP_STATUS } from '../../format.js'
 import { LIVE_MS, useLoad, useNow } from '../../hooks.js'
 
 function TodoItem({ icon: Icon, tone, title, desc, action, to }) {
@@ -33,7 +33,6 @@ export default function DashboardPage() {
   // Mỗi loại việc có cách hiển thị riêng; chỉ dựng đúng loại của việc đang xét
   const TODO = {
     stale_position: x => ({ icon: Clock, tone: 'tone-warning-bg', title: `Vị trí xe ${x.plate} cũ hơn 30 giây`, desc: x.observedAt ? `Cập nhật lần cuối ${ago(x.observedAt, now)}` : 'Chưa nhận được vị trí nào', action: 'Xem chuyến', to: `/dispatcher/trips/${x.tripId}` }),
-    reroute_proposal: x => ({ icon: Route, tone: 'tone-info', title: `Đề xuất đổi tuyến ${x.tripCode}`, desc: `Tiết kiệm ${duration(x.savingSeconds)} cho ${x.remaining} điểm còn lại`, action: 'Xem đề xuất', to: `/dispatcher/trips/${x.tripId}` }),
     reconcile: x => ({ icon: ClipboardCheck, tone: 'tone-warning-bg', title: `${x.tripCode} chờ đối chiếu`, desc: `${x.failed} đơn chưa giao được · về kho lúc ${time(x.returnedAt)}`, action: 'Đối chiếu', to: `/dispatcher/trips/${x.tripId}/reconcile` }),
     loading_mismatch: x => ({ icon: TriangleAlert, tone: 'tone-danger-bg', title: `${x.tripCode}: hàng không khớp khi xuất phát`, desc: `Thiếu ${x.missingOrderIds.length} kiện so với danh sách`, action: 'Xem chuyến', to: `/dispatcher/trips/${x.tripId}` }),
   }
@@ -82,7 +81,7 @@ export default function DashboardPage() {
             routes={layers.flatMap(l => l.routes)} stops={layers.flatMap(l => l.stops)} vehicles={layers.flatMap(l => l.vehicles)}
             fitKey={active.map(t => t.id).join(',')}>
             {active.length > 0 && (
-              <MapOverlay><Legend items={[...active.map(t => ({ color: routeHex(t.vehicle.id), label: t.code })), { color: '#2b7a3b', label: 'Đã giao' }, { color: '#c0392b', label: 'Chưa giao được' }, ...(active.some(t => t.congestion?.length) ? [{ color: CONGESTION_HEX, label: 'Ùn tắc', line: true }] : [])]} /></MapOverlay>
+              <MapOverlay><Legend items={[...active.map(t => ({ color: routeHex(t.vehicle.id), label: t.code })), { color: '#2b7a3b', label: 'Đã giao' }, { color: '#c0392b', label: 'Chưa giao được' }, ...(active.some(t => t.congestion?.length) ? [{ color: CONGESTION_HEX, label: 'Ùn tắc', line: true }] : []), ...(layers.some(l => l.noRoad) ? [NO_ROAD_LEGEND] : [])]} /></MapOverlay>
             )}
           </MapView>
         </div>

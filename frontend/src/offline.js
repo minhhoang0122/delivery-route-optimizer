@@ -99,6 +99,8 @@ export function flush({ userId, retryFailed = false } = {}) {
           // Mất mạng, máy chủ tạm lỗi (5xx), phiên hết hạn (401) hoặc tài khoản bị khóa (gửi lại sau khi đăng nhập lại):
           // giữ nguyên để gửi lại sau, theo đúng thứ tự
           if (e.status === 0 || e.status === 401 || e.status >= 500 || e.code === 'ACCOUNT_LOCKED') { await update(item.clientEventId, { state: 'pending' }); break }
+          // Báo đã nhận tuyến bị từ chối (đã có phiên bản mới hơn, chuyến đã kết thúc): bỏ, lần tải chuyến sau gửi lại cho phiên bản hiện hành
+          if (item.kind === 'route_ack') { await removeItem(item.clientEventId); continue }
           await update(item.clientEventId, { state: 'failed', error: e.message, errorStatus: e.status })
         }
       }

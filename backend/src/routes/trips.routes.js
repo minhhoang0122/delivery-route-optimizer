@@ -1,10 +1,10 @@
-// Theo dõi chuyến (UC06), điều chỉnh tuyến (UC07), đối chiếu và chốt chuyến (UC08, UC09), thu hồi (UC16). Dispatcher.
+// Theo dõi chuyến (UC06, gồm lần hệ thống tự đổi tuyến gần nhất của UC07), đối chiếu và chốt chuyến (UC08, UC09), thu hồi (UC16). Dispatcher.
 import { Router } from 'express';
 import { requireRole } from '../auth.js';
 import { query } from '../db.js';
 import { notFound } from '../errors.js';
 import { eventPayload, fingerprint, requireEventId } from '../idempotency.js';
-import { ACTIVE_STATUSES, approveReroute, closeTrip, dismissReroute, evaluateTripReroute, loadTrip, revokeTrip } from '../services/trips.js';
+import { ACTIVE_STATUSES, closeTrip, loadTrip, revokeTrip } from '../services/trips.js';
 import { integer, oneOf, paramId } from '../validate.js';
 
 const router = Router();
@@ -50,23 +50,6 @@ router.post('/:id/close', async (req, res) => {
     decisions: Array.isArray(req.body?.decisions) ? req.body.decisions : [],
     clientEventId, fp: fingerprint(eventPayload(req.body)),
   });
-  res.json({ trip: await loadTrip(id, { withEvents: true }) });
-});
-
-router.post('/:id/reroute-evaluations', async (req, res) => {
-  const evaluation = await evaluateTripReroute(paramId(req), req.user);
-  res.status(201).json({ evaluation });
-});
-
-router.post('/:id/reroute-evaluations/:eventId/approve', async (req, res) => {
-  const id = paramId(req);
-  await approveReroute(id, paramId(req, 'eventId'), req.user);
-  res.json({ trip: await loadTrip(id, { withEvents: true }) });
-});
-
-router.post('/:id/reroute-evaluations/:eventId/dismiss', async (req, res) => {
-  const id = paramId(req);
-  await dismissReroute(id, paramId(req, 'eventId'), req.user);
   res.json({ trip: await loadTrip(id, { withEvents: true }) });
 });
 

@@ -20,7 +20,7 @@ const VEHICLE_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"
 
 /**
  * depot:    { lat, lon }
- * routes:   [{ points: [[lat, lon]], color, dashed, opacity, weight }]
+ * routes:   [{ points: [[lat, lon]], color, dashed, dotted, opacity, weight }]
  * stops:    [{ lat, lon, label, color, state }]  state done | failed thì đổi màu
  * vehicles: [{ key, lat, lon, color, label, stale, heading }]  xe cùng key trượt từ vị trí cũ sang vị trí mới
  * pin:      { lat, lon } điểm đang chọn (tạo đơn)
@@ -76,7 +76,7 @@ export default function MapView({ height = 480, depot, routes = [], stops = [], 
     for (const s of stops) bounds.push([s.lat, s.lon])
     if (depot) bounds.push([depot.lat, depot.lon])
     const sig = JSON.stringify([
-      routes.map(r => [r.points, r.color, r.weight, r.opacity, r.dashed]),
+      routes.map(r => [r.points, r.color, r.weight, r.opacity, r.dashed, r.dotted]),
       stops.map(s => [s.lat, s.lon, s.label, s.title, s.color, s.state]),
       depot && [depot.lat, depot.lon, depot.name],
       pin && [pin.lat, pin.lon],
@@ -86,7 +86,7 @@ export default function MapView({ height = 480, depot, routes = [], stops = [], 
       g.clearLayers()
       for (const r of routes) {
         if (!r.points?.length) continue
-        L.polyline(r.points, { color: r.color, weight: r.weight ?? 4, opacity: r.opacity ?? 0.9, dashArray: r.dashed ? '8 8' : null }).addTo(g)
+        L.polyline(r.points, { color: r.color, weight: r.weight ?? 4, opacity: r.opacity ?? 0.9, dashArray: r.dotted ? '1 8' : r.dashed ? '8 8' : null }).addTo(g)
       }
       for (const s of stops) {
         const bg = STOP_COLORS[s.state] || s.color || '#1f5fae'
@@ -171,7 +171,7 @@ export function Legend({ items }) {
       {items.map(it => (
         <span key={it.label} className="row" style={{ gap: 6 }}>
           {it.line
-            ? <span style={{ width: 22, height: 0, borderTop: `4px ${it.dashed ? 'dashed' : 'solid'} ${it.color}`, opacity: it.opacity ?? 1 }} />
+            ? <span style={{ width: 22, height: 0, borderTop: `${it.dotted ? 3 : 4}px ${it.dotted ? 'dotted' : it.dashed ? 'dashed' : 'solid'} ${it.color}`, opacity: it.opacity ?? 1 }} />
             : <span className="dot" style={{ background: it.color }} />}
           {it.label}
         </span>

@@ -5,7 +5,7 @@ import { useMemo, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router'
 import { api, newEventId } from '../../api.js'
 import MapView, { Legend, MapOverlay } from '../../components/MapView.jsx'
-import { geoToLatLngs } from '../../components/tripMap.js'
+import { geoToLatLngs, NO_ROAD_LEGEND, noRoadRoute } from '../../components/tripMap.js'
 import { Alert, Badge, Button, Card, Dialog, Dot, ErrorBox, Loading, LoadError, PageHeader, Progress, Stat } from '../../components/ui.jsx'
 import { dateTime, duration, kg, km, PLAN_STATUS, routeHex, time, VEHICLE_TYPE } from '../../format.js'
 import { useAction, useLoad } from '../../hooks.js'
@@ -32,7 +32,7 @@ export default function PlanDraftPage() {
     for (const r of result.routes) {
       const color = routeHex(r.vehicleId)
       const pts = r.orderIds.map(oid => byOrder.get(oid))
-      routes.push({ points: geoToLatLngs(r.geometry) || [depot, ...pts.map(o => [o.lat, o.lon]), depot], color, dashed: !r.geometry })
+      routes.push(r.geometry ? { points: geoToLatLngs(r.geometry), color } : noRoadRoute([depot, ...pts.map(o => [o.lat, o.lon]), depot]))
       pts.forEach((o, i) => stops.push({ lat: o.lat, lon: o.lon, label: i + 1, color, title: `Xe ${r.vehicleId} · ${i + 1}. ${o.code} · ${o.recipientName}` }))
     }
     return { routes, stops }
@@ -77,7 +77,7 @@ export default function PlanDraftPage() {
       <div className="row top wrap" style={{ gap: 24 }}>
         <div style={{ flex: '1 1 560px', minWidth: 0 }}>
           <MapView height={720} depot={{ ...snap.depot }} routes={layers.routes} stops={layers.stops} fitKey={run.id}>
-            <MapOverlay><Legend items={[...routes.map(r => ({ color: routeHex(r.vehicleId), label: `Xe ${r.vehicleId}` })), { color: '#0f172a', label: snap.depot.name }]} /></MapOverlay>
+            <MapOverlay><Legend items={[...routes.map(r => ({ color: routeHex(r.vehicleId), label: `Xe ${r.vehicleId}` })), { color: '#0f172a', label: snap.depot.name }, ...(routes.some(r => !r.geometry) ? [NO_ROAD_LEGEND] : [])]} /></MapOverlay>
             {matrixNote && <MapOverlay position="bottom-left"><span className="map-chip"><Clock size={16} /> {matrixNote}</span></MapOverlay>}
           </MapView>
         </div>

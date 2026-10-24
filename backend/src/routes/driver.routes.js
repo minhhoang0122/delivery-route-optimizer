@@ -1,4 +1,4 @@
-// Ứng dụng Driver: xem nhiệm vụ (UC10), xác nhận tuyến mới (UC10.1), bắt đầu chuyến (UC11), gửi vị trí (UC12),
+// Ứng dụng Driver: xem nhiệm vụ (UC10), ghi nhận thiết bị đã nhận tuyến mới (UC10.1, ứng dụng tự gửi), bắt đầu chuyến (UC11), gửi vị trí (UC12),
 // ghi kết quả (UC13), báo về kho (UC14), xem lại chuyến của mình (UC15).
 // Driver chỉ đọc và thao tác trên chuyến được giao cho chính mình.
 import { Router } from 'express';

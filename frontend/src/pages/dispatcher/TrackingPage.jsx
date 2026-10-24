@@ -3,7 +3,7 @@ import { ChevronRight, LocateFixed, Navigation, Route, TriangleAlert } from 'luc
 import { Link, useSearchParams } from 'react-router'
 import { api } from '../../api.js'
 import MapView, { Legend, MapOverlay } from '../../components/MapView.jsx'
-import { CONGESTION_HEX, isStale, tripLayers } from '../../components/tripMap.js'
+import { CONGESTION_HEX, isStale, NO_ROAD_LEGEND, tripLayers } from '../../components/tripMap.js'
 import { Card, Chips, Dot, Empty, ErrorBox, Loading, PageHeader, Progress, Stat, StatusBadge } from '../../components/ui.jsx'
 import { ago, dateTime, duration, routeHex, time, TRIP_STATUS, VEHICLE_TYPE } from '../../format.js'
 import { LIVE_MS, useLoad, useNow } from '../../hooks.js'
@@ -37,10 +37,7 @@ function TripCard({ t, now }) {
       {t.status === 'assigned' && <span className="caption muted">Giao chuyến lúc {time(t.createdAt)} · {duration(t.routeVersion?.objectiveSeconds)} di chuyển dự kiến</span>}
       {t.status === 'awaiting_reconciliation' && <span className="caption warning strong">Về kho lúc {time(t.returnedAt)} · {t.progress.failed} đơn chưa giao được</span>}
       {['closed', 'revoked'].includes(t.status) && <span className="caption muted">Kết thúc lúc {dateTime(t.closedAt)}</span>}
-      {t.proposal && !t.proposal.outdated && t.proposal.meetsThreshold && (
-        <div className="row tile info" style={{ flexDirection: 'row', gap: 8 }}><Route size={16} className="brand" /><span className="caption strong brand">Có đề xuất đổi tuyến · tiết kiệm {duration(t.proposal.savingSeconds)}</span></div>
-      )}
-      {t.needsAck && <div className="row tile info" style={{ flexDirection: 'row', gap: 8 }}><Route size={16} className="brand" /><span className="caption strong brand">Tuyến mới đang chờ Driver xác nhận</span></div>}
+      {t.needsAck && <div className="row tile info" style={{ flexDirection: 'row', gap: 8 }}><Route size={16} className="brand" /><span className="caption strong brand">Chờ thiết bị Driver nhận tuyến mới</span></div>}
       {t.loadingMismatch && <div className="row tile danger" style={{ flexDirection: 'row', gap: 8 }}><TriangleAlert size={16} className="danger" /><span className="caption strong danger">Hàng không khớp khi xuất phát</span></div>}
       {stale ? (
         <div className="row tile" style={{ flexDirection: 'row', gap: 8, background: 'var(--warn-bg)' }}>
@@ -89,7 +86,7 @@ export default function TrackingPage() {
         <MapView depot={active[0]?.depot ?? ended.data?.trips[0]?.depot} routes={layers.flatMap(l => l.routes)} stops={layers.flatMap(l => l.stops)}
           vehicles={layers.flatMap(l => l.vehicles)} fitKey={`${filter}:${onMap.map(t => t.id).join(',')}`}>
           {onMap.length > 0 && (
-            <MapOverlay><Legend items={[...onMap.map(t => ({ color: routeHex(t.vehicle.id), label: t.code })), { color: '#2b7a3b', label: 'Đã giao' }, { color: '#c0392b', label: 'Chưa giao được' }, ...(onMap.some(t => t.congestion?.length) ? [{ color: CONGESTION_HEX, label: 'Ùn tắc', line: true }] : [])]} /></MapOverlay>
+            <MapOverlay><Legend items={[...onMap.map(t => ({ color: routeHex(t.vehicle.id), label: t.code })), { color: '#2b7a3b', label: 'Đã giao' }, { color: '#c0392b', label: 'Chưa giao được' }, ...(onMap.some(t => t.congestion?.length) ? [{ color: CONGESTION_HEX, label: 'Ùn tắc', line: true }] : []), ...(layers.some(l => l.noRoad) ? [NO_ROAD_LEGEND] : [])]} /></MapOverlay>
           )}
           {staleTrip && (
             <MapOverlay position="bottom-left"><span className="map-chip warning"><TriangleAlert size={16} /> Xe {staleTrip.vehicle.plate}: vị trí cũ hơn 30 giây</span></MapOverlay>

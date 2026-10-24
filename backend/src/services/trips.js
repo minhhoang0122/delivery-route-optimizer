@@ -1,5 +1,5 @@
 // Chuyến giao: giao chuyến từ bản nháp (UC05), bắt đầu chuyến (UC11), ghi kết quả (UC13), báo về kho (UC14),
-// đối chiếu và chốt chuyến (UC09), thu hồi (UC16), điều chỉnh tuyến còn lại (UC07) và xác nhận tuyến (UC10.1).
+// đối chiếu và chốt chuyến (UC09), thu hồi (UC16), tự điều chỉnh tuyến còn lại (UC07) và ghi nhận thiết bị Driver đã nhận tuyến (UC10.1).
 // Mọi thao tác ghi khóa dòng trips bằng SELECT … FOR UPDATE rồi kiểm tra trạng thái, nên hai thao tác đồng thời
 // trên cùng chuyến (ví dụ bắt đầu và thu hồi) chỉ có một thao tác thành công.
 import { detectIncrease, evaluateReroute } from 'optimization-engine';
@@ -22,11 +22,10 @@ const depotKey = t => pointKey('d', t.depot_id, t.depot_lat, t.depot_lon);
 
 /**
  * Đoạn đường giữa hai điểm, cắt từ đường đi của một phiên bản tuyến (GeoJSON, kinh độ trước).
- * Không có đường đi, hoặc hai điểm không nằm trên đường đi, thì nối thẳng.
+ * Không có đường đi, hoặc hai điểm không nằm trên đường đi, thì trả null: không vẽ đường thẳng thay cho đường thật.
  */
 export function sliceLine(coords, a, b) {
-  const straight = [[a.lon, a.lat], [b.lon, b.lat]];
-  if (!coords?.length) return straight;
+  if (!coords?.length) return null;
   const nearest = (p, from) => {
     let best = { i: -1, d: Infinity };
     for (let i = from; i < coords.length; i++) {
@@ -37,7 +36,7 @@ export function sliceLine(coords, a, b) {
   };
   const s = nearest(a, 0);
   const e = nearest(b, s.i);
-  if (s.d > 300 || e.d > 300 || e.i <= s.i) return straight;
+  if (s.d > 300 || e.d > 300 || e.i <= s.i) return null;
   return [[a.lon, a.lat], ...coords.slice(s.i, e.i + 1), [b.lon, b.lat]];
 }
 
@@ -54,23 +53,52 @@ async function congestionOf(t, stops, versions) {
   return legs.filter(l => at.has(l.fromStopId)).map(l => ({
     fromStopId: l.fromStopId, toStopId: l.toStopId, ratio: Math.round((l.after / l.before) * 10) / 10,
     points: sliceLine(geom, at.get(l.fromStopId), l.toStopId ? at.get(l.toStopId) : depot),
-  }));
+  })).filter(l => l.points);
 }
 
-/** Đề xuất đổi tuyến gần nhất chưa được duyệt hoặc bỏ qua. */
-async function pendingProposal(trip) {
+/**
+ * Lần hệ thống tự đổi tuyến gần nhất, kèm kết quả đánh giá đã dùng: thứ tự cũ và mới, thời gian trước và sau,
+ * các chặng chậm, và thiết bị Driver đã nhận tuyến mới hay chưa.
+ */
+async function lastReplanOf(t, versions) {
   const { rows } = await query(
-    `SELECT e.id, e.created_at, e.payload
-       FROM trip_events e
-      WHERE e.trip_id = $1 AND e.event_type = 'reroute_evaluated'
-        AND NOT EXISTS (SELECT 1 FROM trip_events r WHERE r.trip_id = e.trip_id
-                         AND r.event_type IN ('route_replanned', 'reroute_dismissed')
-                         AND r.payload->>'evaluationEventId' = e.id::text)
-      ORDER BY e.id DESC LIMIT 1`, [trip.id]);
-  const e = rows[0];
-  if (!e) return null;
-  const outdated = e.payload.stateVersion !== trip.state_version || e.payload.routeVersionId !== trip.current_route_version;
-  return { eventId: e.id, createdAt: e.created_at, ...e.payload, outdated };
+    `SELECT r.created_at, r.payload, e.payload AS evaluation, v.id AS route_version_id
+       FROM trip_events r
+       JOIN trip_events e ON e.trip_id = r.trip_id AND e.event_type = 'reroute_evaluated' AND e.id::text = r.payload->>'evaluationEventId'
+       LEFT JOIN route_versions v ON v.trip_id = r.trip_id AND v.version_no = (r.payload->>'toVersion')::int
+      WHERE r.trip_id = $1 AND r.event_type = 'route_replanned'
+      ORDER BY r.id DESC LIMIT 1`, [t.id]);
+  const r = rows[0];
+  if (!r) return null;
+  const e = r.evaluation;
+  const routeVersionId = r.route_version_id;
+  const received = routeVersionId != null && t.driver_ack_route_version === routeVersionId;
+  // Tuyến cũ để so sánh: đường đi của phiên bản trước, cắt từ vị trí xe lúc đổi tuyến về kho
+  const from = versions.find(v => v.version_no === r.payload.fromVersion)?.geometry?.coordinates;
+  const oldLine = e.position ? sliceLine(from, e.position, { lat: t.depot_lat, lon: t.depot_lon }) : null;
+  const receivedAt = received ? (await query(
+    `SELECT created_at FROM trip_events WHERE trip_id = $1 AND event_type = 'route_acknowledged'
+        AND payload->>'routeVersionId' = $2 ORDER BY id LIMIT 1`, [t.id, String(routeVersionId)])).rows[0]?.created_at ?? null : null;
+  return {
+    at: r.created_at,
+    evaluationEventId: Number(r.payload.evaluationEventId),
+    fromVersion: r.payload.fromVersion,
+    toVersion: r.payload.toVersion,
+    routeVersionId,
+    currentSeconds: e.currentSeconds,
+    proposedSeconds: e.proposedSeconds,
+    savingSeconds: e.savingSeconds,
+    savingRatio: e.savingRatio,
+    increase: e.increase,
+    slowLegs: e.increase?.slowLegs ?? [],
+    position: e.position,
+    nextStopId: e.nextStopId,
+    currentStopIds: e.currentStopIds,
+    proposedStopIds: e.proposedStopIds,
+    oldGeometry: oldLine && { type: 'LineString', coordinates: oldLine },
+    received,
+    receivedAt,
+  };
 }
 
 /**
@@ -193,7 +221,7 @@ export async function loadTrip(id, { withEvents = false } = {}) {
     loadingMismatch: t.status === 'assigned' && last('loading_mismatch')
       ? { ...last('loading_mismatch').payload, reportedAt: last('loading_mismatch').created_at } : null,
     closeReport: last('trip_closed')?.payload ?? null,
-    proposal: t.status === 'in_progress' ? await pendingProposal(t) : null,
+    lastReplan: t.status === 'in_progress' ? await lastReplanOf(t, versions) : null,
     serverTime: new Date(),
   };
   if (withEvents) {
@@ -241,7 +269,10 @@ function addEvent(c, { tripId, actorId, type, payload, clientEventId = null, fp 
 const tripOrderIds = async (c, tripId) =>
   (await c.query('SELECT order_id FROM trip_stops WHERE trip_id = $1 ORDER BY order_id', [tripId])).rows.map(r => r.order_id);
 
-/** Lấy đường đi sau khi transaction đã kết thúc, vì không giữ transaction mở trong lúc gọi TomTom (mục 3.3.2). */
+/**
+ * Lấy đường đi sau khi transaction đã kết thúc, vì không giữ transaction mở trong lúc gọi TomTom (mục 3.3.2).
+ * routeGeometry tự thử lại khi TomTom tạm từ chối; vẫn thiếu thì backfillGeometry (geometry.js) lấy bổ sung theo chu kỳ.
+ */
 function fillGeometryLater(routeVersionId, points, profile) {
   routeGeometry(points, profile)
     .then(g => g && query('UPDATE route_versions SET geometry = $2 WHERE id = $1', [routeVersionId, g]))
@@ -416,8 +447,12 @@ export async function recordPosition(tripId, user, { lat, lon, observedAt, accur
     [tripId, lat, lon, observedAt, accuracyM, source, clientEventId]);
 }
 
-// ---------------------------------------------------------------- UC10.1 Driver xác nhận tuyến mới
+// ---------------------------------------------------------------- UC10.1 thiết bị Driver nhận tuyến mới
 
+/**
+ * Ứng dụng Driver tự gọi khi tải chuyến và thấy phiên bản tuyến mới (Driver không bấm gì). Ghi nhận thiết bị đã nhận
+ * tuyến hiện hành; trước khi nhận, hệ thống không đổi tuyến thêm lần nữa.
+ */
 export async function acknowledgeRoute(tripId, user, { routeVersionId, clientEventId, fp }) {
   return transaction(async c => {
     const t = await lockTrip(c, tripId);
@@ -508,15 +543,15 @@ async function previousBatchIds(trip) {
 }
 
 /**
- * Đánh giá đổi thứ tự các điểm còn lại. Dispatcher bấm nút thì luôn lưu kết quả để trình duyệt;
- * kiểm tra tự động theo chu kỳ (auto) chỉ lấy chặng từ vị trí xe khi thời gian các chặng chung tăng vượt ngưỡng
- * (mục 3.4.5), và chỉ lưu đề xuất khi phương án mới hợp lệ và đạt ngưỡng tiết kiệm.
+ * Đánh giá đổi thứ tự các điểm còn lại (UC07, do kiểm tra theo chu kỳ gọi). Chỉ lấy chặng từ vị trí xe khi thời gian
+ * các chặng chung tăng vượt ngưỡng (mục 3.4.5), và chỉ lưu kết quả đánh giá khi phương án mới hợp lệ và đạt
+ * ngưỡng tiết kiệm; các trường hợp còn lại trả về skipped và giữ tuyến hiện hành.
  */
-export async function evaluateTripReroute(tripId, user, { auto = false } = {}) {
+export async function evaluateTripReroute(tripId) {
   const trip = await loadTrip(tripId);
   if (!trip) throw notFound('Không tìm thấy chuyến');
   if (trip.status !== 'in_progress') throw conflict('Chỉ đánh giá đổi tuyến khi chuyến đang giao');
-  if (trip.needsAck) throw conflict('Tuyến mới đang chờ Driver xác nhận, chưa đánh giá thêm');
+  if (trip.needsAck) throw conflict('Thiết bị Driver chưa nhận tuyến hiện hành, chưa đánh giá thêm');
   if (!trip.position) throw conflict('Chưa có vị trí xe để đánh giá');
   if (ageSeconds(trip.position.observedAt) > config.reroute.maxPositionAgeSeconds) {
     throw conflict(`Vị trí xe cũ hơn ${config.reroute.maxPositionAgeSeconds} giây, chưa đánh giá được`);
@@ -531,25 +566,31 @@ export async function evaluateTripReroute(tripId, user, { auto = false } = {}) {
   const stopPoints = remaining.map(s => ({ key: key(s), lat: s.order.lat, lon: s.order.lon }));
   const maxAgeSeconds = config.matrixSource === 'tomtom' ? config.reroute.maxEvaluationAgeSeconds : null;
   const t0 = performance.now();
-  // Bước 1: ma trận giữa kho và các điểm còn lại (thường dùng lại được), đủ để phát hiện tăng thời gian
-  const stopMatrix = await buildMatrix({
-    points: [{ key: dKey, lat: trip.depot.lat, lon: trip.depot.lon }, ...stopPoints], profiles: [profile], maxAgeSeconds,
-  });
+  const depotPoint = { key: dKey, lat: trip.depot.lat, lon: trip.depot.lon };
+  // Bước 1: chỉ các chặng nối tiếp theo thứ tự hiện hành (điểm kế tiếp → điểm sau → … → kho), k chặng cho k điểm,
+  // đủ để phát hiện tăng thời gian. Với nguồn tomtom, mỗi lần kiểm tra chỉ tốn khoảng k yêu cầu Routing
+  const chain = [...remaining.map(key), dKey];
+  const chainPairs = chain.slice(0, -1).map((a, i) => [a, chain[i + 1]]);
+  const chainMatrix = await buildMatrix({ points: [depotPoint, ...stopPoints], profiles: [profile], maxAgeSeconds, pairs: chainPairs });
   const oldTravel = await loadBatches(await previousBatchIds(trip));
-  const increase = detectIncrease({ points: [...remaining.map(key), dKey], profile, oldTravel, newTravel: stopMatrix.travel });
+  const increase = detectIncrease({ points: chain, profile, oldTravel, newTravel: chainMatrix.travel });
   increase.slowLegs = increase.slowLegs.map(l => ({
     fromStopId: remaining[l.index].id, toStopId: remaining[l.index + 1]?.id ?? null, before: l.before, after: l.after,
   }));
   // Chưa đủ ngưỡng, hoặc không còn chặng chung để so sánh: giữ tuyến hiện hành, không gọi thêm TomTom
-  if (auto && !increase.triggered) return { skipped: true, increase };
+  if (!increase.triggered) return { skipped: true, increase };
 
-  // Bước 2: chặng từ vị trí xe tới các điểm còn lại. Optimization Engine chỉ đi từ vị trí xe ra,
+  // Bước 2: chỉ khi đã phát hiện tăng mới lấy các chặng còn lại giữa kho và các điểm (khoảng k² chặng) và chặng
+  // từ vị trí xe tới các điểm còn lại (k chặng). Optimization Engine chỉ đi từ vị trí xe ra,
   // không bao giờ quay về vị trí xe, nên không lấy chiều ngược lại
+  const inChain = new Set(chainPairs.map(([a, b]) => `${a}|${b}`));
+  const restPairs = chain.flatMap(a => chain.filter(b => b !== a && !inChain.has(`${a}|${b}`)).map(b => [a, b]));
+  const restMatrix = await buildMatrix({ points: [depotPoint, ...stopPoints], profiles: [profile], maxAgeSeconds, pairs: restPairs });
   const posMatrix = await buildMatrix({
     points: [{ key: posKey, lat: trip.position.lat, lon: trip.position.lon }, ...stopPoints], profiles: [profile], maxAgeSeconds,
     pairs: remaining.map(s => [posKey, key(s)]),
   });
-  const matrix = combineMatrices(stopMatrix, posMatrix);
+  const matrix = combineMatrices(combineMatrices(chainMatrix, restMatrix), posMatrix);
   const matrixMs = performance.now() - t0;
 
   const ev = evaluateReroute({
@@ -558,8 +599,7 @@ export async function evaluateTripReroute(tripId, user, { auto = false } = {}) {
     minSavingSeconds: config.reroute.minSavingSeconds, minSavingRatio: config.reroute.minSavingRatio,
     maxEvaluations: config.maxEvaluations, maxMs: config.maxSearchMs,
   });
-  // Kiểm tra tự động chỉ lưu đề xuất hợp lệ và đạt ngưỡng tiết kiệm; Dispatcher bấm nút thì luôn lưu để xem
-  if (auto && !(ev.valid && ev.meetsThreshold)) return { skipped: true, increase, ...ev };
+  if (!(ev.valid && ev.meetsThreshold)) return { skipped: true, increase, ...ev };
 
   const payload = {
     stateVersion: trip.stateVersion,
@@ -571,35 +611,38 @@ export async function evaluateTripReroute(tripId, user, { auto = false } = {}) {
     currentStopIds: remaining.map(s => s.id),
     ...ev,
     increase,
-    auto,
     matrix: { batchIds: matrix.batchIds, ...matrix.stats, ms: Math.round(matrixMs) },
   };
   const { rows } = await query(
-    `INSERT INTO trip_events (trip_id, actor_id, event_type, payload) VALUES ($1, $2, 'reroute_evaluated', $3) RETURNING id, created_at`,
-    [tripId, user?.id ?? null, payload]);
+    `INSERT INTO trip_events (trip_id, actor_id, event_type, payload) VALUES ($1, NULL, 'reroute_evaluated', $2) RETURNING id, created_at`,
+    [tripId, payload]);
   return { eventId: rows[0].id, createdAt: rows[0].created_at, ...payload };
 }
 
-export async function approveReroute(tripId, eventId, user) {
+/**
+ * Hệ thống áp dụng thứ tự mới của một lần đánh giá, không cần Dispatcher duyệt. Mọi điều kiện được kiểm tra lại
+ * dưới khóa chuyến (mục 3.4.7); không đạt thì báo lỗi và giữ tuyến hiện hành.
+ */
+export async function applyReroute(tripId, eventId) {
   const applied = await transaction(async c => {
     const t = await lockTrip(c, tripId);
     const ev = (await c.query(
       `SELECT * FROM trip_events WHERE id = $1 AND trip_id = $2 AND event_type = 'reroute_evaluated'`, [eventId, tripId])).rows[0];
-    if (!ev) throw notFound('Không tìm thấy đề xuất đổi tuyến');
+    if (!ev) throw notFound('Không tìm thấy kết quả đánh giá đổi tuyến');
     const handled = (await c.query(
-      `SELECT 1 FROM trip_events WHERE trip_id = $1 AND event_type IN ('route_replanned', 'reroute_dismissed') AND payload->>'evaluationEventId' = $2`,
+      `SELECT 1 FROM trip_events WHERE trip_id = $1 AND event_type = 'route_replanned' AND payload->>'evaluationEventId' = $2`,
       [tripId, String(eventId)])).rows.length;
-    if (handled) throw conflict('Đề xuất này đã được xử lý');
+    if (handled) throw conflict('Kết quả đánh giá này đã được áp dụng');
     const p = ev.payload;
     if (t.status !== 'in_progress') throw conflict('Chuyến không còn ở trạng thái đang giao');
     if (!p.valid || !p.meetsThreshold) throw conflict('Phương án mới không đạt điều kiện áp dụng');
-    // Kiểm tra lại dưới khóa (mục 3.4.7): trạng thái, phiên bản tuyến, Driver đã xác nhận, độ mới của dữ liệu
+    // Kiểm tra lại dưới khóa (mục 3.4.7): trạng thái, phiên bản tuyến, thiết bị Driver đã nhận tuyến hiện hành, độ mới của dữ liệu
     if (t.state_version !== p.stateVersion || t.current_route_version !== p.routeVersionId) {
       throw stale('Chuyến vừa thay đổi (điểm đã giao hoặc tuyến mới), cần đánh giá lại');
     }
-    if (t.driver_ack_route_version !== t.current_route_version) throw conflict('Driver chưa xác nhận tuyến hiện hành');
+    if (t.driver_ack_route_version !== t.current_route_version) throw conflict('Thiết bị Driver chưa nhận tuyến hiện hành');
     if (ageSeconds(ev.created_at) > config.reroute.maxEvaluationAgeSeconds) {
-      throw stale(`Đề xuất đã cũ hơn ${config.reroute.maxEvaluationAgeSeconds} giây, cần đánh giá lại`);
+      throw stale(`Kết quả đánh giá đã cũ hơn ${config.reroute.maxEvaluationAgeSeconds} giây, cần đánh giá lại`);
     }
     const pos = (await c.query('SELECT latitude, longitude, observed_at FROM vehicle_positions WHERE trip_id = $1 ORDER BY observed_at DESC LIMIT 1', [tripId])).rows[0];
     if (!pos || ageSeconds(pos.observed_at) > config.reroute.maxPositionAgeSeconds) throw stale('Vị trí xe đã cũ, cần đánh giá lại');
@@ -626,67 +669,74 @@ export async function approveReroute(tripId, eventId, user) {
       await c.query('INSERT INTO route_stops (route_version_id, stop_id, sequence_no) VALUES ($1, $2, $3)', [rvId, sequence[i], i + 1]);
     }
     await c.query('UPDATE trips SET current_route_version = $2, state_version = state_version + 1 WHERE id = $1', [tripId, rvId]);
+    // Người thực hiện để trống: hệ thống tự đổi tuyến
     await addEvent(c, {
-      tripId, actorId: user.id, type: 'route_replanned',
-      payload: { evaluationEventId: eventId, fromVersion: fromNo, toVersion: fromNo + 1, savingSeconds: p.savingSeconds, batchIds: p.matrix.batchIds },
+      tripId, actorId: null, type: 'route_replanned',
+      payload: {
+        evaluationEventId: eventId, routeVersionId: rvId, fromVersion: fromNo, toVersion: fromNo + 1,
+        savingSeconds: p.savingSeconds, batchIds: p.matrix.batchIds,
+      },
     });
-    return { rvId, p };
+    return { rvId, fromNo, p };
   });
   const trip = await loadTrip(tripId);
   const byId = new Map(trip.stops.map(s => [s.id, s]));
   fillGeometryLater(applied.rvId, [applied.p.position, ...applied.p.proposedStopIds.map(id => byId.get(id).order), trip.depot], trip.vehicle.profile);
+  return { routeVersionId: applied.rvId, fromVersion: applied.fromNo, toVersion: applied.fromNo + 1, savingSeconds: applied.p.savingSeconds };
 }
 
-export async function dismissReroute(tripId, eventId, user) {
-  return transaction(async c => {
-    await lockTrip(c, tripId);
-    const ev = (await c.query(`SELECT id FROM trip_events WHERE id = $1 AND trip_id = $2 AND event_type = 'reroute_evaluated'`, [eventId, tripId])).rows[0];
-    if (!ev) throw notFound('Không tìm thấy đề xuất đổi tuyến');
-    const handled = (await c.query(
-      `SELECT 1 FROM trip_events WHERE trip_id = $1 AND event_type IN ('route_replanned', 'reroute_dismissed') AND payload->>'evaluationEventId' = $2`,
-      [tripId, String(eventId)])).rows.length;
-    if (handled) return;
-    await addEvent(c, { tripId, actorId: user.id, type: 'reroute_dismissed', payload: { evaluationEventId: eventId } });
-  });
-}
-
-// ---------------------------------------------------------------- kiểm tra theo chu kỳ (UC07 Alternative Flow)
+// ---------------------------------------------------------------- kiểm tra theo chu kỳ (UC07)
 
 let checking = false;
 
 /**
- * Mỗi chu kỳ xét các chuyến đang giao: bỏ qua chuyến đang chờ Driver xác nhận, chuyến đã có đề xuất đạt ngưỡng
- * chưa xử lý và chưa quá hạn, hoặc vị trí đã cũ. Đề xuất chỉ được lưu để Dispatcher duyệt, hệ thống không tự áp dụng tuyến mới.
+ * Mỗi chu kỳ xét các chuyến đang giao: bỏ qua chuyến mà thiết bị Driver chưa nhận tuyến hiện hành, vị trí đã cũ,
+ * còn ít hơn 3 điểm hoặc chưa hết thời gian chờ sau lần đổi tuyến trước. Phương án mới hợp lệ và đạt ngưỡng
+ * tiết kiệm thì hệ thống áp dụng ngay; không đạt điều kiện áp dụng thì giữ tuyến hiện hành.
+ * Trả về kết quả từng chuyến: applied (đã đổi tuyến), kept (đã xét, giữ tuyến) hoặc skipped (không xét), kèm lý do.
  */
 export async function periodicRerouteCheck() {
-  if (checking) return;
+  if (checking) return [];
   checking = true;
+  const results = [];
   try {
     const { rows } = await query(`SELECT id FROM trips WHERE status = 'in_progress' ORDER BY id`);
     for (const { id } of rows) {
       const trip = await loadTrip(id);
-      if (trip.needsAck) continue;
-      // Chỉ bỏ qua khi đề xuất đang chờ duyệt còn dùng được: đúng phiên bản, đạt ngưỡng và chưa quá hạn
-      const p = trip.proposal;
-      if (p && !p.outdated && p.valid && p.meetsThreshold && ageSeconds(p.createdAt) <= config.reroute.maxEvaluationAgeSeconds) continue;
-      if (!trip.position || ageSeconds(trip.position.observedAt) > config.reroute.maxPositionAgeSeconds) continue;
-      if (trip.stops.filter(s => s.status === 'pending').length < 3) continue;
+      const out = (outcome, reason, extra) => results.push({ tripId: id, code: trip.code, outcome, reason, ...extra });
+      if (trip.needsAck) { out('skipped', 'needs_ack'); continue; }
+      if (!trip.position || ageSeconds(trip.position.observedAt) > config.reroute.maxPositionAgeSeconds) { out('skipped', 'stale_position'); continue; }
+      if (trip.stops.filter(s => s.status === 'pending').length < 3) { out('skipped', 'few_stops'); continue; }
+      // Trong thời gian chờ sau lần đổi tuyến trước thì không đánh giá, tránh tốn yêu cầu TomTom cho phương án không áp dụng được
+      if (trip.lastReplan && ageSeconds(trip.lastReplan.at) < config.reroute.cooldownSeconds) { out('skipped', 'cooldown'); continue; }
       try {
-        const ev = await evaluateTripReroute(id, null, { auto: true });
+        const ev = await evaluateTripReroute(id);
         if (ev.skipped) {
           if (!ev.increase.legs) console.log(`Kiểm tra định kỳ ${trip.code}: không còn chặng chung đủ dữ liệu để so sánh, giữ tuyến hiện hành`);
           else if (ev.increase.triggered && ev.valid === false) console.log(`Kiểm tra định kỳ ${trip.code}: ${ev.reason}, giữ tuyến hiện hành`);
           else if (ev.increase.triggered) {
             console.log(`Kiểm tra định kỳ ${trip.code}: thời gian còn lại tăng ${ev.increase.increase} giây nhưng thứ tự mới chỉ tiết kiệm ${ev.savingSeconds} giây, chưa đạt ngưỡng, giữ tuyến hiện hành`);
           }
+          out('kept', ev.increase.triggered ? 'below_threshold' : 'no_increase');
           continue;
         }
-        console.log(`Kiểm tra định kỳ ${trip.code}: thời gian còn lại tăng ${ev.increase.increase} giây, đề xuất tiết kiệm ${ev.savingSeconds} giây`);
+        try {
+          const r = await applyReroute(id, ev.eventId);
+          console.log(`Kiểm tra định kỳ ${trip.code}: thời gian còn lại tăng ${ev.increase.increase} giây, đã đổi sang tuyến phiên bản ${r.toVersion}, tiết kiệm ${ev.savingSeconds} giây`);
+          out('applied', null, r);
+        } catch (err) {
+          if (!(err instanceof HttpError)) throw err;
+          // Dữ liệu vừa thay đổi hoặc không còn đạt điều kiện: giữ tuyến hiện hành, chu kỳ sau đánh giá lại
+          console.log(`Kiểm tra định kỳ ${trip.code}: không đổi tuyến (${err.message}), giữ tuyến hiện hành`);
+          out('kept', err.message);
+        }
       } catch (err) {
         if (!(err instanceof HttpError)) console.error(`Kiểm tra định kỳ ${trip.code} lỗi`, err.message);
+        out('kept', err.message);
       }
     }
   } finally {
     checking = false;
   }
+  return results;
 }

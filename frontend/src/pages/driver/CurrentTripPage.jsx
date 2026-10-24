@@ -13,7 +13,7 @@ import { removeItem } from '../../offline.js'
 
 const mapsLink = o => `https://www.google.com/maps/dir/?api=1&destination=${o.lat},${o.lon}`
 
-function NextStopCard({ stop, total, actions }) {
+function NextStopCard({ stop, total }) {
   const o = stop.order
   return (
     <section className="card" style={{ padding: 12, gap: 8 }}>
@@ -23,12 +23,10 @@ function NextStopCard({ stop, total, actions }) {
         <span className="body-large secondary">{o.address}</span>
         <span className="row secondary" style={{ gap: 8 }}><Package size={16} className="muted" />{kg(o.weightKg)}{stop.eta ? ` · Dự kiến ${time(stop.eta)}` : ''}</span>
       </div>
-      {actions && (
-        <div className="row">
-          <a className="btn secondary large" href={`tel:${o.phone.replace(/\s/g, '')}`}><Phone size={18} /> Gọi</a>
-          <a className="btn secondary large grow" href={mapsLink(o)} target="_blank" rel="noreferrer"><Navigation size={18} /> Chỉ đường</a>
-        </div>
-      )}
+      <div className="row">
+        <a className="btn secondary large" href={`tel:${o.phone.replace(/\s/g, '')}`}><Phone size={18} /> Gọi</a>
+        <a className="btn secondary large grow" href={mapsLink(o)} target="_blank" rel="noreferrer"><Navigation size={18} /> Chỉ đường</a>
+      </div>
     </section>
   )
 }
@@ -97,7 +95,6 @@ export default function CurrentTripPage() {
   const { trip, setTrip, online, outbox, location, reload, retry, error } = useDriver()
   const navigate = useNavigate()
   const now = useNow()
-  const ack = useAction()
 
   if (trip === undefined) return <DriverScreen title="Chuyến hiện tại">{error ? <ErrorBox error={error} onRetry={reload} /> : <Loading />}</DriverScreen>
   if (!trip) {
@@ -135,10 +132,9 @@ export default function CurrentTripPage() {
   const rest = trip.stops.filter(s => s.status === 'pending' && s.id !== trip.nextStopId)
   const allDone = !trip.stops.some(s => s.status === 'pending')
 
-  async function acknowledge() {
-    const res = await ack.run(() => api(`/driver/trips/${trip.id}/route-ack`, { method: 'POST', body: { clientEventId: newEventId(), routeVersionId: trip.routeVersion.id } }))
-    if (res) setTrip(res.trip)
-  }
+  // Tuyến vừa được hệ thống đổi: báo ngắn cho đến 1 phút sau khi thiết bị đã nhận; danh sách điểm đã theo thứ tự mới
+  const lr = trip.lastReplan
+  const routeUpdated = lr && lr.routeVersionId === trip.routeVersion?.id && (!lr.received || now - new Date(lr.receivedAt).getTime() < 60_000)
 
   const locationNote = {
     sharing: [LocateFixed, 'success', `Đang chia sẻ vị trí · cập nhật ${ago(location.lastSentAt, now)}`],
@@ -165,11 +161,9 @@ export default function CurrentTripPage() {
           <div className="row" style={{ gap: 8 }}><WifiOff size={20} className="danger" /><span className="body-large strong">Đang ngoại tuyến · kết quả sẽ tự gửi</span></div>
         </div>
       )}
-      {trip.needsAck && (
+      {routeUpdated && (
         <div className="banner info">
-          <div className="row" style={{ gap: 8 }}><RefreshCw size={20} className="brand" /><span className="body-large strong">Tuyến đã được điều chỉnh</span></div>
-          <ErrorBox error={ack.error} />
-          <Button block onClick={acknowledge} loading={ack.busy}>Xác nhận tuyến mới</Button>
+          <div className="row" style={{ gap: 8 }}><RefreshCw size={20} className="brand" /><span className="body-large strong">Tuyến đã cập nhật · {time(lr.at)}</span></div>
         </div>
       )}
       {failedSync.length > 0 && (
@@ -200,7 +194,7 @@ export default function CurrentTripPage() {
           })}
         </>
       )}
-      {next && <NextStopCard stop={next} total={total} actions={!trip.needsAck} />}
+      {next && <NextStopCard stop={next} total={total} />}
       {allDone && <Alert tone="success" title="Đã xử lý hết các điểm" />}
       {rest.length > 0 && (
         <>

@@ -27,9 +27,6 @@ router.get('/', async (_req, res) => {
     if (t.status === 'in_progress' && (!t.position || now - new Date(t.position.observedAt).getTime() > maxAge)) {
       todo.push({ type: 'stale_position', tripId: t.id, tripCode: t.code, plate: t.vehicle.plate, observedAt: t.position?.observedAt ?? null });
     }
-    if (t.proposal && !t.proposal.outdated && t.proposal.meetsThreshold) {
-      todo.push({ type: 'reroute_proposal', tripId: t.id, tripCode: t.code, savingSeconds: t.proposal.savingSeconds, remaining: t.proposal.currentStopIds.length });
-    }
     if (t.status === 'awaiting_reconciliation') {
       todo.push({ type: 'reconcile', tripId: t.id, tripCode: t.code, failed: t.progress.failed, returnedAt: t.returnedAt });
     }
@@ -50,7 +47,7 @@ router.get('/', async (_req, res) => {
       stopsTotal: inProgress.reduce((s, t) => s + t.progress.total, 0),
       awaitingReconciliation: trips.filter(t => t.status === 'awaiting_reconciliation').length,
       assigned: trips.filter(t => t.status === 'assigned').length,
-      warnings: todo.filter(x => x.type === 'stale_position' || x.type === 'reroute_proposal' || x.type === 'loading_mismatch').length,
+      warnings: todo.filter(x => x.type === 'stale_position' || x.type === 'loading_mismatch').length,
     },
     todo,
     trips,

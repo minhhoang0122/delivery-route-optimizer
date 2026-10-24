@@ -8,11 +8,11 @@
 //     Tạo một đợt ma trận "sự cố giả định": chặng từ điểm kế tiếp tới điểm sau nó (theo tuyến hiện hành) bị ùn tắc,
 //     chậm đi --factor lần. Đợt này được đánh dấu scenario = incident, không dùng cho các chỉ số trên dữ liệu thật.
 //
-//   npm run simulate -- demo --trip 3[,1,2] [--speed 4] [--jam-at 3] [--factor 3] [--approve-after 8]
+//   npm run simulate -- demo --trip 3[,1,2] [--speed 4] [--jam-at 3] [--factor 3]
 //     Chạy trọn một chuyến: Driver bắt đầu chuyến, xe chạy theo đường đi, giao từng điểm. Khi chuyến đầu tiên trong danh
-//     sách tới điểm thứ --jam-at (mặc định là điểm có chặng phía sau dài nhất), công cụ tạo ùn tắc ở chặng phía trước; kiểm tra đổi tuyến định kỳ của Backend phát hiện
-//     và tạo đề xuất, công cụ đóng vai Dispatcher duyệt sau --approve-after giây (0 là để người xem tự bấm duyệt) và
-//     đóng vai Driver xác nhận tuyến mới, rồi xe chạy tiếp theo tuyến mới. Các chuyến còn lại trong danh sách chỉ chạy.
+//     sách tới điểm thứ --jam-at (mặc định là điểm có chặng phía sau dài nhất), công cụ tạo ùn tắc ở chặng phía trước;
+//     kiểm tra đổi tuyến định kỳ của Backend phát hiện và tự đổi tuyến. Công cụ đóng vai thiết bị Driver tự nhận tuyến mới
+//     (như ứng dụng gửi khi tải chuyến), rồi xe chạy tiếp theo tuyến mới. Các chuyến còn lại trong danh sách chỉ chạy.
 //     Về tới kho thì Driver tự gửi báo cáo về kho. --trip active chạy mọi chuyến đang chờ xuất phát hoặc đang giao.
 //
 //   npm run simulate -- prepare [--orders 12]
@@ -26,7 +26,7 @@ import { loadVehicles, prepareSnapshot, runPlanning, vehicleProblem } from '../s
 import { config } from '../src/config.js';
 import { hasKey, routeGeometry } from '../src/services/tomtom.js';
 import {
-  acknowledgeRoute, approveReroute, closeTrip, commitPlan, evaluateTripReroute, loadTrip, recordAttempt, returnTrip, startTrip,
+  acknowledgeRoute, closeTrip, commitPlan, loadTrip, periodicRerouteCheck, recordAttempt, returnTrip, startTrip,
 } from '../src/services/trips.js';
 
 const args = process.argv.slice(2);
@@ -40,7 +40,7 @@ let tripIds = tripArg.split(',').map(Number).filter(Number.isInteger);
 if (!['drive', 'incident', 'demo', 'prepare'].includes(command) || (command !== 'prepare' && tripArg !== 'active' && !tripIds.length)) {
   console.log('Cách dùng: npm run simulate -- drive --trip <mã chuyến> [--speed 4]');
   console.log('           npm run simulate -- incident --trip <mã chuyến> [--factor 3]');
-  console.log('           npm run simulate -- demo --trip <mã chuyến>[,<mã chuyến>…]|active [--speed 4] [--jam-at 3] [--factor 3] [--approve-after 8]');
+  console.log('           npm run simulate -- demo --trip <mã chuyến>[,<mã chuyến>…]|active [--speed 4] [--jam-at 3] [--factor 3]');
   console.log('           npm run simulate -- prepare [--orders 12]');
   process.exit(1);
 }
@@ -54,13 +54,11 @@ async function writePosition(tripId, p) {
      VALUES ($1, $2, $3, now(), 5, 'simulator', $4)`, [tripId, p.lat.toFixed(6), p.lon.toFixed(6), randomUUID()]);
 }
 
-/** Người dùng đóng vai Driver của chuyến và một Dispatcher đang hoạt động. */
+/** Người dùng đóng vai Driver của chuyến. */
 async function actors(trip) {
   const driver = (await query(
     `SELECT u.id, u.role, d.id AS driver_id FROM drivers d JOIN users u ON u.id = d.user_id WHERE d.id = $1`, [trip.driver.id])).rows[0];
-  const dispatcher = (await query(
-    `SELECT id, role FROM users WHERE role = 'dispatcher' AND status = 'active' ORDER BY id LIMIT 1`)).rows[0];
-  return { driver, dispatcher };
+  return { driver };
 }
 
 /**
@@ -143,21 +141,22 @@ async function createIncident(tripId, factor) {
 async function incident() {
   const r = await createIncident(tripIds[0], opt('factor', 3));
   console.log(`Đã tạo đợt ma trận ${r.batchId} (${r.legs} chặng): ${r.text}.`);
-  console.log('Mở chi tiết chuyến và bấm "Đánh giá đổi tuyến" để xem đề xuất.');
+  console.log('Kiểm tra đổi tuyến định kỳ của Backend sẽ xét chuyến này ở chu kỳ kế tiếp.');
 }
 
 /**
- * Chờ đề xuất đổi tuyến sau khi có ùn tắc. Kiểm tra định kỳ của Backend thường tạo đề xuất trong một chu kỳ;
- * nếu Backend tắt kiểm tra định kỳ thì sau 20 giây công cụ tự gọi bước đánh giá như một lần kiểm tra.
+ * Chờ hệ thống tự đổi tuyến sau khi có ùn tắc. Kiểm tra định kỳ của Backend thường đổi tuyến trong một chu kỳ;
+ * nếu Backend tắt kiểm tra định kỳ thì sau 20 giây công cụ tự chạy một lần kiểm tra như Backend.
+ * Trả về lần đổi tuyến, hoặc null nếu hệ thống giữ tuyến hiện hành.
  */
-async function waitProposal(tripId, pos, log) {
+async function waitReplan(tripId, version, pos, log) {
   for (let waited = 0; waited < 60_000; waited += TICK_MS) {
     const trip = await loadTrip(tripId);
-    if (trip.proposal && !trip.proposal.outdated) return trip.proposal;
+    if (trip.routeVersion?.id !== version) return trip.lastReplan;
     if (waited === 20_000) {
-      log('Backend chưa tạo đề xuất (kiểm tra định kỳ đang tắt?), tự chạy một lần kiểm tra');
-      const ev = await evaluateTripReroute(tripId, null, { auto: true }).catch(err => ({ error: err.message }));
-      if (ev.error) log(`Không đánh giá được: ${ev.error}`);
+      log('Backend chưa đổi tuyến (kiểm tra định kỳ đang tắt?), tự chạy một lần kiểm tra');
+      const r = (await periodicRerouteCheck().catch(err => [{ tripId, outcome: 'kept', reason: err.message }])).find(x => x.tripId === tripId);
+      if (r && r.outcome !== 'applied') { log(`giữ tuyến hiện hành: ${r.reason}`); return null; }
     }
     await writePosition(tripId, pos);
     await sleep(TICK_MS);
@@ -165,12 +164,12 @@ async function waitProposal(tripId, pos, log) {
   return null;
 }
 
-async function runTrip(tripId, { speed, jamAt: jamOpt, factor, approveAfter, lead }) {
+async function runTrip(tripId, { speed, jamAt: jamOpt, factor, lead }) {
   let jamAt = jamOpt;
   let trip = await loadTrip(tripId);
   if (!trip) throw new Error(`Không tìm thấy chuyến ${tripId}`);
   const log = msg => console.log(`${new Date().toLocaleTimeString('vi-VN')} ${trip.code} ${msg}`);
-  const { driver, dispatcher } = await actors(trip);
+  const { driver } = await actors(trip);
   if (trip.status === 'assigned') {
     await startTrip(tripId, driver, { checkedOrderIds: trip.stops.map(s => s.order.id), clientEventId: randomUUID(), fp: 'simulator' });
     log('Driver kiểm đủ hàng và bắt đầu chuyến');
@@ -196,12 +195,13 @@ async function runTrip(tripId, { speed, jamAt: jamOpt, factor, approveAfter, lea
     if (trip.status !== 'in_progress') { log(`ở trạng thái ${trip.status}, dừng mô phỏng`); return; }
     here ??= trip.position ? { lat: trip.position.lat, lon: trip.position.lon } : { lat: trip.depot.lat, lon: trip.depot.lon };
     if (trip.needsAck) {
+      // Như ứng dụng Driver: lần tải chuyến kế tiếp thấy phiên bản tuyến mới thì tự gửi đã nhận, Driver không bấm gì
       await hold(tripId, here, 3000);
       await acknowledgeRoute(tripId, driver, { routeVersionId: trip.routeVersion.id, clientEventId: randomUUID(), fp: 'simulator' });
-      log(`Driver xác nhận tuyến phiên bản ${trip.routeVersion.versionNo}`);
+      log(`thiết bị Driver đã nhận tuyến phiên bản ${trip.routeVersion.versionNo}`);
       continue;
     }
-    // Tuyến mới vừa duyệt có thể chưa có đường đi (Backend lấy đường đi sau khi ghi), chờ thêm tối đa 10 giây
+    // Tuyến mới vừa đổi có thể chưa có đường đi (Backend lấy đường đi sau khi ghi), chờ thêm tối đa 10 giây
     if (!trip.routeVersion?.geometry && trip.routeVersion?.reason === 'replan') {
       for (let i = 0; i < 10 && !trip.routeVersion.geometry; i++) { await hold(tripId, here, TICK_MS); trip = await loadTrip(tripId); }
     }
@@ -242,26 +242,10 @@ async function runTrip(tripId, { speed, jamAt: jamOpt, factor, approveAfter, lea
       const r = await createIncident(tripId, factor).catch(err => ({ error: err.message }));
       if (r.error) { log(`không tạo được ùn tắc: ${r.error}`); continue; }
       log(`ÙN TẮC phía trước: ${r.text}`);
-      const p = await waitProposal(tripId, here, log);
-      if (!p) log('không có đề xuất đổi tuyến, giữ tuyến hiện hành');
-      else if (!p.meetsThreshold) log('đề xuất không đủ ngưỡng tiết kiệm, giữ tuyến hiện hành');
-      else {
-        log(`có đề xuất đổi tuyến, tiết kiệm ${Math.round(p.savingSeconds / 60)} phút`);
-        if (approveAfter > 0) {
-          await hold(tripId, here, approveAfter * 1000);
-          await approveReroute(tripId, p.eventId, dispatcher)
-            .then(() => log('Dispatcher duyệt tuyến mới'))
-            .catch(err => log(`duyệt không thành công: ${err.message}`));
-        } else {
-          log('chờ Dispatcher bấm duyệt trên màn hình chi tiết chuyến');
-          for (let i = 0; i < 120; i++) {
-            const t = await loadTrip(tripId);
-            if (t.needsAck || !t.proposal) break;
-            await hold(tripId, here, TICK_MS);
-          }
-        }
-      }
-      continue;   // xử lý xác nhận tuyến mới rồi giao điểm đang đứng
+      const p = await waitReplan(tripId, version, here, log);
+      if (p) log(`hệ thống đã đổi sang tuyến phiên bản ${p.toVersion}, tiết kiệm ${Math.round(p.savingSeconds / 60)} phút`);
+      else log('hệ thống giữ tuyến hiện hành');
+      continue;   // thiết bị nhận tuyến mới rồi giao điểm đang đứng
     }
     await hold(tripId, here, 3000);
     await recordAttempt(tripId, next.id, driver, { result: 'delivered', occurredAt: new Date().toISOString(), clientEventId: randomUUID(), fp: 'simulator' });
@@ -297,7 +281,7 @@ async function drive() {
 
 async function demo() {
   const settings = {
-    speed: opt('speed', 4), jamAt: opt('jam-at', 0), factor: opt('factor', 3), approveAfter: opt('approve-after', 8),
+    speed: opt('speed', 4), jamAt: opt('jam-at', 0), factor: opt('factor', 3),
   };
   if (tripArg === 'active') {
     // Chuyến còn nhiều điểm nhất đi đầu để có đủ điểm cho ùn tắc và đổi tuyến

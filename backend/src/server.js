@@ -2,6 +2,7 @@
 import { createApp } from './app.js';
 import { checkConfig, config } from './config.js';
 import { pool } from './db.js';
+import { backfillGeometry } from './services/geometry.js';
 import { failInterruptedRuns } from './services/planning.js';
 import { periodicRerouteCheck } from './services/trips.js';
 
@@ -29,4 +30,6 @@ createApp().listen(config.port, () => {
       config.reroute.checkIntervalSeconds * 1000);
     console.log(`Kiểm tra đổi tuyến tự động mỗi ${config.reroute.checkIntervalSeconds} giây`);
   }
+  // Lấy bổ sung đường đi còn thiếu (TomTom từ chối lúc lập kế hoạch hoặc đổi tuyến), tối đa 2 yêu cầu mỗi phút
+  setInterval(() => backfillGeometry().catch(err => console.error('Lấy bổ sung đường đi lỗi', err.message)), 60_000);
 });

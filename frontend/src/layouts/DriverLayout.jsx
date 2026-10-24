@@ -6,7 +6,7 @@ import { NavLink, Outlet, useLocation } from 'react-router'
 import { api, newEventId } from '../api.js'
 import { useAuth } from '../auth.jsx'
 import ErrorBoundary from '../components/ErrorBoundary.jsx'
-import { cacheGet, cacheSet, dropSettled, flush, listOwnOutbox, subscribe } from '../offline.js'
+import { cacheGet, cacheSet, dropSettled, enqueue, flush, listOwnOutbox, subscribe } from '../offline.js'
 import { DriverContext, useDriver } from './driverContext.js'
 
 
@@ -98,6 +98,25 @@ function DriverProvider({ children }) {
     const id = setInterval(() => { if (navigator.onLine) sync() }, 10_000)
     return () => { off(); window.removeEventListener('online', up); window.removeEventListener('offline', down); clearInterval(id) }
   }, [reload, refreshOutbox, sync])
+
+  // Hệ thống vừa đổi tuyến: ứng dụng tự gửi đã nhận phiên bản tuyến mới qua hàng đợi (mất mạng thì gửi sau), Driver không bấm gì
+  const acked = useRef(new Set())
+  useEffect(() => {
+    const rv = trip?.status === 'in_progress' && trip.needsAck ? trip.routeVersion : null
+    if (!rv || acked.current.has(rv.id)) return
+    acked.current.add(rv.id)
+    listOwnOutbox(userId)
+      .then(own => {
+        if (own.some(x => x.kind === 'route_ack' && x.body.routeVersionId === rv.id)) return null
+        const clientEventId = newEventId()
+        return enqueue({
+          clientEventId, userId, kind: 'route_ack', tripId: trip.id, body: { clientEventId, routeVersionId: rv.id },
+          path: `/driver/trips/${trip.id}/route-ack`, label: `Tuyến phiên bản ${rv.versionNo}`,
+        })
+      })
+      .then(() => sync())
+      .catch(() => {})
+  }, [trip, userId, sync])
 
   const location = useShareLocation(trip)
 

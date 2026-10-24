@@ -12,6 +12,11 @@ export const stopState = (stop, nextStopId) =>
 
 export const CONGESTION_HEX = '#d92d20'
 
+// Chưa lấy được đường đi thật: nối các điểm theo thứ tự bằng nét chấm xám, không vẽ như một tuyến đường
+export const NO_ROAD_HEX = '#8a94a6'
+export const noRoadRoute = points => ({ points, color: NO_ROAD_HEX, weight: 3, opacity: 0.9, dotted: true })
+export const NO_ROAD_LEGEND = { color: NO_ROAD_HEX, label: 'Chưa có đường đi', line: true, dotted: true }
+
 /** Hướng chạy (độ, 0 là bắc) từ hai điểm cuối khác nhau của vệt di chuyển. */
 function heading(trail) {
   if (!trail || trail.length < 2) return undefined
@@ -35,22 +40,15 @@ export function tripLayers(trip, { now = Date.now(), opacity = 0.85, label } = {
   const depot = [trip.depot.lat, trip.depot.lon]
   const ordered = [...trip.stops].sort((a, b) => a.seq - b.seq)
   const pending = ordered.filter(s => s.status === 'pending')
-  const done = ordered.filter(s => s.status !== 'pending')
   const routes = []
   const geom = geoToLatLngs(trip.routeVersion?.geometry)
   const trail = ['in_progress', 'awaiting_reconciliation'].includes(trip.status) && trip.trail?.length > 1 ? geoToLatLngs({ coordinates: trip.trail }) : null
-  if (!trail && trip.status === 'in_progress' && done.length) {
-    // Chưa có vệt di chuyển: nối kho → các điểm đã xử lý → vị trí xe, màu xám
-    const passed = [depot, ...done.map(s => [s.order.lat, s.order.lon])]
-    if (trip.position) passed.push([trip.position.lat, trip.position.lon])
-    routes.push({ points: passed, color: '#94a3b8', weight: 4, opacity: 0.9 })
-  }
   if (geom) {
     routes.push({ points: geom, color, opacity })
   } else {
     const start = trip.status === 'in_progress' && trip.position ? [trip.position.lat, trip.position.lon] : depot
     const list = trip.status === 'in_progress' ? pending : ordered
-    routes.push({ points: [start, ...list.map(s => [s.order.lat, s.order.lon]), depot], color, opacity, dashed: !geom })
+    routes.push(noRoadRoute([start, ...list.map(s => [s.order.lat, s.order.lon]), depot]))
   }
   routes.push(...congestionRoutes(trip))
   // Vệt di chuyển thật của xe vẽ sau cùng để nằm trên tuyến
@@ -67,7 +65,7 @@ export function tripLayers(trip, { now = Date.now(), opacity = 0.85, label } = {
       stale: now - new Date(trip.position.observedAt).getTime() > STALE_MS,
       label,
     }] : []
-  return { routes, stops, vehicles, depot: trip.depot }
+  return { routes, stops, vehicles, depot: trip.depot, noRoad: !geom }
 }
 
 export const isStale = (position, now = Date.now()) => !position || now - new Date(position.observedAt).getTime() > STALE_MS

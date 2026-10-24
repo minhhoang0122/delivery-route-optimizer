@@ -112,11 +112,13 @@ export async function routeGeometry(points, profile) {
   if (!hasKey() || points.length < 2) return null;
   const path = `/routing/1${routeQuery(points, profile, { routeRepresentation: 'polyline' })}`;
   let { status, data } = await send(path);
-  // Ngay sau một loạt yêu cầu ma trận, TomTom có thể từ chối vì gọi quá nhanh (429): chờ rồi thử lại hai lần
-  for (let i = 1; i <= 2 && (status === 429 || status >= 500 || status === 0); i++) {
-    await new Promise(r => setTimeout(r, 1500 * i));
+  // Ngay sau một loạt yêu cầu ma trận, TomTom có thể từ chối vì gọi quá nhanh (429), hoặc lỗi tạm thời (5xx, mạng):
+  // chờ 2, 4, 8 giây rồi thử lại. Vẫn không được thì trả null, việc lấy bổ sung theo chu kỳ (geometry.js) sẽ thử lại sau
+  for (let i = 0; i < 3 && retryable(status); i++) {
+    await sleep(2000 * 2 ** i);
     ({ status, data } = await send(path));
   }
+  if (status !== 200) console.error(`Không lấy được đường đi: HTTP ${status} ${errorText(data)}`.trim());
   if (status !== 200 || !data.routes?.length) return null;
   const coords = [];
   for (const legPart of data.routes[0].legs) {

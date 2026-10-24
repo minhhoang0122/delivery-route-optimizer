@@ -35,7 +35,8 @@ export const config = {
     maxEvaluationAgeSeconds: num('EVALUATION_MAX_AGE_SECONDS', 120),
     maxDisplacementM: num('MAX_DISPLACEMENT_M', 100),
     cooldownSeconds: num('REROUTE_COOLDOWN_SECONDS', 120),
-    // Chu kỳ kiểm tra tự động (giây), mặc định 120, 0 là tắt. Chặng từ vị trí xe chỉ được lấy khi phát hiện tăng thời gian
+    // Chu kỳ kiểm tra tự động (giây), mặc định 120, 0 là tắt. Mỗi lần chỉ lấy các chặng nối tiếp của thứ tự hiện hành;
+    // các chặng còn lại và chặng từ vị trí xe chỉ được lấy khi phát hiện tăng thời gian
     checkIntervalSeconds: num('REROUTE_CHECK_SECONDS', 120),
   },
 };
