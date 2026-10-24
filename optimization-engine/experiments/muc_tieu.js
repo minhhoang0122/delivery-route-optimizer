@@ -1,44 +1,43 @@
 // Biến thể dùng cho thí nghiệm so sánh mục tiêu (mục 4.4.2): cùng Insertion Heuristic và Local Search với Relocate,
-// Swap như engine, chỉ khác hàm chi phí của một tuyến. Không dùng trong hệ thống.
+// Swap như engine, chỉ khác hàm chi phí của một tuyến (cộng dồn theo xe). Không dùng trong hệ thống.
 //  - travelCost:  tổng thời gian chạy của tuyến, kể cả chặng về kho (mục tiêu của đề tài)
 //  - waitingCost: tổng thời điểm hàng đến tay từng khách, tính từ lúc xe rời kho (tổng thời gian khách chờ)
 
-const legOf = (P, v, a, b) => (a === b ? 0 : P.travel(P.vehicles[v].profile, a, b));
+import { routeSchedule } from '../src/index.js';
 
-/** Thời điểm đến từng điểm và thời lượng cả tuyến (chạy và phục vụ); null nếu có chặng thiếu dữ liệu. */
+/**
+ * Thời điểm đến từng điểm (tính từ giờ xuất phát) và thời lượng cả tuyến (chạy và phục vụ); null nếu có chặng thiếu
+ * dữ liệu. Dùng lịch của engine nên có cả thời gian phụ thuộc giờ (travelAt) và thời gian dừng nếu bài toán có.
+ */
 export function timeline(P, v, route) {
-  const arrivals = [];
-  let clock = 0;
-  let prev = P.depot;
-  for (const o of route) {
-    const t = legOf(P, v, prev, P.orders[o].point);
-    if (t == null) return null;
-    clock += t;
-    arrivals.push(clock);
-    clock += P.orders[o].serviceSeconds ?? P.serviceSeconds ?? 0;   // thời gian phục vụ, mặc định 0
-    prev = P.orders[o].point;
-  }
-  const back = legOf(P, v, prev, P.depot);
-  return back == null ? null : { arrivals, total: clock + back };
+  const s = routeSchedule(P, v, route);
+  if (!s) return null;
+  const t0 = P.startSeconds ?? 0;
+  return { arrivals: s.arrivals.map(a => a - t0), total: s.seconds, travel: s.travelSeconds };
 }
 
 const feasible = (P, v, route) => route.every(o => P.orders[o].vehicleTypes.includes(P.vehicles[v].type))
-  && route.reduce((s, o) => s + P.orders[o].weightKg, 0) <= P.vehicles[v].capacityKg;
+  && route.reduce((s, o) => s + P.orders[o].weightKg, 0) <= P.vehicles[v].capacityKg
+  && route.reduce((s, o) => s + (P.orders[o].parcels ?? 1), 0) <= (P.vehicles[v].capacityParcels ?? Infinity);
+// Giới hạn thời gian: thời lượng chuyến (maxRouteSeconds) và giờ hết ca (shiftEndSeconds)
+const late = (P, tl) => (P.maxRouteSeconds && tl.total > P.maxRouteSeconds)
+  || (P.shiftEndSeconds != null && (P.startSeconds ?? 0) + tl.total > P.shiftEndSeconds + 1e-9);
 
 export const travelCost = (P, v, route) => {
   const tl = timeline(P, v, route);
   if (!tl || !feasible(P, v, route)) return Infinity;
-  return P.maxRouteSeconds && tl.total > P.maxRouteSeconds ? Infinity : tl.total;
+  return late(P, tl) ? Infinity : tl.total;
 };
 export const waitingCost = (P, v, route) => {
   const tl = timeline(P, v, route);
   if (!tl || !feasible(P, v, route)) return Infinity;
-  if (P.maxRouteSeconds && tl.total > P.maxRouteSeconds) return Infinity;
+  if (late(P, tl)) return Infinity;
   return tl.arrivals.reduce((s, a) => s + a, 0);
 };
 
 /** Insertion Heuristic rồi Local Search (Relocate, Swap, Best Improvement) với hàm chi phí cho trước. */
 export function solve(P, cost, { maxEvaluations = 10_000 } = {}) {
+  const t0 = performance.now();
   const V = P.vehicles.length;
   const routes = P.vehicles.map(() => []);
   const unassigned = [];
@@ -95,7 +94,7 @@ export function solve(P, cost, { maxEvaluations = 10_000 } = {}) {
     if (!best) break;
     for (const [v, r] of best.changes) { routes[v] = r; costs[v] = cost(P, v, r); }
   }
-  return { routes, unassigned, evaluations };
+  return { routes, unassigned, evaluations, ms: performance.now() - t0 };
 }
 
 /** Chỉ số để so sánh: số xe, tổng thời gian chạy, chuyến dài nhất, thời gian khách chờ trung bình và lâu nhất. */

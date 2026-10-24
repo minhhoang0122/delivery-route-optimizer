@@ -1,18 +1,28 @@
-// Ghi thêm ma trận thời gian TomTom cho các khung giờ trung gian (16:30, 17:00) trên đúng 21 điểm của
-// test/fixtures/ma_tran_1600.json, để engine nội suy thời gian chặng theo giờ xe thực sự rời điểm.
-// Định dạng yêu cầu giống test_demo/02_ghi_ma_tran.mjs và backend (Batch Routing đồng bộ, tối đa 100 mục/lần).
+// Ghi ma trận thời gian TomTom theo khung giờ để engine nội suy thời gian chặng theo giờ xe thực sự rời điểm.
+// Hai bộ điểm:
+//  - mặc định: đúng 21 điểm của test/fixtures/ma_tran_1600.json (kịch bản 20 đơn), ghi ra ma_tran_HHMM.json
+//  - --kich-ban kich_ban_60.json: kho và 30 điểm giao của kịch bản 60 đơn, ghi ra ma_tran_60_HHMM.json
+// Định dạng yêu cầu giống test_demo/02_ghi_ma_tran.mjs và backend (Batch Routing đồng bộ, tối đa 100 mục/lần),
+// cùng tham số cấu hình xe của bản ghi 12/10/2026 (cau_hinh trong ma_tran_1600.json).
 // Lịch sử giao thông của TomTom tính theo thứ trong tuần và giờ, departAt phải ở tương lai, nên ghi vào
 // Thứ Hai kế tiếp rồi so một mẫu nhỏ lúc 16:00 với bản ghi Thứ Hai 12/10/2026 để kiểm tra tính nhất quán.
 //   node experiments/ghi_ma_tran.js --mau                 40 chặng lúc 16:00, so với ma_tran_1600.json
 //   node experiments/ghi_ma_tran.js --gio 16:30,17:00     ghi đủ 840 chặng mỗi khung giờ
+//   node experiments/ghi_ma_tran.js --kich-ban kich_ban_60.json --gio 16:00,16:30,17:00,17:30
+//                                                         1.860 chặng mỗi khung giờ, giới hạn cứng 8.000 request
+// Sau khi ghi đủ các khung, kiểm tra FIFO của phép nội suy trên các khung đã có.
 // Khóa đọc từ backend/.env (TOMTOM_API_KEY) lúc chạy, không in, không ghi ra file.
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { clockSeconds, fifoCheck } from '../src/index.js';
 
 const BASE = 'https://api.tomtom.com';
-const GIOI_HAN_REQUEST = 1800;          // tổng số request Routing tối đa cho mọi lần chạy của script
 const args = process.argv.slice(2);
 const lay = ten => { const i = args.indexOf(ten); return i >= 0 ? args[i + 1] : null; };
 const fixture = name => new URL(`../test/fixtures/${name}`, import.meta.url);
+const KICH_BAN = lay('--kich-ban');
+// Tổng số request Routing tối đa cho mọi lần chạy của script, đếm riêng cho từng bộ điểm
+const GIOI_HAN_REQUEST = KICH_BAN ? 8000 : 1800;
+const TIEN_TO = KICH_BAN ? 'ma_tran_60_' : 'ma_tran_';
 
 function docKhoa() {
   const f = new URL('../../backend/.env', import.meta.url);
@@ -24,7 +34,10 @@ const KEY = docKhoa();
 if (!KEY) { console.log('Không có TOMTOM_API_KEY trong backend/.env'); process.exit(1); }
 
 const goc = JSON.parse(readFileSync(fixture('ma_tran_1600.json'), 'utf8'));
-const diem = goc.diem;
+const kb = KICH_BAN ? JSON.parse(readFileSync(fixture(KICH_BAN), 'utf8')) : null;
+const diem = kb
+  ? [kb.kho, ...kb.diem].map(d => ({ ma: d.ma, lat: d.lat, lon: d.lon }))
+  : goc.diem;
 const N = diem.length;
 const CAU_HINH = goc.cau_hinh;          // giữ đúng tham số đã dùng cho bản ghi 12/10
 const cfgs = Object.keys(CAU_HINH);
@@ -43,7 +56,7 @@ const departAt = gio => `${NGAY}T${gio}:00+07:00`;
 const nhan = gio => `Thứ Hai ${NGAY.slice(8, 10)}/${NGAY.slice(5, 7)}/${NGAY.slice(0, 4)} ${gio}`;
 
 // Đếm request đã dùng qua các lần chạy (không chứa khóa)
-const FILE_DEM = new URL('./.dem_request_tomtom.json', import.meta.url);
+const FILE_DEM = new URL(KICH_BAN ? './.dem_request_tomtom_60.json' : './.dem_request_tomtom.json', import.meta.url);
 let daDung = existsSync(FILE_DEM) ? JSON.parse(readFileSync(FILE_DEM, 'utf8')).routing : 0;
 const ghiDem = () => writeFileSync(FILE_DEM, JSON.stringify({ routing: daDung }));
 
@@ -66,15 +79,15 @@ async function gui(body) {
   }
 }
 
-/** Batch Routing, nhóm 100 mục, thử lại mục lỗi tạm thời tối đa 2 lần, dừng hẳn nếu sắp vượt hạn mức. */
+/** Batch Routing, nhóm 100 mục, thử lại mục lỗi tạm thời đúng 1 lần (tránh dồn request), dừng hẳn nếu sắp vượt hạn mức. */
 async function batch(queries) {
   const out = new Array(queries.length);
   for (let s = 0; s < queries.length; s += 100) {
     let cho = [];
     for (let i = s; i < Math.min(s + 100, queries.length); i++) cho.push(i);
-    for (let lan = 0; lan <= 2 && cho.length; lan++) {
+    for (let lan = 0; lan <= 1 && cho.length; lan++) {
       if (daDung + cho.length > GIOI_HAN_REQUEST) throw new Error(`Dừng: sẽ vượt ${GIOI_HAN_REQUEST} request (đã dùng ${daDung})`);
-      if (lan) await sleep(1500 * lan);
+      if (lan) await sleep(3000);
       daDung += cho.length; ghiDem();
       const { status, data } = await gui({ batchItems: cho.map(i => ({ query: queries[i] })) });
       if (status === 401 || status === 403) throw new Error(`Khóa TomTom bị từ chối (HTTP ${status})`);
@@ -99,7 +112,7 @@ async function batch(queries) {
 const capDiem = [];
 for (let i = 0; i < N; i++) for (let j = 0; j < N; j++) if (i !== j) capDiem.push([i, j]);
 
-if (args.includes('--mau')) {
+if (args.includes('--mau') && !KICH_BAN) {
   // 20 chặng mỗi cấu hình, cách đều nhau trong danh sách 420 cặp (cố định để chạy lại được)
   const mau = cfgs.flatMap(c => capDiem.filter((_, k) => k % 21 === 0).map(([i, j]) => ({ c, i, j })));
   const dep = departAt('16:00');
@@ -123,7 +136,11 @@ if (args.includes('--mau')) {
   }, null, 1));
   console.log(tk);
 } else {
-  for (const gio of (lay('--gio') ?? '16:30,17:00').split(',').map(s => s.trim())) {
+  const dsGio = (lay('--gio') ?? '16:30,17:00').split(',').map(s => s.trim());
+  const canDung = dsGio.length * cfgs.length * capDiem.length;
+  console.log(`${N} điểm, ${cfgs.length} cấu hình, ${dsGio.length} khung giờ → ${canDung} request Routing (đã dùng ${daDung}, giới hạn ${GIOI_HAN_REQUEST})`);
+  if (daDung + canDung > GIOI_HAN_REQUEST) { console.log('Dừng: không đủ hạn mức cho mọi khung giờ'); process.exit(1); }
+  for (const gio of dsGio) {
     const dep = departAt(gio);
     const out = { departAt: dep, nhan: nhan(gio), bat_dau: new Date().toISOString(), diem, cau_hinh: CAU_HINH, thoi_gian: {}, quang_duong: {}, loi: [] };
     for (const c of cfgs) {
@@ -139,9 +156,22 @@ if (args.includes('--mau')) {
       console.log(`  ${out.nhan} · ${c}: ${capDiem.length - out.loi.filter(l => l.cau_hinh === c).length}/${capDiem.length} chặng hợp lệ`);
     }
     out.ket_thuc = new Date().toISOString();
-    const ten = `ma_tran_${gio.replace(':', '')}.json`;
+    const ten = `${TIEN_TO}${gio.replace(':', '')}.json`;
     writeFileSync(fixture(ten), JSON.stringify(out));
     console.log(`  → test/fixtures/${ten}`);
   }
 }
-console.log(`Tổng request Routing đã dùng (mọi lần chạy): ${daDung}`);
+// Kiểm tra FIFO trên mọi khung giờ đã có của bộ điểm này
+const khung = ['16:00', '16:30', '17:00', '17:30']
+  .map(g => ({ g, f: fixture(`${TIEN_TO}${g.replace(':', '')}.json`) }))
+  .filter(x => existsSync(x.f))
+  .map(({ g, f }) => {
+    const m = JSON.parse(readFileSync(f, 'utf8'));
+    const idx = new Map(m.diem.map((d, i) => [d.ma, i]));
+    return { seconds: clockSeconds(g), travel: (p, a, b) => m.thoi_gian[p][idx.get(a)][idx.get(b)] };
+  });
+if (khung.length >= 2) {
+  const f = fifoCheck(khung, cfgs, diem.map(d => d.ma));
+  console.log(`FIFO trên ${khung.length} khung: ${f.violations.length} vi phạm / ${f.checked} cặp chặng và khung, phần dư nhỏ nhất ${Math.round(f.margin)} giây`);
+}
+console.log(`Tổng request Routing đã dùng (mọi lần chạy của bộ điểm này): ${daDung}`);

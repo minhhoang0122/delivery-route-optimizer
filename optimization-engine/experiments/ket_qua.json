@@ -10,8 +10,8 @@
       "vehicles": 1,
       "longest": 9785,
       "unassigned": 0,
-      "insertionMs": 0.6687000000000012,
-      "searchMs": 11.961500000000001
+      "insertionMs": 1.1535999999999973,
+      "searchMs": 17.109199999999994
     },
     {
       "matrix": "16:00",
@@ -23,8 +23,8 @@
       "vehicles": 4,
       "longest": 3568,
       "unassigned": 0,
-      "insertionMs": 0.3684999999999974,
-      "searchMs": 8.7483
+      "insertionMs": 0.3406000000000091,
+      "searchMs": 11.316999999999993
     },
     {
       "matrix": "16:00",
@@ -36,8 +36,8 @@
       "vehicles": 5,
       "longest": 2655,
       "unassigned": 1,
-      "insertionMs": 0.22039999999999793,
-      "searchMs": 6.0321
+      "insertionMs": 0.27590000000000714,
+      "searchMs": 6.696899999999999
     },
     {
       "matrix": "17:30",
@@ -49,8 +49,8 @@
       "vehicles": 1,
       "longest": 10347,
       "unassigned": 0,
-      "insertionMs": 0.14499999999999602,
-      "searchMs": 7.1053
+      "insertionMs": 0.1203000000000003,
+      "searchMs": 9.107500000000002
     },
     {
       "matrix": "17:30",
@@ -62,8 +62,8 @@
       "vehicles": 4,
       "longest": 3447,
       "unassigned": 0,
-      "insertionMs": 0.07899999999999352,
-      "searchMs": 7.2021000000000015
+      "insertionMs": 0.10139999999999816,
+      "searchMs": 7.9321000000000055
     },
     {
       "matrix": "17:30",
@@ -75,8 +75,8 @@
       "vehicles": 4,
       "longest": 2640,
       "unassigned": 3,
-      "insertionMs": 0.0870999999999924,
-      "searchMs": 3.71220000000001
+      "insertionMs": 0.1092999999999904,
+      "searchMs": 3.766900000000007
     }
   ],
   "e2": [
@@ -103,6 +103,7 @@
             20,
             17
           ],
+          "flippedPairs": 0,
           "evaluations": 30,
           "vehicle": 1,
           "remaining": 6
@@ -121,6 +122,7 @@
             20,
             17
           ],
+          "flippedPairs": 0,
           "evaluations": 18,
           "vehicle": 1,
           "remaining": 5
@@ -138,6 +140,7 @@
             20,
             17
           ],
+          "flippedPairs": 0,
           "evaluations": 9,
           "vehicle": 1,
           "remaining": 4
@@ -154,6 +157,7 @@
             20,
             17
           ],
+          "flippedPairs": 0,
           "evaluations": 3,
           "vehicle": 1,
           "remaining": 3
@@ -171,6 +175,7 @@
             14,
             1
           ],
+          "flippedPairs": 0,
           "evaluations": 9,
           "vehicle": 2,
           "remaining": 4
@@ -187,6 +192,7 @@
             14,
             1
           ],
+          "flippedPairs": 0,
           "evaluations": 3,
           "vehicle": 2,
           "remaining": 3
@@ -203,6 +209,7 @@
             19,
             5
           ],
+          "flippedPairs": 0,
           "evaluations": 3,
           "vehicle": 4,
           "remaining": 3
@@ -219,6 +226,7 @@
             18,
             4
           ],
+          "flippedPairs": 0,
           "evaluations": 3,
           "vehicle": 5,
           "remaining": 3
@@ -248,6 +256,7 @@
             17,
             16
           ],
+          "flippedPairs": 4,
           "evaluations": 60,
           "vehicle": 1,
           "remaining": 6
@@ -266,6 +275,7 @@
             17,
             3
           ],
+          "flippedPairs": 3,
           "evaluations": 36,
           "vehicle": 1,
           "remaining": 5
@@ -283,6 +293,7 @@
             6,
             20
           ],
+          "flippedPairs": 2,
           "evaluations": 18,
           "vehicle": 1,
           "remaining": 4
@@ -299,6 +310,7 @@
             17,
             20
           ],
+          "flippedPairs": 1,
           "evaluations": 6,
           "vehicle": 1,
           "remaining": 3
@@ -316,6 +328,7 @@
             13,
             1
           ],
+          "flippedPairs": 1,
           "evaluations": 18,
           "vehicle": 2,
           "remaining": 4
@@ -332,6 +345,7 @@
             1,
             14
           ],
+          "flippedPairs": 1,
           "evaluations": 6,
           "vehicle": 2,
           "remaining": 3
@@ -348,6 +362,7 @@
             5,
             19
           ],
+          "flippedPairs": 1,
           "evaluations": 6,
           "vehicle": 4,
           "remaining": 3
@@ -364,6 +379,7 @@
             4,
             18
           ],
+          "flippedPairs": 1,
           "evaluations": 6,
           "vehicle": 5,
           "remaining": 3
@@ -465,25 +481,25 @@
   "e5": [
     {
       "n": 5,
-      "medianMs": 0.0864000000000118,
+      "medianMs": 0.13999999999998636,
       "evaluations": 47,
       "legs": 60
     },
     {
       "n": 10,
-      "medianMs": 0.22109999999999275,
+      "medianMs": 0.2674999999999841,
       "evaluations": 141,
       "legs": 220
     },
     {
       "n": 15,
-      "medianMs": 1.6783000000000072,
+      "medianMs": 2.1952,
       "evaluations": 1284,
       "legs": 480
     },
     {
       "n": 20,
-      "medianMs": 4.844400000000007,
+      "medianMs": 7.503700000000038,
       "evaluations": 4037,
       "legs": 840
     }
@@ -820,6 +836,2754 @@
         "waitAvg": 1385.3,
         "waitMax": 2517,
         "unassigned": 0
+      }
+    ]
+  },
+  "k60": {
+    "data": {
+      "points": 30,
+      "orders": 60,
+      "kg": 461.90000000000003,
+      "parcels": 68,
+      "truckOnly": [
+        {
+          "code": "DH-2005",
+          "kg": 120,
+          "reason": "Quá nặng cho xe máy"
+        },
+        {
+          "code": "DH-2013",
+          "kg": 45,
+          "reason": "Cồng kềnh"
+        },
+        {
+          "code": "DH-2037",
+          "kg": 62,
+          "reason": "Cồng kềnh"
+        },
+        {
+          "code": "DH-2057",
+          "kg": 32,
+          "reason": "Cồng kềnh"
+        }
+      ],
+      "bikeEligibleKg": 202.89999999999998,
+      "bikeEligibleParcels": 61,
+      "bikeCapacityKg": 180,
+      "bikeCapacityParcels": 60
+    },
+    "slots": [
+      {
+        "label": "16:00",
+        "departAt": "2026-10-26T16:00:00+07:00",
+        "errors": 0
+      },
+      {
+        "label": "16:30",
+        "departAt": "2026-10-26T16:30:00+07:00",
+        "errors": 0
+      },
+      {
+        "label": "17:00",
+        "departAt": "2026-10-26T17:00:00+07:00",
+        "errors": 0
+      },
+      {
+        "label": "17:30",
+        "departAt": "2026-10-26T17:30:00+07:00",
+        "errors": 0
+      }
+    ],
+    "fifo": {
+      "checked": 5580,
+      "violations": 0,
+      "marginSeconds": 367
+    },
+    "objectives": [
+      {
+        "objective": "total",
+        "vehicles": 4,
+        "finish": 63682.59037496952,
+        "predictedFinish": 63682.59037496952,
+        "travel": 10180.119785684336,
+        "duration": 18460.119785684336,
+        "late": 0,
+        "unassigned": 0,
+        "waitAvg": 2499.393083425978,
+        "waitMax": 5665.590374969521,
+        "etaMean": 0,
+        "etaMax": 0,
+        "loads": [
+          {
+            "vehicle": 1,
+            "kg": 38.3,
+            "parcels": 8,
+            "orders": 7,
+            "end": 59924.71156758804
+          },
+          {
+            "vehicle": 2,
+            "kg": 59.199999999999996,
+            "parcels": 20,
+            "orders": 19,
+            "end": 63216.966281912966
+          },
+          {
+            "vehicle": 3,
+            "kg": 26.6,
+            "parcels": 12,
+            "orders": 12,
+            "end": 62035.85156121381
+          },
+          {
+            "vehicle": 4,
+            "kg": 337.79999999999995,
+            "parcels": 28,
+            "orders": 22,
+            "end": 63682.59037496952
+          }
+        ],
+        "evaluations": 98282,
+        "ms": 367.3230000000001
+      },
+      {
+        "objective": "makespan",
+        "vehicles": 4,
+        "finish": 62484.86380060357,
+        "predictedFinish": 62484.86380060357,
+        "travel": 9945.232272844376,
+        "duration": 18405.232272844376,
+        "late": 0,
+        "unassigned": 0,
+        "waitAvg": 2547.006704995089,
+        "waitMax": 4408.470597946034,
+        "etaMean": 0,
+        "etaMax": 0,
+        "loads": [
+          {
+            "vehicle": 1,
+            "kg": 59.300000000000004,
+            "parcels": 19,
+            "orders": 18,
+            "end": 62080.949948457215
+          },
+          {
+            "vehicle": 2,
+            "kg": 59.800000000000004,
+            "parcels": 15,
+            "orders": 12,
+            "end": 61842.55312260961
+          },
+          {
+            "vehicle": 3,
+            "kg": 50.2,
+            "parcels": 17,
+            "orders": 16,
+            "end": 62484.86380060357
+          },
+          {
+            "vehicle": 4,
+            "kg": 292.59999999999997,
+            "parcels": 17,
+            "orders": 14,
+            "end": 62396.86540117398
+          }
+        ],
+        "evaluations": 35754,
+        "ms": 171.3540999999999
+      },
+      {
+        "objective": "waiting",
+        "vehicles": 4,
+        "finish": 63118.239648758245,
+        "predictedFinish": 63118.239648758245,
+        "travel": 11170.508257966583,
+        "duration": 19360.508257966583,
+        "late": 0,
+        "unassigned": 2,
+        "waitAvg": 1803.4834329453593,
+        "waitMax": 4811.331496528306,
+        "etaMean": 0,
+        "etaMax": 0,
+        "loads": [
+          {
+            "vehicle": 1,
+            "kg": 59.8,
+            "parcels": 12,
+            "orders": 12,
+            "end": 61476.828671346935
+          },
+          {
+            "vehicle": 2,
+            "kg": 47.6,
+            "parcels": 17,
+            "orders": 15,
+            "end": 62280.55778451512
+          },
+          {
+            "vehicle": 3,
+            "kg": 59.4,
+            "parcels": 17,
+            "orders": 15,
+            "end": 62884.88215334628
+          },
+          {
+            "vehicle": 4,
+            "kg": 294.4,
+            "parcels": 20,
+            "orders": 16,
+            "end": 63118.239648758245
+          }
+        ],
+        "evaluations": 138591,
+        "ms": 753.4757
+      }
+    ],
+    "capacityRelaxed": {
+      "vehicles": 4,
+      "finish": 62162.361730421675,
+      "predictedFinish": 62162.361730421675,
+      "travel": 9472.055263189039,
+      "duration": 17752.05526318904,
+      "late": 0,
+      "unassigned": 0,
+      "waitAvg": 2291.160141702724,
+      "waitMax": 4205.171944242858,
+      "etaMean": 0,
+      "etaMax": 0,
+      "loads": [
+        {
+          "vehicle": 1,
+          "kg": 58.8,
+          "parcels": 19,
+          "orders": 18,
+          "end": 61903.52812771655
+        },
+        {
+          "vehicle": 2,
+          "kg": 72.3,
+          "parcels": 19,
+          "orders": 16,
+          "end": 62130.55815087855
+        },
+        {
+          "vehicle": 3,
+          "kg": 40.699999999999996,
+          "parcels": 15,
+          "orders": 14,
+          "end": 62162.361730421675
+        },
+        {
+          "vehicle": 4,
+          "kg": 290.09999999999997,
+          "parcels": 15,
+          "orders": 12,
+          "end": 61955.60725417227
+        }
+      ],
+      "evaluations": 35626
+    },
+    "insertionVsLs": [
+      {
+        "method": "greedy_only",
+        "vehicles": 4,
+        "finish": 64770.311514913374,
+        "predictedFinish": 64770.311514913374,
+        "travel": 11994.837559350606,
+        "duration": 20184.837559350606,
+        "late": 0,
+        "unassigned": 7,
+        "waitAvg": 2789.9885948760093,
+        "waitMax": 6791.311514913374,
+        "etaMean": 0,
+        "etaMax": 0,
+        "loads": [
+          {
+            "vehicle": 1,
+            "kg": 59.8,
+            "parcels": 5,
+            "orders": 5,
+            "end": 60229.52327888097
+          },
+          {
+            "vehicle": 2,
+            "kg": 60,
+            "parcels": 10,
+            "orders": 9,
+            "end": 61598.39299477811
+          },
+          {
+            "vehicle": 3,
+            "kg": 54.1,
+            "parcels": 20,
+            "orders": 17,
+            "end": 63986.60977077815
+          },
+          {
+            "vehicle": 4,
+            "kg": 284.9,
+            "parcels": 26,
+            "orders": 22,
+            "end": 64770.311514913374
+          }
+        ],
+        "positions": 1082,
+        "evaluations": 0,
+        "moves": 0,
+        "stopReason": "—",
+        "ms": 1.583599999999933
+      },
+      {
+        "method": "greedy_default",
+        "vehicles": 4,
+        "finish": 63909.52597320159,
+        "predictedFinish": 63909.52597320159,
+        "travel": 12809.002930759481,
+        "duration": 21899.00293075948,
+        "late": 0,
+        "unassigned": 0,
+        "waitAvg": 2715.720734462943,
+        "waitMax": 5959.614464302467,
+        "etaMean": 0,
+        "etaMax": 0,
+        "loads": [
+          {
+            "vehicle": 1,
+            "kg": 55.69999999999999,
+            "parcels": 13,
+            "orders": 13,
+            "end": 62886.469498477316
+          },
+          {
+            "vehicle": 2,
+            "kg": 60,
+            "parcels": 10,
+            "orders": 9,
+            "end": 61598.39299477811
+          },
+          {
+            "vehicle": 3,
+            "kg": 50.800000000000004,
+            "parcels": 20,
+            "orders": 17,
+            "end": 63904.61446430247
+          },
+          {
+            "vehicle": 4,
+            "kg": 295.4,
+            "parcels": 25,
+            "orders": 21,
+            "end": 63909.52597320159
+          }
+        ],
+        "evaluations": 10001,
+        "moves": 3,
+        "stopReason": "Đạt giới hạn số phép đánh giá",
+        "ms": 40.13709999999992
+      },
+      {
+        "method": "greedy_converged",
+        "vehicles": 4,
+        "finish": 62522.13114783413,
+        "predictedFinish": 62522.13114783413,
+        "travel": 11091.803905362445,
+        "duration": 19551.803905362445,
+        "late": 0,
+        "unassigned": 0,
+        "waitAvg": 2591.710353583344,
+        "waitMax": 4590.965074229272,
+        "etaMean": 0,
+        "etaMax": 0,
+        "loads": [
+          {
+            "vehicle": 1,
+            "kg": 57.19999999999998,
+            "parcels": 17,
+            "orders": 17,
+            "end": 62486.46566990969
+          },
+          {
+            "vehicle": 2,
+            "kg": 58.99999999999999,
+            "parcels": 17,
+            "orders": 14,
+            "end": 62503.96507422927
+          },
+          {
+            "vehicle": 3,
+            "kg": 53,
+            "parcels": 19,
+            "orders": 17,
+            "end": 62439.242013389354
+          },
+          {
+            "vehicle": 4,
+            "kg": 292.70000000000005,
+            "parcels": 15,
+            "orders": 12,
+            "end": 62522.13114783413
+          }
+        ],
+        "evaluations": 147408,
+        "moves": 34,
+        "stopReason": "Không còn phương án cải thiện",
+        "ms": 456.7685999999999
+      },
+      {
+        "method": "regret2_only",
+        "vehicles": 4,
+        "finish": 62575.26380060357,
+        "predictedFinish": 62575.26380060357,
+        "travel": 10051.630104924297,
+        "duration": 18511.630104924297,
+        "late": 0,
+        "unassigned": 0,
+        "waitAvg": 2610.252355992449,
+        "waitMax": 4588.470597946034,
+        "etaMean": 0,
+        "etaMax": 0,
+        "loads": [
+          {
+            "vehicle": 1,
+            "kg": 59.300000000000004,
+            "parcels": 19,
+            "orders": 18,
+            "end": 62230.942701978594
+          },
+          {
+            "vehicle": 2,
+            "kg": 59.7,
+            "parcels": 15,
+            "orders": 12,
+            "end": 61802.53590175904
+          },
+          {
+            "vehicle": 3,
+            "kg": 50.7,
+            "parcels": 18,
+            "orders": 17,
+            "end": 62575.26380060357
+          },
+          {
+            "vehicle": 4,
+            "kg": 292.2,
+            "parcels": 16,
+            "orders": 13,
+            "end": 62302.887700583095
+          }
+        ],
+        "positions": 41631,
+        "evaluations": 0,
+        "moves": 0,
+        "stopReason": "—",
+        "ms": 40.57120000000032
+      },
+      {
+        "method": "regret2_default",
+        "vehicles": 4,
+        "finish": 62484.86380060357,
+        "predictedFinish": 62484.86380060357,
+        "travel": 10235.019352049778,
+        "duration": 18695.019352049778,
+        "late": 0,
+        "unassigned": 0,
+        "waitAvg": 2582.0658649798406,
+        "waitMax": 4498.470597946034,
+        "etaMean": 0,
+        "etaMax": 0,
+        "loads": [
+          {
+            "vehicle": 1,
+            "kg": 59.300000000000004,
+            "parcels": 19,
+            "orders": 18,
+            "end": 62230.942701978594
+          },
+          {
+            "vehicle": 2,
+            "kg": 59.6,
+            "parcels": 15,
+            "orders": 12,
+            "end": 61982.347448293636
+          },
+          {
+            "vehicle": 3,
+            "kg": 50.400000000000006,
+            "parcels": 17,
+            "orders": 16,
+            "end": 62484.86380060357
+          },
+          {
+            "vehicle": 4,
+            "kg": 292.59999999999997,
+            "parcels": 17,
+            "orders": 14,
+            "end": 62396.86540117398
+          }
+        ],
+        "evaluations": 10000,
+        "moves": 2,
+        "stopReason": "Đạt giới hạn số phép đánh giá",
+        "ms": 68.35869999999977
+      },
+      {
+        "method": "regret2_converged",
+        "vehicles": 4,
+        "finish": 62484.86380060357,
+        "predictedFinish": 62484.86380060357,
+        "travel": 9945.232272844376,
+        "duration": 18405.232272844376,
+        "late": 0,
+        "unassigned": 0,
+        "waitAvg": 2547.006704995089,
+        "waitMax": 4408.470597946034,
+        "etaMean": 0,
+        "etaMax": 0,
+        "loads": [
+          {
+            "vehicle": 1,
+            "kg": 59.300000000000004,
+            "parcels": 19,
+            "orders": 18,
+            "end": 62080.949948457215
+          },
+          {
+            "vehicle": 2,
+            "kg": 59.800000000000004,
+            "parcels": 15,
+            "orders": 12,
+            "end": 61842.55312260961
+          },
+          {
+            "vehicle": 3,
+            "kg": 50.2,
+            "parcels": 17,
+            "orders": 16,
+            "end": 62484.86380060357
+          },
+          {
+            "vehicle": 4,
+            "kg": 292.59999999999997,
+            "parcels": 17,
+            "orders": 14,
+            "end": 62396.86540117398
+          }
+        ],
+        "evaluations": 35754,
+        "moves": 6,
+        "stopReason": "Không còn phương án cải thiện",
+        "ms": 158.5844000000002
+      }
+    ],
+    "staticVsTd": [
+      {
+        "method": "static_1600",
+        "vehicles": 4,
+        "finish": 62435.8004144584,
+        "predictedFinish": 62274,
+        "travel": 10186.364393505151,
+        "duration": 18646.36439350515,
+        "late": 0,
+        "unassigned": 0,
+        "waitAvg": 2182.033591098492,
+        "waitMax": 4345.351627611839,
+        "etaMean": 42.18359109849177,
+        "etaMax": 231.0467037037015,
+        "loads": [
+          {
+            "vehicle": 1,
+            "kg": 59.99999999999999,
+            "parcels": 14,
+            "orders": 14,
+            "end": 61964.58615156146
+          },
+          {
+            "vehicle": 2,
+            "kg": 58.599999999999994,
+            "parcels": 19,
+            "orders": 18,
+            "end": 62301.83754337428
+          },
+          {
+            "vehicle": 3,
+            "kg": 38.300000000000004,
+            "parcels": 13,
+            "orders": 12,
+            "end": 62344.14028411102
+          },
+          {
+            "vehicle": 4,
+            "kg": 305,
+            "parcels": 22,
+            "orders": 16,
+            "end": 62435.8004144584
+          }
+        ],
+        "evaluations": 35938
+      },
+      {
+        "method": "static_1700",
+        "vehicles": 4,
+        "finish": 62715.61215956935,
+        "predictedFinish": 62838,
+        "travel": 9758.299777164502,
+        "duration": 17948.299777164502,
+        "late": 0,
+        "unassigned": 0,
+        "waitAvg": 2438.171747642637,
+        "waitMax": 4728.197946473905,
+        "etaMean": 85.62825235736128,
+        "etaMax": 258.1892884698318,
+        "loads": [
+          {
+            "vehicle": 1,
+            "kg": 59.800000000000004,
+            "parcels": 13,
+            "orders": 12,
+            "end": 60803.31433179346
+          },
+          {
+            "vehicle": 2,
+            "kg": 56.199999999999996,
+            "parcels": 20,
+            "orders": 19,
+            "end": 62248.971568320674
+          },
+          {
+            "vehicle": 3,
+            "kg": 38.4,
+            "parcels": 15,
+            "orders": 14,
+            "end": 62715.61215956935
+          },
+          {
+            "vehicle": 4,
+            "kg": 307.5,
+            "parcels": 20,
+            "orders": 15,
+            "end": 62580.40171748102
+          }
+        ],
+        "evaluations": 30700
+      },
+      {
+        "method": "time_dependent",
+        "vehicles": 4,
+        "finish": 62484.86380060357,
+        "predictedFinish": 62484.86380060357,
+        "travel": 9945.232272844376,
+        "duration": 18405.232272844376,
+        "late": 0,
+        "unassigned": 0,
+        "waitAvg": 2547.006704995089,
+        "waitMax": 4408.470597946034,
+        "etaMean": 0,
+        "etaMax": 0,
+        "loads": [
+          {
+            "vehicle": 1,
+            "kg": 59.300000000000004,
+            "parcels": 19,
+            "orders": 18,
+            "end": 62080.949948457215
+          },
+          {
+            "vehicle": 2,
+            "kg": 59.800000000000004,
+            "parcels": 15,
+            "orders": 12,
+            "end": 61842.55312260961
+          },
+          {
+            "vehicle": 3,
+            "kg": 50.2,
+            "parcels": 17,
+            "orders": 16,
+            "end": 62484.86380060357
+          },
+          {
+            "vehicle": 4,
+            "kg": 292.59999999999997,
+            "parcels": 17,
+            "orders": 14,
+            "end": 62396.86540117398
+          }
+        ],
+        "evaluations": 35754
+      }
+    ],
+    "reference": [
+      {
+        "method": "regret_rs",
+        "vehicles": 4,
+        "finish": 62484.86380060357,
+        "predictedFinish": 62484.86380060357,
+        "travel": 9945.232272844376,
+        "duration": 18405.232272844376,
+        "late": 0,
+        "unassigned": 0,
+        "waitAvg": 2547.006704995089,
+        "waitMax": 4408.470597946034,
+        "etaMean": 0,
+        "etaMax": 0,
+        "loads": [
+          {
+            "vehicle": 1,
+            "kg": 59.300000000000004,
+            "parcels": 19,
+            "orders": 18,
+            "end": 62080.949948457215
+          },
+          {
+            "vehicle": 2,
+            "kg": 59.800000000000004,
+            "parcels": 15,
+            "orders": 12,
+            "end": 61842.55312260961
+          },
+          {
+            "vehicle": 3,
+            "kg": 50.2,
+            "parcels": 17,
+            "orders": 16,
+            "end": 62484.86380060357
+          },
+          {
+            "vehicle": 4,
+            "kg": 292.59999999999997,
+            "parcels": 17,
+            "orders": 14,
+            "end": 62396.86540117398
+          }
+        ],
+        "evaluations": 35754,
+        "ms": 144.6899000000003
+      },
+      {
+        "method": "greedy_rs",
+        "vehicles": 4,
+        "finish": 62522.13114783413,
+        "predictedFinish": 62522.13114783413,
+        "travel": 11091.803905362445,
+        "duration": 19551.803905362445,
+        "late": 0,
+        "unassigned": 0,
+        "waitAvg": 2591.710353583344,
+        "waitMax": 4590.965074229272,
+        "etaMean": 0,
+        "etaMax": 0,
+        "loads": [
+          {
+            "vehicle": 1,
+            "kg": 57.19999999999998,
+            "parcels": 17,
+            "orders": 17,
+            "end": 62486.46566990969
+          },
+          {
+            "vehicle": 2,
+            "kg": 58.99999999999999,
+            "parcels": 17,
+            "orders": 14,
+            "end": 62503.96507422927
+          },
+          {
+            "vehicle": 3,
+            "kg": 53,
+            "parcels": 19,
+            "orders": 17,
+            "end": 62439.242013389354
+          },
+          {
+            "vehicle": 4,
+            "kg": 292.70000000000005,
+            "parcels": 15,
+            "orders": 12,
+            "end": 62522.13114783413
+          }
+        ],
+        "evaluations": 147408,
+        "ms": 447.68010000000004
+      },
+      {
+        "method": "regret_all",
+        "vehicles": 4,
+        "finish": 62478.151860052385,
+        "predictedFinish": 62478.151860052385,
+        "travel": 10075.247148630391,
+        "duration": 18625.24714863039,
+        "late": 0,
+        "unassigned": 0,
+        "waitAvg": 2534.8364374799057,
+        "waitMax": 4521.763951136352,
+        "etaMean": 0,
+        "etaMax": 0,
+        "loads": [
+          {
+            "vehicle": 1,
+            "kg": 59.800000000000004,
+            "parcels": 20,
+            "orders": 19,
+            "end": 62478.151860052385
+          },
+          {
+            "vehicle": 2,
+            "kg": 59.599999999999994,
+            "parcels": 15,
+            "orders": 12,
+            "end": 61755.76608680045
+          },
+          {
+            "vehicle": 3,
+            "kg": 49.900000000000006,
+            "parcels": 16,
+            "orders": 15,
+            "end": 62394.463800603575
+          },
+          {
+            "vehicle": 4,
+            "kg": 292.59999999999997,
+            "parcels": 17,
+            "orders": 14,
+            "end": 62396.86540117398
+          }
+        ],
+        "evaluations": 79847,
+        "ms": 258.2886000000003
+      },
+      {
+        "method": "greedy_all",
+        "vehicles": 4,
+        "finish": 62429.090896103364,
+        "predictedFinish": 62429.090896103364,
+        "travel": 10767.850696044305,
+        "duration": 19227.850696044305,
+        "late": 0,
+        "unassigned": 0,
+        "waitAvg": 2308.51489529857,
+        "waitMax": 4470.887936315645,
+        "etaMean": 0,
+        "etaMax": 0,
+        "loads": [
+          {
+            "vehicle": 1,
+            "kg": 58.6,
+            "parcels": 18,
+            "orders": 18,
+            "end": 62429.090896103364
+          },
+          {
+            "vehicle": 2,
+            "kg": 55.3,
+            "parcels": 15,
+            "orders": 14,
+            "end": 62381.67763969683
+          },
+          {
+            "vehicle": 3,
+            "kg": 54.4,
+            "parcels": 15,
+            "orders": 13,
+            "end": 62391.18144775338
+          },
+          {
+            "vehicle": 4,
+            "kg": 293.6,
+            "parcels": 20,
+            "orders": 15,
+            "end": 62425.90071249074
+          }
+        ],
+        "evaluations": 250712,
+        "ms": 728.3415
+      },
+      {
+        "method": "ils_1",
+        "vehicles": 4,
+        "finish": 62177.33889387266,
+        "predictedFinish": 62177.33889387266,
+        "travel": 9242.05325175151,
+        "duration": 17522.05325175151,
+        "late": 0,
+        "unassigned": 0,
+        "waitAvg": 2303.301244422849,
+        "waitMax": 4074.3388938726566,
+        "etaMean": 0,
+        "etaMax": 0,
+        "loads": [
+          {
+            "vehicle": 1,
+            "kg": 56.199999999999996,
+            "parcels": 20,
+            "orders": 18,
+            "end": 61640.142805766
+          },
+          {
+            "vehicle": 2,
+            "kg": 59,
+            "parcels": 15,
+            "orders": 15,
+            "end": 62091.1248674724
+          },
+          {
+            "vehicle": 3,
+            "kg": 43.6,
+            "parcels": 14,
+            "orders": 13,
+            "end": 62013.446684640454
+          },
+          {
+            "vehicle": 4,
+            "kg": 303.09999999999997,
+            "parcels": 19,
+            "orders": 14,
+            "end": 62177.33889387266
+          }
+        ],
+        "evaluations": 3000000,
+        "ms": 9666.03,
+        "cap": 3000000,
+        "bestAt": 1624492,
+        "iterations": 86,
+        "restarts": 2
+      },
+      {
+        "method": "ils_2",
+        "vehicles": 4,
+        "finish": 62083.36110623308,
+        "predictedFinish": 62083.36110623308,
+        "travel": 9439.878972918443,
+        "duration": 17719.878972918443,
+        "late": 0,
+        "unassigned": 0,
+        "waitAvg": 2442.888103316763,
+        "waitMax": 4067.1850852712523,
+        "etaMean": 0,
+        "etaMax": 0,
+        "loads": [
+          {
+            "vehicle": 1,
+            "kg": 55.8,
+            "parcels": 20,
+            "orders": 19,
+            "end": 62023.825538001656
+          },
+          {
+            "vehicle": 2,
+            "kg": 53.10000000000001,
+            "parcels": 14,
+            "orders": 13,
+            "end": 61987.6631110431
+          },
+          {
+            "vehicle": 3,
+            "kg": 50.300000000000004,
+            "parcels": 16,
+            "orders": 15,
+            "end": 62025.02921764061
+          },
+          {
+            "vehicle": 4,
+            "kg": 302.7,
+            "parcels": 18,
+            "orders": 13,
+            "end": 62083.36110623308
+          }
+        ],
+        "evaluations": 3000000,
+        "ms": 10178.735999999999,
+        "cap": 3000000,
+        "bestAt": 1215164,
+        "iterations": 77,
+        "restarts": 3
+      },
+      {
+        "method": "ils_3",
+        "vehicles": 4,
+        "finish": 62177.33889387266,
+        "predictedFinish": 62177.33889387266,
+        "travel": 9723.546758917364,
+        "duration": 17913.546758917364,
+        "late": 0,
+        "unassigned": 0,
+        "waitAvg": 2468.323656127321,
+        "waitMax": 4074.3388938726566,
+        "etaMean": 0,
+        "etaMax": 0,
+        "loads": [
+          {
+            "vehicle": 1,
+            "kg": 58,
+            "parcels": 20,
+            "orders": 19,
+            "end": 62008.29170858687
+          },
+          {
+            "vehicle": 2,
+            "kg": 59.2,
+            "parcels": 13,
+            "orders": 12,
+            "end": 62008.083259647276
+          },
+          {
+            "vehicle": 3,
+            "kg": 41.6,
+            "parcels": 16,
+            "orders": 15,
+            "end": 62119.83289681056
+          },
+          {
+            "vehicle": 4,
+            "kg": 303.09999999999997,
+            "parcels": 19,
+            "orders": 14,
+            "end": 62177.33889387266
+          }
+        ],
+        "evaluations": 3000000,
+        "ms": 10547.359200000003,
+        "cap": 3000000,
+        "bestAt": 470448,
+        "iterations": 75,
+        "restarts": 4
+      }
+    ],
+    "reroute": [
+      {
+        "plan": "static",
+        "reroute": "static",
+        "evaluations": 22,
+        "improved": 0,
+        "accepted": 0,
+        "triggered": 0,
+        "predictedSaving": 0,
+        "realSaving": 0,
+        "worseInReality": 0,
+        "maxPredicted": 0,
+        "flippedAvg": 0,
+        "flippedMax": 0,
+        "finishWithout": 62435.8004144584,
+        "finishWith": 62435.8004144584,
+        "events": [
+          {
+            "vehicle": 1,
+            "clock": 57846,
+            "remaining": 13,
+            "points": 8,
+            "trigger": false,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 1,
+            "clock": 58403.956666666665,
+            "remaining": 12,
+            "points": 7,
+            "trigger": false,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 1,
+            "clock": 58952.083164814816,
+            "remaining": 10,
+            "points": 6,
+            "trigger": false,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 1,
+            "clock": 59234.58547944239,
+            "remaining": 9,
+            "points": 5,
+            "trigger": false,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 1,
+            "clock": 59691.850303795465,
+            "remaining": 8,
+            "points": 4,
+            "trigger": false,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 1,
+            "clock": 60355.82313814145,
+            "remaining": 6,
+            "points": 3,
+            "trigger": false,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 2,
+            "clock": 57995,
+            "remaining": 16,
+            "points": 11,
+            "trigger": false,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 2,
+            "clock": 58351.09722222222,
+            "remaining": 15,
+            "points": 10,
+            "trigger": false,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 2,
+            "clock": 58661.60087962962,
+            "remaining": 14,
+            "points": 9,
+            "trigger": false,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 2,
+            "clock": 58984.190657896084,
+            "remaining": 12,
+            "points": 8,
+            "trigger": false,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 2,
+            "clock": 59454.34261637562,
+            "remaining": 11,
+            "points": 7,
+            "trigger": false,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 2,
+            "clock": 59898.433187402916,
+            "remaining": 9,
+            "points": 6,
+            "trigger": false,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 2,
+            "clock": 60202.26390938192,
+            "remaining": 8,
+            "points": 5,
+            "trigger": false,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 2,
+            "clock": 60630.15531372568,
+            "remaining": 6,
+            "points": 4,
+            "trigger": false,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 2,
+            "clock": 61096.989509913044,
+            "remaining": 4,
+            "points": 3,
+            "trigger": false,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 3,
+            "clock": 57916,
+            "remaining": 11,
+            "points": 6,
+            "trigger": false,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 3,
+            "clock": 58338.526666666665,
+            "remaining": 9,
+            "points": 5,
+            "trigger": false,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 3,
+            "clock": 59203.91193333333,
+            "remaining": 7,
+            "points": 4,
+            "trigger": false,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 3,
+            "clock": 59950.495741740735,
+            "remaining": 6,
+            "points": 3,
+            "trigger": false,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 4,
+            "clock": 58293,
+            "remaining": 12,
+            "points": 5,
+            "trigger": false,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 4,
+            "clock": 58755,
+            "remaining": 8,
+            "points": 4,
+            "trigger": false,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 4,
+            "clock": 59496.191666666666,
+            "remaining": 6,
+            "points": 3,
+            "trigger": false,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          }
+        ]
+      },
+      {
+        "plan": "static",
+        "reroute": "td",
+        "evaluations": 22,
+        "improved": 0,
+        "accepted": 0,
+        "triggered": 0,
+        "predictedSaving": 0,
+        "realSaving": 0,
+        "worseInReality": 0,
+        "maxPredicted": 0,
+        "flippedAvg": 0,
+        "flippedMax": 0,
+        "finishWithout": 62435.8004144584,
+        "finishWith": 62435.8004144584,
+        "events": [
+          {
+            "vehicle": 1,
+            "clock": 57846,
+            "remaining": 13,
+            "points": 8,
+            "trigger": false,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 1,
+            "clock": 58403.956666666665,
+            "remaining": 12,
+            "points": 7,
+            "trigger": false,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 1,
+            "clock": 58952.083164814816,
+            "remaining": 10,
+            "points": 6,
+            "trigger": false,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 1,
+            "clock": 59234.58547944239,
+            "remaining": 9,
+            "points": 5,
+            "trigger": false,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 1,
+            "clock": 59691.850303795465,
+            "remaining": 8,
+            "points": 4,
+            "trigger": false,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 1,
+            "clock": 60355.82313814145,
+            "remaining": 6,
+            "points": 3,
+            "trigger": false,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 2,
+            "clock": 57995,
+            "remaining": 16,
+            "points": 11,
+            "trigger": false,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 2,
+            "clock": 58351.09722222222,
+            "remaining": 15,
+            "points": 10,
+            "trigger": false,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 2,
+            "clock": 58661.60087962962,
+            "remaining": 14,
+            "points": 9,
+            "trigger": false,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 2,
+            "clock": 58984.190657896084,
+            "remaining": 12,
+            "points": 8,
+            "trigger": false,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 2,
+            "clock": 59454.34261637562,
+            "remaining": 11,
+            "points": 7,
+            "trigger": false,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 2,
+            "clock": 59898.433187402916,
+            "remaining": 9,
+            "points": 6,
+            "trigger": false,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 2,
+            "clock": 60202.26390938192,
+            "remaining": 8,
+            "points": 5,
+            "trigger": false,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 2,
+            "clock": 60630.15531372568,
+            "remaining": 6,
+            "points": 4,
+            "trigger": false,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 2,
+            "clock": 61096.989509913044,
+            "remaining": 4,
+            "points": 3,
+            "trigger": false,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 3,
+            "clock": 57916,
+            "remaining": 11,
+            "points": 6,
+            "trigger": false,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 3,
+            "clock": 58338.526666666665,
+            "remaining": 9,
+            "points": 5,
+            "trigger": false,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 3,
+            "clock": 59203.91193333333,
+            "remaining": 7,
+            "points": 4,
+            "trigger": false,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 3,
+            "clock": 59950.495741740735,
+            "remaining": 6,
+            "points": 3,
+            "trigger": false,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 4,
+            "clock": 58293,
+            "remaining": 12,
+            "points": 5,
+            "trigger": false,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 4,
+            "clock": 58755,
+            "remaining": 8,
+            "points": 4,
+            "trigger": false,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 4,
+            "clock": 59496.191666666666,
+            "remaining": 6,
+            "points": 3,
+            "trigger": false,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          }
+        ]
+      },
+      {
+        "plan": "td",
+        "reroute": "td",
+        "evaluations": 22,
+        "improved": 0,
+        "accepted": 0,
+        "triggered": null,
+        "predictedSaving": 0,
+        "realSaving": 0,
+        "worseInReality": 0,
+        "maxPredicted": 0,
+        "flippedAvg": 0,
+        "flippedMax": 0,
+        "finishWithout": 62484.86380060357,
+        "finishWith": 62484.86380060357,
+        "events": [
+          {
+            "vehicle": 1,
+            "clock": 57916,
+            "remaining": 17,
+            "points": 10,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 1,
+            "clock": 58312.70222222222,
+            "remaining": 16,
+            "points": 9,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 1,
+            "clock": 58871.26573333333,
+            "remaining": 15,
+            "points": 8,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 1,
+            "clock": 59195.797027037035,
+            "remaining": 14,
+            "points": 7,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 1,
+            "clock": 59499.683580940946,
+            "remaining": 13,
+            "points": 6,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 1,
+            "clock": 59822.683580940946,
+            "remaining": 11,
+            "points": 5,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 1,
+            "clock": 60106.38805357585,
+            "remaining": 10,
+            "points": 4,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 1,
+            "clock": 60702.742680421106,
+            "remaining": 6,
+            "points": 3,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 2,
+            "clock": 58180,
+            "remaining": 11,
+            "points": 6,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 2,
+            "clock": 58761.28888888889,
+            "remaining": 8,
+            "points": 5,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 2,
+            "clock": 59155.579209876545,
+            "remaining": 7,
+            "points": 4,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 2,
+            "clock": 59548.4434205487,
+            "remaining": 6,
+            "points": 3,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 3,
+            "clock": 58559,
+            "remaining": 15,
+            "points": 7,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 3,
+            "clock": 59222.32777777778,
+            "remaining": 13,
+            "points": 6,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 3,
+            "clock": 59953.03165740741,
+            "remaining": 10,
+            "points": 5,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 3,
+            "clock": 60816.10405550412,
+            "remaining": 6,
+            "points": 4,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 3,
+            "clock": 61211.46422892996,
+            "remaining": 4,
+            "points": 3,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 4,
+            "clock": 58023,
+            "remaining": 13,
+            "points": 7,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 4,
+            "clock": 58670.865,
+            "remaining": 11,
+            "points": 6,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 4,
+            "clock": 59691.9402,
+            "remaining": 10,
+            "points": 5,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 4,
+            "clock": 60146.751144999995,
+            "remaining": 8,
+            "points": 4,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 4,
+            "clock": 61156.31462421944,
+            "remaining": 4,
+            "points": 3,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          }
+        ]
+      },
+      {
+        "plan": "td",
+        "reroute": "static",
+        "evaluations": 22,
+        "improved": 0,
+        "accepted": 0,
+        "triggered": null,
+        "predictedSaving": 0,
+        "realSaving": 0,
+        "worseInReality": 0,
+        "maxPredicted": 0,
+        "flippedAvg": 0,
+        "flippedMax": 0,
+        "finishWithout": 62484.86380060357,
+        "finishWith": 62484.86380060357,
+        "events": [
+          {
+            "vehicle": 1,
+            "clock": 57916,
+            "remaining": 17,
+            "points": 10,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 1,
+            "clock": 58312.70222222222,
+            "remaining": 16,
+            "points": 9,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 1,
+            "clock": 58871.26573333333,
+            "remaining": 15,
+            "points": 8,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 1,
+            "clock": 59195.797027037035,
+            "remaining": 14,
+            "points": 7,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 1,
+            "clock": 59499.683580940946,
+            "remaining": 13,
+            "points": 6,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 1,
+            "clock": 59822.683580940946,
+            "remaining": 11,
+            "points": 5,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 1,
+            "clock": 60106.38805357585,
+            "remaining": 10,
+            "points": 4,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 1,
+            "clock": 60702.742680421106,
+            "remaining": 6,
+            "points": 3,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 2,
+            "clock": 58180,
+            "remaining": 11,
+            "points": 6,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 2,
+            "clock": 58761.28888888889,
+            "remaining": 8,
+            "points": 5,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 2,
+            "clock": 59155.579209876545,
+            "remaining": 7,
+            "points": 4,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 2,
+            "clock": 59548.4434205487,
+            "remaining": 6,
+            "points": 3,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 3,
+            "clock": 58559,
+            "remaining": 15,
+            "points": 7,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 3,
+            "clock": 59222.32777777778,
+            "remaining": 13,
+            "points": 6,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 3,
+            "clock": 59953.03165740741,
+            "remaining": 10,
+            "points": 5,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 3,
+            "clock": 60816.10405550412,
+            "remaining": 6,
+            "points": 4,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 3,
+            "clock": 61211.46422892996,
+            "remaining": 4,
+            "points": 3,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 4,
+            "clock": 58023,
+            "remaining": 13,
+            "points": 7,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 4,
+            "clock": 58670.865,
+            "remaining": 11,
+            "points": 6,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 4,
+            "clock": 59691.9402,
+            "remaining": 10,
+            "points": 5,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 4,
+            "clock": 60146.751144999995,
+            "remaining": 8,
+            "points": 4,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 4,
+            "clock": 61156.31462421944,
+            "remaining": 4,
+            "points": 3,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          }
+        ]
+      },
+      {
+        "plan": "td",
+        "reroute": "static",
+        "stress": true,
+        "evaluations": 22,
+        "improved": 1,
+        "accepted": 0,
+        "triggered": null,
+        "predictedSaving": 0,
+        "realSaving": 0,
+        "worseInReality": 0,
+        "maxPredicted": 69.19741358024748,
+        "flippedAvg": 0,
+        "flippedMax": 0,
+        "finishWithout": 62938.77176670684,
+        "finishWith": 62938.77176670684,
+        "events": [
+          {
+            "vehicle": 1,
+            "clock": 57916,
+            "remaining": 17,
+            "points": 10,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 1,
+            "clock": 58312.70222222222,
+            "remaining": 16,
+            "points": 9,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 1,
+            "clock": 58871.26573333333,
+            "remaining": 15,
+            "points": 8,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 1,
+            "clock": 59195.797027037035,
+            "remaining": 14,
+            "points": 7,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 1,
+            "clock": 59499.683580940946,
+            "remaining": 13,
+            "points": 6,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 1,
+            "clock": 59875.683580940946,
+            "remaining": 11,
+            "points": 5,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 1,
+            "clock": 60263.269192877415,
+            "remaining": 10,
+            "points": 4,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 1,
+            "clock": 61007.02432082993,
+            "remaining": 6,
+            "points": 3,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 2,
+            "clock": 58180,
+            "remaining": 11,
+            "points": 6,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 2,
+            "clock": 58761.28888888889,
+            "remaining": 8,
+            "points": 5,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 2,
+            "clock": 59248.89867632739,
+            "remaining": 7,
+            "points": 4,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 2,
+            "clock": 59854.73078596776,
+            "remaining": 6,
+            "points": 3,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 3,
+            "clock": 58559,
+            "remaining": 15,
+            "points": 7,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 3,
+            "clock": 59222.32777777778,
+            "remaining": 13,
+            "points": 6,
+            "trigger": null,
+            "predictedSaving": 69.19741358024748,
+            "ratio": 0.018392019694706985,
+            "meets": false,
+            "realSaving": 87.5763590919596,
+            "flipped": 6
+          },
+          {
+            "vehicle": 3,
+            "clock": 59953.03165740741,
+            "remaining": 10,
+            "points": 5,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 3,
+            "clock": 61229.17645360083,
+            "remaining": 6,
+            "points": 4,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 3,
+            "clock": 61663.11283681207,
+            "remaining": 4,
+            "points": 3,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 4,
+            "clock": 58023,
+            "remaining": 13,
+            "points": 7,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 4,
+            "clock": 58670.865,
+            "remaining": 11,
+            "points": 6,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 4,
+            "clock": 59691.9402,
+            "remaining": 10,
+            "points": 5,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 4,
+            "clock": 60146.751144999995,
+            "remaining": 8,
+            "points": 4,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 4,
+            "clock": 61156.31462421944,
+            "remaining": 4,
+            "points": 3,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          }
+        ]
+      },
+      {
+        "plan": "td",
+        "reroute": "td",
+        "stress": true,
+        "evaluations": 22,
+        "improved": 2,
+        "accepted": 0,
+        "triggered": null,
+        "predictedSaving": 0,
+        "realSaving": 0,
+        "worseInReality": 0,
+        "maxPredicted": 87.5763590919596,
+        "flippedAvg": 0,
+        "flippedMax": 0,
+        "finishWithout": 62938.77176670684,
+        "finishWith": 62938.77176670684,
+        "events": [
+          {
+            "vehicle": 1,
+            "clock": 57916,
+            "remaining": 17,
+            "points": 10,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 1,
+            "clock": 58312.70222222222,
+            "remaining": 16,
+            "points": 9,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 1,
+            "clock": 58871.26573333333,
+            "remaining": 15,
+            "points": 8,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 1,
+            "clock": 59195.797027037035,
+            "remaining": 14,
+            "points": 7,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 1,
+            "clock": 59499.683580940946,
+            "remaining": 13,
+            "points": 6,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 1,
+            "clock": 59875.683580940946,
+            "remaining": 11,
+            "points": 5,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 1,
+            "clock": 60263.269192877415,
+            "remaining": 10,
+            "points": 4,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 1,
+            "clock": 61007.02432082993,
+            "remaining": 6,
+            "points": 3,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 2,
+            "clock": 58180,
+            "remaining": 11,
+            "points": 6,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 2,
+            "clock": 58761.28888888889,
+            "remaining": 8,
+            "points": 5,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 2,
+            "clock": 59248.89867632739,
+            "remaining": 7,
+            "points": 4,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 2,
+            "clock": 59854.73078596776,
+            "remaining": 6,
+            "points": 3,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 3,
+            "clock": 58559,
+            "remaining": 15,
+            "points": 7,
+            "trigger": null,
+            "predictedSaving": 87.5763590919596,
+            "ratio": 0.019995644466608453,
+            "meets": false,
+            "realSaving": 87.5763590919596,
+            "flipped": 6
+          },
+          {
+            "vehicle": 3,
+            "clock": 59222.32777777778,
+            "remaining": 13,
+            "points": 6,
+            "trigger": null,
+            "predictedSaving": 87.5763590919596,
+            "ratio": 0.023564557774270585,
+            "meets": false,
+            "realSaving": 87.5763590919596,
+            "flipped": 6
+          },
+          {
+            "vehicle": 3,
+            "clock": 59953.03165740741,
+            "remaining": 10,
+            "points": 5,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 3,
+            "clock": 61229.17645360083,
+            "remaining": 6,
+            "points": 4,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 3,
+            "clock": 61663.11283681207,
+            "remaining": 4,
+            "points": 3,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 4,
+            "clock": 58023,
+            "remaining": 13,
+            "points": 7,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 4,
+            "clock": 58670.865,
+            "remaining": 11,
+            "points": 6,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 4,
+            "clock": 59691.9402,
+            "remaining": 10,
+            "points": 5,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 4,
+            "clock": 60146.751144999995,
+            "remaining": 8,
+            "points": 4,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          },
+          {
+            "vehicle": 4,
+            "clock": 61156.31462421944,
+            "remaining": 4,
+            "points": 3,
+            "trigger": null,
+            "predictedSaving": 0,
+            "ratio": 0,
+            "meets": false,
+            "realSaving": 0,
+            "flipped": 0
+          }
+        ]
+      }
+    ],
+    "scaling": [
+      {
+        "n": 15,
+        "points": 15,
+        "insertionMs": 0.7600000000020373,
+        "lsMs": 1.7500999999974738,
+        "evaluations": 837,
+        "defaultStop": "Không còn phương án cải thiện",
+        "legsPerProfile": 240,
+        "legsTotal": 1920
+      },
+      {
+        "n": 30,
+        "points": 30,
+        "insertionMs": 5.364199999996345,
+        "lsMs": 20.722099999999045,
+        "evaluations": 7130,
+        "defaultStop": "Không còn phương án cải thiện",
+        "legsPerProfile": 930,
+        "legsTotal": 7440
+      },
+      {
+        "n": 45,
+        "points": 30,
+        "insertionMs": 17.958200000000943,
+        "lsMs": 95.42209999999614,
+        "evaluations": 22520,
+        "defaultStop": "Đạt giới hạn số phép đánh giá",
+        "legsPerProfile": 930,
+        "legsTotal": 7440
+      },
+      {
+        "n": 60,
+        "points": 30,
+        "insertionMs": 39.41730000000098,
+        "lsMs": 123.53139999999985,
+        "evaluations": 35754,
+        "defaultStop": "Đạt giới hạn số phép đánh giá",
+        "legsPerProfile": 930,
+        "legsTotal": 7440
       }
     ]
   }
