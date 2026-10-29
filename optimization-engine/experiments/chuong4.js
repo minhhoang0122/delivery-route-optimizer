@@ -7,7 +7,7 @@
 // Mục thời gian phụ thuộc giờ dùng thêm ma_tran_1630.json và ma_tran_1700.json (ghi bằng ghi_ma_tran.js).
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import {
-  clockSeconds, evaluateReroute, fifoCheck, insertion, interpolateSlots, localSearch, plan, routeSchedule, routeSeconds, totalSeconds,
+  clockSeconds, evaluateReroute, fifoCheck, groupedProblem, insertion, interpolateSlots, localSearch, plan, routeSchedule, routeSeconds, totalSeconds,
 } from '../src/index.js';
 import { metrics, solve, waitingCost } from './muc_tieu.js';
 import { ils, simulate } from './mo_phong.js';
@@ -409,10 +409,12 @@ table(['Xe', 'Số đơn', 'Khối lượng (kg)', 'Số kiện', 'Về kho'],
 console.log('### b) Insertion Heuristic so với Insertion Heuristic kết hợp Relocate và Swap (mục tiêu makespan)\n');
 out.k60.insertionVsLs = [];
 {
+  // Mọi dòng dùng cùng bài toán đã gom đơn cùng điểm giao như plan() (groupedProblem), để chênh lệch chỉ do Relocate, Swap
   const P = problem60();
+  const { Q, expand, expandUnassigned } = groupedProblem(P);
   for (const rule of ['greedy', 'regret2']) {
-    const { r: a, ms } = time(() => insertion(P, { rule }));
-    out.k60.insertionVsLs.push({ method: `${rule}_only`, ...onTruth(P, a.routes, a.unassigned), positions: a.stats.positions, evaluations: 0, moves: 0, stopReason: '—', ms });
+    const { r: a, ms } = time(() => insertion(Q, { rule }));
+    out.k60.insertionVsLs.push({ method: `${rule}_only`, ...onTruth(P, expand(a.routes), expandUnassigned(a.unassigned)), positions: a.stats.positions, evaluations: 0, moves: 0, stopReason: '—', ms });
     for (const [lim, label] of [[{}, 'default'], [BIG, 'converged']]) {
       const r = planned(P, { insertion: rule, ...lim });
       out.k60.insertionVsLs.push({ method: `${rule}_${label}`, ...onTruth(P, r.routes, r.unassigned), evaluations: r.stats.evaluations, moves: r.stats.moves, stopReason: r.stats.stopReason, ms: r.ms });
@@ -454,10 +456,12 @@ out.k60.reference = [];
     const r = planned(P, { ...BIG, insertion: rule, moves });
     row(method, r, r.stats.evaluations, r.ms);
   }
+  // ILS chạy trên bài toán đã gom đơn cùng điểm giao, nên cũng không tách đơn cùng địa chỉ (cùng quy tắc với engine)
   const ILS_CAP = 3_000_000;
+  const { Q, expand, expandUnassigned } = groupedProblem(P);
   for (const seed of [1, 2, 3]) {
-    const x = ils(P, { maxEvaluations: ILS_CAP, seed });
-    row(`ils_${seed}`, x.best, x.evaluations, x.ms, { cap: ILS_CAP, bestAt: x.bestAt, iterations: x.iterations, restarts: x.restarts });
+    const x = ils(Q, { maxEvaluations: ILS_CAP, seed });
+    row(`ils_${seed}`, { routes: expand(x.best.routes), unassigned: expandUnassigned(x.best.unassigned) }, x.evaluations, x.ms, { cap: ILS_CAP, bestAt: x.bestAt, iterations: x.iterations, restarts: x.restarts });
   }
 }
 const MR = {
@@ -535,7 +539,8 @@ const spread = kb60.don.map((d, i) => { const k = rank.get(d.diem) ?? 0; rank.se
   .sort((a, b) => a.k - b.k || a.i - b.i).map(x => x.d);
 for (const n of [15, 30, 45, 60]) {
   const orders = spread.slice(0, n);
-  const P = problem60({ orders });
+  // Đo trên bài toán đã gom đơn cùng điểm giao, đúng như plan() chạy trong hệ thống
+  const P = groupedProblem(problem60({ orders })).Q;
   const runs = [];
   for (let i = 0; i < 5; i++) {
     const t0 = performance.now();

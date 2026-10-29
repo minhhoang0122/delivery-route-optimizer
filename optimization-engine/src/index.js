@@ -685,6 +685,19 @@ function remainingSplits(P, G, routes, unassigned) {
   return forced;
 }
 
+/**
+ * Bài toán đã gom đơn cùng điểm giao như plan() làm, cho các thí nghiệm muốn so mọi cách lập trên cùng một bài toán:
+ * Q là bài toán theo nhóm, expand đổi tuyến theo chỉ số nhóm về chỉ số đơn gốc, expandUnassigned đổi danh sách chưa xếp.
+ */
+export function groupedProblem(P) {
+  const G = groupOrders(P);
+  return {
+    Q: G.Q,
+    expand: routes => routes.map(r => r.flatMap(q => G.groups[q].members)),
+    expandUnassigned: list => list.flatMap(u => G.groups[u.order].members.map(o => ({ order: o, reason: u.reason }))),
+  };
+}
+
 /** Insertion Heuristic, Local Search, rồi chèn lại đơn chưa xếp và cải thiện tiếp (tối đa 3 lần). */
 function solve(Q, options) {
   const first = insertion(Q, { rule: options.insertion });

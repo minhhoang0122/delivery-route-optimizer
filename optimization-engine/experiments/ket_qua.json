@@ -10,8 +10,8 @@
       "vehicles": 1,
       "longest": 9785,
       "unassigned": 0,
-      "insertionMs": 1.1109000000000009,
-      "searchMs": 19.165100000000002
+      "insertionMs": 1.7379000000000033,
+      "searchMs": 18.560499999999998
     },
     {
       "matrix": "16:00",
@@ -23,8 +23,8 @@
       "vehicles": 4,
       "longest": 3568,
       "unassigned": 0,
-      "insertionMs": 0.3462999999999994,
-      "searchMs": 11.738199999999999
+      "insertionMs": 0.36480000000000246,
+      "searchMs": 11.020600000000002
     },
     {
       "matrix": "16:00",
@@ -36,8 +36,8 @@
       "vehicles": 5,
       "longest": 2655,
       "unassigned": 1,
-      "insertionMs": 0.3027000000000015,
-      "searchMs": 6.570300000000003
+      "insertionMs": 0.2920000000000016,
+      "searchMs": 6.2256
     },
     {
       "matrix": "17:30",
@@ -49,8 +49,8 @@
       "vehicles": 1,
       "longest": 10347,
       "unassigned": 0,
-      "insertionMs": 0.20860000000000412,
-      "searchMs": 10.842499999999987
+      "insertionMs": 0.12590000000000146,
+      "searchMs": 11.945999999999998
     },
     {
       "matrix": "17:30",
@@ -62,8 +62,8 @@
       "vehicles": 4,
       "longest": 3447,
       "unassigned": 0,
-      "insertionMs": 0.13400000000000034,
-      "searchMs": 9.902299999999997
+      "insertionMs": 0.1419000000000068,
+      "searchMs": 10.4148
     },
     {
       "matrix": "17:30",
@@ -75,8 +75,8 @@
       "vehicles": 4,
       "longest": 2640,
       "unassigned": 3,
-      "insertionMs": 0.11310000000000286,
-      "searchMs": 4.717399999999998
+      "insertionMs": 0.11769999999999925,
+      "searchMs": 4.45450000000001
     }
   ],
   "e2": [
@@ -94,6 +94,8 @@
           "proposedSeconds": 3046,
           "savingSeconds": 0,
           "savingRatio": 0,
+          "currentLateSeconds": 0,
+          "proposedLateSeconds": 0,
           "meetsThreshold": false,
           "proposedStopIds": [
             15,
@@ -106,9 +108,7 @@
           "flippedPairs": 0,
           "evaluations": 30,
           "vehicle": 1,
-          "remaining": 6,
-          "currentLateSeconds": 0,
-          "proposedLateSeconds": 0
+          "remaining": 6
         },
         {
           "valid": true,
@@ -116,6 +116,8 @@
           "proposedSeconds": 2936,
           "savingSeconds": 0,
           "savingRatio": 0,
+          "currentLateSeconds": 0,
+          "proposedLateSeconds": 0,
           "meetsThreshold": false,
           "proposedStopIds": [
             16,
@@ -127,9 +129,7 @@
           "flippedPairs": 0,
           "evaluations": 18,
           "vehicle": 1,
-          "remaining": 5,
-          "currentLateSeconds": 0,
-          "proposedLateSeconds": 0
+          "remaining": 5
         },
         {
           "valid": true,
@@ -137,6 +137,8 @@
           "proposedSeconds": 2683,
           "savingSeconds": 0,
           "savingRatio": 0,
+          "currentLateSeconds": 0,
+          "proposedLateSeconds": 0,
           "meetsThreshold": false,
           "proposedStopIds": [
             3,
@@ -147,9 +149,7 @@
           "flippedPairs": 0,
           "evaluations": 9,
           "vehicle": 1,
-          "remaining": 4,
-          "currentLateSeconds": 0,
-          "proposedLateSeconds": 0
+          "remaining": 4
         },
         {
           "valid": true,
@@ -157,6 +157,8 @@
           "proposedSeconds": 2369,
           "savingSeconds": 0,
           "savingRatio": 0,
+          "currentLateSeconds": 0,
+          "proposedLateSeconds": 0,
           "meetsThreshold": false,
           "proposedStopIds": [
             6,
@@ -166,9 +168,7 @@
           "flippedPairs": 0,
           "evaluations": 3,
           "vehicle": 1,
-          "remaining": 3,
-          "currentLateSeconds": 0,
-          "proposedLateSeconds": 0
+          "remaining": 3
         },
         {
           "valid": true,
@@ -176,6 +176,8 @@
           "proposedSeconds": 1846,
           "savingSeconds": 0,
           "savingRatio": 0,
+          "currentLateSeconds": 0,
+          "proposedLateSeconds": 0,
           "meetsThreshold": false,
           "proposedStopIds": [
             12,
@@ -186,9 +188,7 @@
           "flippedPairs": 0,
           "evaluations": 9,
           "vehicle": 2,
-          "remaining": 4,
-          "currentLateSeconds": 0,
-          "proposedLateSeconds": 0
+          "remaining": 4
         },
         {
           "valid": true,
@@ -196,6 +196,8 @@
           "proposedSeconds": 1769,
           "savingSeconds": 0,
           "savingRatio": 0,
+          "currentLateSeconds": 0,
+          "proposedLateSeconds": 0,
           "meetsThreshold": false,
           "proposedStopIds": [
             13,
@@ -205,9 +207,7 @@
           "flippedPairs": 0,
           "evaluations": 3,
           "vehicle": 2,
-          "remaining": 3,
-          "currentLateSeconds": 0,
-          "proposedLateSeconds": 0
+          "remaining": 3
         },
         {
           "valid": true,
@@ -215,6 +215,8 @@
           "proposedSeconds": 3135,
           "savingSeconds": 0,
           "savingRatio": 0,
+          "currentLateSeconds": 0,
+          "proposedLateSeconds": 0,
           "meetsThreshold": false,
           "proposedStopIds": [
             8,
@@ -224,9 +226,7 @@
           "flippedPairs": 0,
           "evaluations": 3,
           "vehicle": 4,
-          "remaining": 3,
-          "currentLateSeconds": 0,
-          "proposedLateSeconds": 0
+          "remaining": 3
         },
         {
           "valid": true,
@@ -234,6 +234,8 @@
           "proposedSeconds": 1619,
           "savingSeconds": 0,
           "savingRatio": 0,
+          "currentLateSeconds": 0,
+          "proposedLateSeconds": 0,
           "meetsThreshold": false,
           "proposedStopIds": [
             11,
@@ -243,9 +245,7 @@
           "flippedPairs": 0,
           "evaluations": 3,
           "vehicle": 5,
-          "remaining": 3,
-          "currentLateSeconds": 0,
-          "proposedLateSeconds": 0
+          "remaining": 3
         }
       ]
     },
@@ -263,6 +263,8 @@
           "proposedSeconds": 3285,
           "savingSeconds": 267,
           "savingRatio": 0.07516891891891891,
+          "currentLateSeconds": 0,
+          "proposedLateSeconds": 0,
           "meetsThreshold": true,
           "proposedStopIds": [
             15,
@@ -275,9 +277,7 @@
           "flippedPairs": 4,
           "evaluations": 60,
           "vehicle": 1,
-          "remaining": 6,
-          "currentLateSeconds": 0,
-          "proposedLateSeconds": 0
+          "remaining": 6
         },
         {
           "valid": true,
@@ -285,6 +285,8 @@
           "proposedSeconds": 3113,
           "savingSeconds": 451,
           "savingRatio": 0.12654320987654322,
+          "currentLateSeconds": 0,
+          "proposedLateSeconds": 0,
           "meetsThreshold": true,
           "proposedStopIds": [
             16,
@@ -296,9 +298,7 @@
           "flippedPairs": 3,
           "evaluations": 36,
           "vehicle": 1,
-          "remaining": 5,
-          "currentLateSeconds": 0,
-          "proposedLateSeconds": 0
+          "remaining": 5
         },
         {
           "valid": true,
@@ -306,6 +306,8 @@
           "proposedSeconds": 2699,
           "savingSeconds": 892,
           "savingRatio": 0.24839877471456417,
+          "currentLateSeconds": 0,
+          "proposedLateSeconds": 0,
           "meetsThreshold": true,
           "proposedStopIds": [
             3,
@@ -316,9 +318,7 @@
           "flippedPairs": 2,
           "evaluations": 18,
           "vehicle": 1,
-          "remaining": 4,
-          "currentLateSeconds": 0,
-          "proposedLateSeconds": 0
+          "remaining": 4
         },
         {
           "valid": true,
@@ -326,6 +326,8 @@
           "proposedSeconds": 3187,
           "savingSeconds": 234,
           "savingRatio": 0.06840105232388191,
+          "currentLateSeconds": 0,
+          "proposedLateSeconds": 0,
           "meetsThreshold": true,
           "proposedStopIds": [
             6,
@@ -335,9 +337,7 @@
           "flippedPairs": 1,
           "evaluations": 6,
           "vehicle": 1,
-          "remaining": 3,
-          "currentLateSeconds": 0,
-          "proposedLateSeconds": 0
+          "remaining": 3
         },
         {
           "valid": true,
@@ -345,6 +345,8 @@
           "proposedSeconds": 1934,
           "savingSeconds": 252,
           "savingRatio": 0.11527904849039342,
+          "currentLateSeconds": 0,
+          "proposedLateSeconds": 0,
           "meetsThreshold": true,
           "proposedStopIds": [
             12,
@@ -355,9 +357,7 @@
           "flippedPairs": 1,
           "evaluations": 18,
           "vehicle": 2,
-          "remaining": 4,
-          "currentLateSeconds": 0,
-          "proposedLateSeconds": 0
+          "remaining": 4
         },
         {
           "valid": true,
@@ -365,6 +365,8 @@
           "proposedSeconds": 1981,
           "savingSeconds": 634,
           "savingRatio": 0.2424474187380497,
+          "currentLateSeconds": 0,
+          "proposedLateSeconds": 0,
           "meetsThreshold": true,
           "proposedStopIds": [
             13,
@@ -374,9 +376,7 @@
           "flippedPairs": 1,
           "evaluations": 6,
           "vehicle": 2,
-          "remaining": 3,
-          "currentLateSeconds": 0,
-          "proposedLateSeconds": 0
+          "remaining": 3
         },
         {
           "valid": true,
@@ -384,6 +384,8 @@
           "proposedSeconds": 3814,
           "savingSeconds": 387,
           "savingRatio": 0.09212092358962153,
+          "currentLateSeconds": 0,
+          "proposedLateSeconds": 0,
           "meetsThreshold": true,
           "proposedStopIds": [
             8,
@@ -393,9 +395,7 @@
           "flippedPairs": 1,
           "evaluations": 6,
           "vehicle": 4,
-          "remaining": 3,
-          "currentLateSeconds": 0,
-          "proposedLateSeconds": 0
+          "remaining": 3
         },
         {
           "valid": true,
@@ -403,6 +403,8 @@
           "proposedSeconds": 2517,
           "savingSeconds": 184,
           "savingRatio": 0.06812291743798593,
+          "currentLateSeconds": 0,
+          "proposedLateSeconds": 0,
           "meetsThreshold": true,
           "proposedStopIds": [
             11,
@@ -412,9 +414,7 @@
           "flippedPairs": 1,
           "evaluations": 6,
           "vehicle": 5,
-          "remaining": 3,
-          "currentLateSeconds": 0,
-          "proposedLateSeconds": 0
+          "remaining": 3
         }
       ]
     }
@@ -513,25 +513,25 @@
   "e5": [
     {
       "n": 5,
-      "medianMs": 0.11469999999999914,
+      "medianMs": 0.10900000000000887,
       "evaluations": 47,
       "legs": 60
     },
     {
       "n": 10,
-      "medianMs": 0.2658999999999878,
+      "medianMs": 0.26429999999999154,
       "evaluations": 141,
       "legs": 220
     },
     {
       "n": 15,
-      "medianMs": 2.1482000000000028,
+      "medianMs": 2.2066999999999837,
       "evaluations": 1284,
       "legs": 480
     },
     {
       "n": 20,
-      "medianMs": 8.15609999999998,
+      "medianMs": 8.26030000000003,
       "evaluations": 4037,
       "legs": 840
     }
@@ -969,7 +969,7 @@
           }
         ],
         "evaluations": 17218,
-        "ms": 70.5693
+        "ms": 78.79930000000002
       },
       {
         "objective": "makespan",
@@ -1015,7 +1015,7 @@
           }
         ],
         "evaluations": 3573,
-        "ms": 18.467399999999998
+        "ms": 19.839999999999918
       },
       {
         "objective": "waiting",
@@ -1061,7 +1061,7 @@
           }
         ],
         "evaluations": 138591,
-        "ms": 869.6852000000001
+        "ms": 997.3076
       }
     ],
     "capacityRelaxed": {
@@ -1112,51 +1112,51 @@
       {
         "method": "greedy_only",
         "vehicles": 4,
-        "finish": 64770.311514913374,
-        "predictedFinish": 64770.311514913374,
-        "travel": 11994.837559350606,
-        "duration": 20184.837559350606,
+        "finish": 64747.94037380149,
+        "predictedFinish": 64747.94037380149,
+        "travel": 11498.55908645453,
+        "duration": 18878.55908645453,
         "late": 0,
-        "unassigned": 7,
-        "waitAvg": 2789.9885948760093,
-        "waitMax": 6791.311514913374,
+        "unassigned": 5,
+        "waitAvg": 2426.1660804472554,
+        "waitMax": 6740.940373801488,
         "etaMean": 0,
         "etaMax": 0,
         "loads": [
           {
             "vehicle": 1,
-            "kg": 59.8,
-            "parcels": 5,
-            "orders": 5,
-            "end": 60229.52327888097
+            "kg": 59.89999999999999,
+            "parcels": 10,
+            "orders": 10,
+            "end": 60505.53711757919
           },
           {
             "vehicle": 2,
-            "kg": 60,
-            "parcels": 10,
-            "orders": 9,
-            "end": 61598.39299477811
+            "kg": 59.699999999999996,
+            "parcels": 12,
+            "orders": 10,
+            "end": 61309.59596177891
           },
           {
             "vehicle": 3,
-            "kg": 54.1,
+            "kg": 48.800000000000004,
             "parcels": 20,
-            "orders": 17,
-            "end": 63986.60977077815
+            "orders": 18,
+            "end": 62715.48563329494
           },
           {
             "vehicle": 4,
-            "kg": 284.9,
-            "parcels": 26,
-            "orders": 22,
-            "end": 64770.311514913374
+            "kg": 290.9,
+            "parcels": 21,
+            "orders": 17,
+            "end": 64747.94037380149
           }
         ],
-        "positions": 1082,
+        "positions": 282,
         "evaluations": 0,
         "moves": 0,
         "stopReason": "—",
-        "ms": 1.820699999999988
+        "ms": 0.393100000000004
       },
       {
         "method": "greedy_default",
@@ -1204,7 +1204,7 @@
         "evaluations": 27822,
         "moves": 25,
         "stopReason": "Không còn phương án cải thiện",
-        "ms": 89.90679999999998
+        "ms": 92.25639999999999
       },
       {
         "method": "greedy_converged",
@@ -1252,56 +1252,56 @@
         "evaluations": 27822,
         "moves": 25,
         "stopReason": "Không còn phương án cải thiện",
-        "ms": 81.92280000000005
+        "ms": 80.9643000000001
       },
       {
         "method": "regret2_only",
         "vehicles": 4,
-        "finish": 62575.26380060357,
-        "predictedFinish": 62575.26380060357,
-        "travel": 10051.630104924297,
-        "duration": 18511.630104924297,
+        "finish": 62277.64224735569,
+        "predictedFinish": 62277.64224735569,
+        "travel": 9818.43638103205,
+        "duration": 17918.43638103205,
         "late": 0,
         "unassigned": 0,
-        "waitAvg": 2610.252355992449,
-        "waitMax": 4588.470597946034,
+        "waitAvg": 2112.3030783857353,
+        "waitMax": 4271.21934771807,
         "etaMean": 0,
         "etaMax": 0,
         "loads": [
           {
             "vehicle": 1,
-            "kg": 59.300000000000004,
-            "parcels": 19,
-            "orders": 18,
-            "end": 62230.942701978594
+            "kg": 58.2,
+            "parcels": 17,
+            "orders": 17,
+            "end": 61912.26508177117
           },
           {
             "vehicle": 2,
-            "kg": 59.7,
-            "parcels": 15,
-            "orders": 12,
-            "end": 61802.53590175904
+            "kg": 57.29999999999999,
+            "parcels": 13,
+            "orders": 13,
+            "end": 62045.37473079927
           },
           {
             "vehicle": 3,
-            "kg": 50.7,
-            "parcels": 18,
-            "orders": 17,
-            "end": 62575.26380060357
+            "kg": 47.4,
+            "parcels": 19,
+            "orders": 15,
+            "end": 62083.154321105925
           },
           {
             "vehicle": 4,
-            "kg": 292.2,
-            "parcels": 16,
-            "orders": 13,
-            "end": 62302.887700583095
+            "kg": 299,
+            "parcels": 19,
+            "orders": 15,
+            "end": 62277.64224735569
           }
         ],
-        "positions": 41631,
+        "positions": 5220,
         "evaluations": 0,
         "moves": 0,
         "stopReason": "—",
-        "ms": 50.28559999999993
+        "ms": 5.260999999999967
       },
       {
         "method": "regret2_default",
@@ -1349,7 +1349,7 @@
         "evaluations": 3573,
         "moves": 2,
         "stopReason": "Không còn phương án cải thiện",
-        "ms": 16.372299999999996
+        "ms": 13.961300000000165
       },
       {
         "method": "regret2_converged",
@@ -1397,7 +1397,7 @@
         "evaluations": 3573,
         "moves": 2,
         "stopReason": "Không còn phương án cải thiện",
-        "ms": 13.294200000000046
+        "ms": 13.171499999999924
       }
     ],
     "staticVsTd": [
@@ -1582,7 +1582,7 @@
           }
         ],
         "evaluations": 3573,
-        "ms": 13.133399999999938
+        "ms": 15.758800000000065
       },
       {
         "method": "greedy_rs",
@@ -1628,7 +1628,7 @@
           }
         ],
         "evaluations": 27822,
-        "ms": 90.10580000000004
+        "ms": 90.19889999999987
       },
       {
         "method": "regret_all",
@@ -1674,7 +1674,7 @@
           }
         ],
         "evaluations": 14984,
-        "ms": 46.727200000000266
+        "ms": 47.922199999999975
       },
       {
         "method": "greedy_all",
@@ -1720,157 +1720,157 @@
           }
         ],
         "evaluations": 62363,
-        "ms": 177.4643000000001
+        "ms": 182.22350000000006
       },
       {
         "method": "ils_1",
         "vehicles": 4,
-        "finish": 62177.33889387266,
-        "predictedFinish": 62177.33889387266,
-        "travel": 9242.05325175151,
-        "duration": 17522.05325175151,
+        "finish": 62008.374344569165,
+        "predictedFinish": 62008.374344569165,
+        "travel": 9163.558949252001,
+        "duration": 17263.558949252,
         "late": 0,
         "unassigned": 0,
-        "waitAvg": 2303.301244422849,
-        "waitMax": 4074.3388938726566,
+        "waitAvg": 1934.6928534711894,
+        "waitMax": 3967.120609044883,
         "etaMean": 0,
         "etaMax": 0,
         "loads": [
           {
             "vehicle": 1,
-            "kg": 56.199999999999996,
-            "parcels": 20,
-            "orders": 18,
-            "end": 61640.142805766
+            "kg": 58.49999999999999,
+            "parcels": 15,
+            "orders": 14,
+            "end": 61799.63269582355
           },
           {
             "vehicle": 2,
-            "kg": 59,
-            "parcels": 15,
+            "kg": 52.9,
+            "parcels": 18,
             "orders": 15,
-            "end": 62091.1248674724
+            "end": 61931.735255708314
           },
           {
             "vehicle": 3,
-            "kg": 43.6,
-            "parcels": 14,
-            "orders": 13,
-            "end": 62013.446684640454
+            "kg": 55.699999999999996,
+            "parcels": 18,
+            "orders": 18,
+            "end": 61923.81665315097
           },
           {
             "vehicle": 4,
-            "kg": 303.09999999999997,
-            "parcels": 19,
-            "orders": 14,
-            "end": 62177.33889387266
+            "kg": 294.8,
+            "parcels": 17,
+            "orders": 13,
+            "end": 62008.374344569165
           }
         ],
         "evaluations": 3000000,
-        "ms": 11491.8256,
+        "ms": 11593.6987,
         "cap": 3000000,
-        "bestAt": 1624492,
-        "iterations": 86,
-        "restarts": 2
+        "bestAt": 698580,
+        "iterations": 326,
+        "restarts": 18
       },
       {
         "method": "ils_2",
         "vehicles": 4,
-        "finish": 62083.36110623308,
-        "predictedFinish": 62083.36110623308,
-        "travel": 9439.878972918443,
-        "duration": 17719.878972918443,
+        "finish": 62008.374344569165,
+        "predictedFinish": 62008.374344569165,
+        "travel": 9197.719421339309,
+        "duration": 17297.71942133931,
         "late": 0,
         "unassigned": 0,
-        "waitAvg": 2442.888103316763,
-        "waitMax": 4067.1850852712523,
+        "waitAvg": 1990.6756658687907,
+        "waitMax": 3985.756932317847,
         "etaMean": 0,
         "etaMax": 0,
         "loads": [
           {
             "vehicle": 1,
-            "kg": 55.8,
-            "parcels": 20,
-            "orders": 19,
-            "end": 62023.825538001656
+            "kg": 52.9,
+            "parcels": 18,
+            "orders": 15,
+            "end": 61931.735255708314
           },
           {
             "vehicle": 2,
-            "kg": 53.10000000000001,
+            "kg": 55.29999999999999,
             "parcels": 14,
-            "orders": 13,
-            "end": 61987.6631110431
+            "orders": 14,
+            "end": 61787.738413489235
           },
           {
             "vehicle": 3,
-            "kg": 50.300000000000004,
-            "parcels": 16,
-            "orders": 15,
-            "end": 62025.02921764061
+            "kg": 58.90000000000001,
+            "parcels": 19,
+            "orders": 18,
+            "end": 61969.871407572595
           },
           {
             "vehicle": 4,
-            "kg": 302.7,
-            "parcels": 18,
+            "kg": 294.8,
+            "parcels": 17,
             "orders": 13,
-            "end": 62083.36110623308
+            "end": 62008.374344569165
           }
         ],
         "evaluations": 3000000,
-        "ms": 12195.7507,
+        "ms": 11457.900499999998,
         "cap": 3000000,
-        "bestAt": 1215164,
-        "iterations": 77,
-        "restarts": 3
+        "bestAt": 1820276,
+        "iterations": 348,
+        "restarts": 20
       },
       {
         "method": "ils_3",
         "vehicles": 4,
-        "finish": 62177.33889387266,
-        "predictedFinish": 62177.33889387266,
-        "travel": 9723.546758917364,
-        "duration": 17913.546758917364,
+        "finish": 62008.374344569165,
+        "predictedFinish": 62008.374344569165,
+        "travel": 9252.557277421074,
+        "duration": 17352.557277421074,
         "late": 0,
         "unassigned": 0,
-        "waitAvg": 2468.323656127321,
-        "waitMax": 4074.3388938726566,
+        "waitAvg": 2000.9715890343737,
+        "waitMax": 4023.8799845146277,
         "etaMean": 0,
         "etaMax": 0,
         "loads": [
           {
             "vehicle": 1,
-            "kg": 58,
-            "parcels": 20,
-            "orders": 19,
-            "end": 62008.29170858687
+            "kg": 59.29999999999999,
+            "parcels": 15,
+            "orders": 15,
+            "end": 61831.854759347254
           },
           {
             "vehicle": 2,
-            "kg": 59.2,
-            "parcels": 13,
-            "orders": 12,
-            "end": 62008.083259647276
+            "kg": 54.900000000000006,
+            "parcels": 18,
+            "orders": 17,
+            "end": 61980.59291779634
           },
           {
             "vehicle": 3,
-            "kg": 41.6,
-            "parcels": 16,
+            "kg": 52.9,
+            "parcels": 18,
             "orders": 15,
-            "end": 62119.83289681056
+            "end": 61931.735255708314
           },
           {
             "vehicle": 4,
-            "kg": 303.09999999999997,
-            "parcels": 19,
-            "orders": 14,
-            "end": 62177.33889387266
+            "kg": 294.8,
+            "parcels": 17,
+            "orders": 13,
+            "end": 62008.374344569165
           }
         ],
         "evaluations": 3000000,
-        "ms": 12036.122600000002,
+        "ms": 11527.927599999995,
         "cap": 3000000,
-        "bestAt": 470448,
-        "iterations": 75,
-        "restarts": 4
+        "bestAt": 649741,
+        "iterations": 362,
+        "restarts": 21
       }
     ],
     "reroute": [
@@ -3285,8 +3285,8 @@
       {
         "n": 15,
         "points": 15,
-        "insertionMs": 0.895700000000943,
-        "lsMs": 2.257399999994959,
+        "insertionMs": 1.07220000000234,
+        "lsMs": 3.088900000002468,
         "evaluations": 837,
         "defaultStop": "Không còn phương án cải thiện",
         "legsPerProfile": 240,
@@ -3295,8 +3295,8 @@
       {
         "n": 30,
         "points": 30,
-        "insertionMs": 6.146499999995285,
-        "lsMs": 23.581600000004983,
+        "insertionMs": 8.620699999999488,
+        "lsMs": 32.0792999999976,
         "evaluations": 7130,
         "defaultStop": "Không còn phương án cải thiện",
         "legsPerProfile": 930,
@@ -3305,9 +3305,9 @@
       {
         "n": 45,
         "points": 30,
-        "insertionMs": 21.381099999998696,
-        "lsMs": 94.8744000000006,
-        "evaluations": 22520,
+        "insertionMs": 7.299300000006042,
+        "lsMs": 22.42149999999674,
+        "evaluations": 7138,
         "defaultStop": "Không còn phương án cải thiện",
         "legsPerProfile": 930,
         "legsTotal": 7440
@@ -3315,9 +3315,9 @@
       {
         "n": 60,
         "points": 30,
-        "insertionMs": 46.42190000000119,
-        "lsMs": 148.52040000000125,
-        "evaluations": 35754,
+        "insertionMs": 6.389699999999721,
+        "lsMs": 9.616800000003423,
+        "evaluations": 3573,
         "defaultStop": "Không còn phương án cải thiện",
         "legsPerProfile": 930,
         "legsTotal": 7440
@@ -3337,7 +3337,7 @@
           "lateMax": 188.99433197355393,
           "served": 60,
           "unassigned": 0,
-          "ms": 22.338599999995495
+          "ms": 38.51800000000367
         },
         {
           "key": "ignore",
@@ -3350,7 +3350,7 @@
           "early": 0,
           "served": 60,
           "unassigned": 0,
-          "ms": 22.338599999995495
+          "ms": 38.51800000000367
         },
         {
           "key": "hard",
@@ -3363,7 +3363,7 @@
           "early": 0,
           "served": 60,
           "unassigned": 0,
-          "ms": 64.26080000000366
+          "ms": 67.79279999999562
         }
       ]
     }
