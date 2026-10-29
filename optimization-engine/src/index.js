@@ -22,9 +22,12 @@
 //     'total':    giảm tổng thời lượng các chuyến (mục tiêu ban đầu, giữ để so sánh).
 // - Giới hạn thời gian: P.shiftEndSeconds là giờ kết thúc ca (giây kể từ 0:00), mọi xe phải về kho trước giờ đó;
 //   P.maxRouteSeconds (cách cũ, vẫn dùng được) giới hạn thời lượng một chuyến.
-// - Giờ hẹn sớm nhất: order.notBeforeSeconds (giây kể từ 0:00, tùy chọn), khách hẹn "giao sau HH:MM". Xe đến sớm hơn
-//   thì chờ tới giờ hẹn rồi mới giao; thời gian chờ tính vào thời lượng chuyến nên Insertion và Local Search tự đưa
-//   đơn đó về sau trong tuyến khi chờ làm muộn giờ về kho.
+// - Khung giờ giao: order.notBeforeSeconds và order.notAfterSeconds (giây kể từ 0:00, tùy chọn), giờ sớm nhất và
+//   muộn nhất được bắt đầu giao. Xe đến sớm hơn giờ sớm nhất thì chờ rồi mới giao; thời gian chờ tính vào thời lượng
+//   chuyến nên Insertion và Local Search tự đưa đơn đó về sau trong tuyến khi chờ làm muộn giờ về kho.
+//   Đến muộn hơn giờ muộn nhất là trễ khung giờ. P.windowMode:
+//     'hard' (mặc định, lập kế hoạch): phương án làm trễ khung giờ bị loại, đơn không còn chỗ thì ghi lý do;
+//     'soft' (xe đang giao): trễ vẫn được tính, Local Search giảm tổng thời gian trễ trước rồi mới giảm thời lượng.
 // - Đơn cùng điểm giao: plan() gom các đơn cùng điểm (và cùng giờ hẹn) thành một nhóm đi cùng xe, giao liền nhau trong
 //   một lần dừng. Chỉ tách khi không thể chở chung (không có loại xe chung, hoặc vượt tải xe lớn nhất chở được),
 //   tách ít phần nhất và ghi trong kết quả (splitPoints).
@@ -42,7 +45,9 @@ const REASONS = {
   no_route: 'Thiếu dữ liệu tuyến từ TomTom',
   duration: 'Vượt giới hạn thời lượng chuyến',
   shift: 'Không kịp trong ca',
+  window: 'Không kịp khung giờ khách hẹn',
 };
+const LATE_EPS = 1e-6;
 
 /** Thời gian một chặng khi rời điểm a lúc `clock`: cùng điểm thì 0, thiếu dữ liệu thì null. */
 function leg(P, profile, a, b, clock) {
@@ -55,13 +60,16 @@ const serviceOf = (P, o) => P.orders[o].serviceSeconds ?? P.serviceSeconds ?? 0;
 const stopOf = P => P.stopSeconds ?? 0;
 const parcelsOf = (P, o) => P.orders[o].parcels ?? 1;
 const notBeforeOf = (P, o) => P.orders[o].notBeforeSeconds ?? null;
+const notAfterOf = (P, o) => P.orders[o].notAfterSeconds ?? null;
+const hardWindows = P => (P.windowMode ?? 'hard') === 'hard';
 const startClock = P => P.startSeconds ?? 0;
 const objectiveOf = P => P.objective ?? 'makespan';
-const hasWindows = P => P.orders.some(o => o.notBeforeSeconds != null);
+const hasWindows = P => P.orders.some(o => o.notBeforeSeconds != null || o.notAfterSeconds != null);
 
 /**
- * Xe ở điểm `prev` lúc `clock` đi giao đơn o: chạy chặng, đến sớm hơn giờ hẹn thì chờ, dừng xe nếu là điểm mới, giao.
- * Trả về giờ giao xong, null nếu chặng không hợp lệ. acc (tùy chọn) ghi giờ bắt đầu giao và thời gian chờ.
+ * Xe ở điểm `prev` lúc `clock` đi giao đơn o: chạy chặng, đến sớm hơn giờ sớm nhất thì chờ, dừng xe nếu là điểm mới, giao.
+ * Trả về giờ giao xong, null nếu chặng không hợp lệ. acc (tùy chọn) ghi giờ bắt đầu giao, thời gian chờ và thời gian
+ * trễ so với giờ muộn nhất của khung giờ (late: tổng giây trễ, lateCount: số đơn trễ).
  */
 function visit(P, profile, prev, clock, o, acc = null) {
   const u = P.orders[o].point;
@@ -70,10 +78,15 @@ function visit(P, profile, prev, clock, o, acc = null) {
   clock += t;
   const nb = notBeforeOf(P, o);
   if (nb != null && clock < nb) {
-    if (acc) acc.wait += nb - clock;
+    if (acc) acc.wait = (acc.wait ?? 0) + nb - clock;
     clock = nb;
   }
-  acc?.arrivals.push(clock);
+  acc?.arrivals?.push(clock);
+  const na = notAfterOf(P, o);
+  if (acc && na != null && clock > na + LATE_EPS) {
+    acc.late = (acc.late ?? 0) + clock - na;
+    acc.lateCount = (acc.lateCount ?? 0) + 1;
+  }
   if (u !== prev) clock += stopOf(P);
   return clock + serviceOf(P, o);
 }
@@ -120,7 +133,7 @@ export function routeSeconds(P, v, route, start = P.depot, startSeconds = startC
  * lần dừng. null nếu có chặng không hợp lệ.
  */
 export function routeSchedule(P, v, route, { start = P.depot, startSeconds = startClock(P) } = {}) {
-  const acc = { arrivals: [], wait: 0 };
+  const acc = { arrivals: [], wait: 0, late: 0, lateCount: 0 };
   const end = forward(P, P.vehicles[v].profile, start, startSeconds, route, 0, acc);
   if (end == null) return null;
   let stops = 0;
@@ -135,6 +148,9 @@ export function routeSchedule(P, v, route, { start = P.depot, startSeconds = sta
   return {
     arrivals: acc.arrivals, end, seconds: end - startSeconds, travelSeconds: end - startSeconds - service - acc.wait,
     serviceSeconds: service, waitSeconds: acc.wait, stops,
+    // Trễ khung giờ: từng đơn (giây, 0 nếu đúng khung giờ hoặc không có giờ muộn nhất), tổng và số đơn trễ
+    lateness: route.map((o, k) => Math.max(0, acc.arrivals[k] - (notAfterOf(P, o) ?? Infinity))),
+    lateSeconds: acc.late, lateCount: acc.lateCount,
   };
 }
 
@@ -231,10 +247,12 @@ function insertionOptionsAt(P, routes, loads, parcels, costs, o) {
       if (p >= depart.length) { found.add('no_route'); break; }
       positions++;
       const i = p === 0 ? P.depot : P.orders[r[p - 1]].point;
-      const c = visit(P, profile, i, depart[p], o);
+      const acc = { late: 0 };
+      const c = visit(P, profile, i, depart[p], o, acc);
       if (c == null) { found.add('no_route'); continue; }
-      const end = forward(P, profile, u, c, r, p);
+      const end = forward(P, profile, u, c, r, p, acc);
       if (end == null) { found.add('no_route'); continue; }
+      if (hardWindows(P) && acc.late > LATE_EPS) { found.add('window'); continue; }
       const seconds = end - t0;
       const bad = timeViolation(P, seconds, end);
       if (bad) { found.add(bad); continue; }
@@ -343,6 +361,8 @@ export function insertion(P, { rule = null, queue = null, routes: initial = null
  *  - 'makespan': (M', T') tốt hơn (M, T) khi M' < M − ε, hoặc M' ≤ M và T' < T − ε (M là giờ xe cuối về kho,
  *    T là tổng thời lượng các chuyến). Mỗi bước M không tăng và M hoặc T giảm thật sự, nên không lặp vòng.
  *  - 'total': nhận khi T giảm hơn ε (cách cũ).
+ * Khung giờ: P.windowMode 'hard' loại mọi phương án làm trễ khung giờ; 'soft' (xe đang giao, tuyến có thể đã trễ)
+ * so tổng thời gian trễ L trước: nhận khi L giảm hơn ε, hoặc L không tăng và mục tiêu trên cải thiện.
  * ε tính bằng giây, mặc định 1e-6 (chỉ để bỏ sai số làm tròn của phép nội suy). Giới hạn tính toán được kiểm tra
  * trước mỗi lần xét một phương án (NFR09). Local Search không thêm hoặc bớt đơn.
  *  start[v]   điểm xe v đang đứng (chuyến đang giao), mặc định là kho
@@ -368,8 +388,15 @@ export function localSearch(P, initial, {
   // Vị trí đầu tiên của phần đuôi bị ghim: không lấy đơn từ đó trở đi và không chèn đơn vào sau nó
   const endOf = v => routes[v].length - (lockedEnd?.[v] ?? 0);
   const clockOf = v => startTimes?.[v] ?? startClock(P);
+  const hard = hardWindows(P);
+  const lateOf = (v, r) => {
+    const acc = { late: 0 };
+    forward(P, P.vehicles[v].profile, startOf(v), clockOf(v), r, 0, acc);
+    return acc.late;
+  };
   const costs = routes.map((r, v) => routeSeconds(P, v, r, startOf(v), clockOf(v)));
   const ends = routes.map((r, v) => clockOf(v) + costs[v]);
+  const lates = routes.map((r, v) => (hard ? 0 : lateOf(v, r)));
   let evaluations = 0;
   let accepted = 0;
   let stopReason = null;
@@ -379,15 +406,19 @@ export function localSearch(P, initial, {
     else if (now() - t0 >= maxMs) stopReason = 'Đạt giới hạn thời gian tính';
     return !stopReason;
   };
-  // Giá trị một tuyến mới: { c: thời lượng, end: giờ về kho }, null nếu vượt tải, thiếu chặng hoặc vượt giới hạn thời gian.
+  // Giá trị một tuyến mới: { c: thời lượng, end: giờ về kho, late: tổng giây trễ khung giờ }, null nếu vượt tải,
+  // thiếu chặng, vượt giới hạn thời gian hoặc (khung giờ cứng) trễ khung giờ.
   // Tuyến đã bỏ một đơn của Relocate được dùng lại cho mọi vị trí chèn nên giữ kết quả theo đúng mảng đó.
   const memo = new WeakMap();
   const value = (v, r) => {
     if (memo.has(r)) return memo.get(r);
     let out = null;
     if (loadOf(P, r) <= P.vehicles[v].capacityKg && parcelLoadOf(P, r) <= parcelCap(P, v)) {
-      const end = forward(P, P.vehicles[v].profile, startOf(v), clockOf(v), r);
-      if (end != null && !timeViolation(P, end - clockOf(v), end)) out = { c: end - clockOf(v), end };
+      const acc = { late: 0 };
+      const end = forward(P, P.vehicles[v].profile, startOf(v), clockOf(v), r, 0, acc);
+      if (end != null && !timeViolation(P, end - clockOf(v), end) && !(hard && acc.late > LATE_EPS)) {
+        out = { c: end - clockOf(v), end, late: hard ? 0 : acc.late };
+      }
     }
     memo.set(r, out);
     return out;
@@ -472,6 +503,7 @@ export function localSearch(P, initial, {
   const sum = xs => xs.reduce((s, x) => s + x, 0);
   let M = Math.max(...ends);
   let T = sum(costs);
+  let L = sum(lates);
   while (true) {
     let best = null;
     scan: for (const neighbours of gens) {
@@ -485,11 +517,17 @@ export function localSearch(P, initial, {
           next.push([v, r, x]);
         }
         if (next.length < change.length) continue;
+        // Khung giờ mềm: tổng trễ của phương án lân cận, giảm trễ được ưu tiên hơn giảm thời lượng
+        let L2 = L;
+        for (const [v, , x] of next) L2 += x.late - lates[v];
+        if (L2 > L + epsilon) continue;
+        const lessLate = L2 < L - epsilon;
         if (objective === 'total') {
           let delta = 0;
           for (const [v, , x] of next) delta += x.c - costs[v];
-          // Chỉ nhận phương án tiết kiệm vượt ngưỡng ε và tốt nhất trong lượt
-          if (delta < -epsilon && (!best || delta < best.delta)) best = { delta, next };
+          // Chỉ nhận phương án giảm trễ hoặc tiết kiệm vượt ngưỡng ε, tốt nhất trong lượt
+          if ((lessLate || delta < -epsilon)
+            && (!best || L2 < best.L - epsilon || (Math.abs(L2 - best.L) <= epsilon && delta < best.delta))) best = { L: L2, delta, next };
         } else {
           let M2 = -Infinity;
           let T2 = 0;
@@ -498,15 +536,17 @@ export function localSearch(P, initial, {
             M2 = Math.max(M2, x ? x.end : ends[w]);
             T2 += x ? x.c : costs[w];
           }
-          const improves = M2 < M - epsilon || (M2 <= M && T2 < T - epsilon);
-          if (improves && (!best || M2 < best.M || (M2 === best.M && T2 < best.T))) best = { M: M2, T: T2, next };
+          const improves = lessLate || M2 < M - epsilon || (M2 <= M && T2 < T - epsilon);
+          if (improves && (!best || L2 < best.L - epsilon
+            || (Math.abs(L2 - best.L) <= epsilon && (M2 < best.M || (M2 === best.M && T2 < best.T))))) best = { L: L2, M: M2, T: T2, next };
         }
       }
     }
     if (!best) break;
-    for (const [v, r, x] of best.next) { routes[v] = r; costs[v] = x.c; ends[v] = x.end; }
+    for (const [v, r, x] of best.next) { routes[v] = r; costs[v] = x.c; ends[v] = x.end; lates[v] = x.late; }
     M = Math.max(...ends);
     T = sum(costs);
+    L = sum(lates);
     accepted++;
     if (stopReason) break;
   }
@@ -524,7 +564,7 @@ const sumOf = (os, f) => os.reduce((s, o) => s + f(o), 0);
 const kgOf = (P, os) => round6(sumOf(os, o => P.orders[o].weightKg));
 const piecesOf = (P, os) => sumOf(os, o => parcelsOf(P, o));
 const typesOf = (P, os) => P.orders[os[0]].vehicleTypes.filter(t => os.every(o => P.orders[o].vehicleTypes.includes(t)));
-const groupKey = (P, o) => `${P.orders[o].point}|${notBeforeOf(P, o) ?? ''}`;
+const groupKey = (P, o) => `${P.orders[o].point}|${notBeforeOf(P, o) ?? ''}|${notAfterOf(P, o) ?? ''}`;
 
 const SPLIT = {
   vehicle_type: 'Các đơn cùng địa chỉ không có loại xe chung',
@@ -550,7 +590,7 @@ function packFirstFit(P, members, bins) {
 }
 
 /**
- * Gom đơn thành nhóm cho plan(): mỗi nhóm là các đơn cùng điểm giao và cùng giờ hẹn, phải đi cùng một xe và giao liền
+ * Gom đơn thành nhóm cho plan(): mỗi nhóm là các đơn cùng điểm giao và cùng khung giờ, phải đi cùng một xe và giao liền
  * nhau. Nhóm chỉ bị tách khi:
  *  - các đơn không có loại xe chung: tách theo loại xe chở được nhiều đơn nhất trước;
  *  - tổng khối lượng hoặc số kiện vượt xe lớn nhất chở được nhóm: tách ít phần nhất theo sức chứa của xe đó;
@@ -744,9 +784,11 @@ export function flippedPairs(before, after) {
  * Phần tuyến được tính từ vị trí hiện tại, qua các điểm còn lại rồi về kho. Cả thứ tự hiện hành và thứ tự đề xuất
  * được tính trên cùng một dữ liệu mới. Với một xe, về kho sớm nhất cũng là thời lượng phần còn lại ngắn nhất,
  * nên hai mục tiêu trùng nhau.
- *  stops:   [{ id, point, serviceSeconds?, notBeforeSeconds?, pinned? }] các điểm chưa xử lý theo thứ tự hiện hành;
- *           phần tử đầu là điểm kế tiếp. pinned: điểm giao sau, giữ ở cuối tuyến theo thứ tự hiện hành.
- *           notBeforeSeconds: khách hẹn giờ, xe đến sớm thì chờ.
+ *  stops:   [{ id, point, serviceSeconds?, notBeforeSeconds?, notAfterSeconds?, pinned? }] các điểm chưa xử lý theo thứ
+ *           tự hiện hành; phần tử đầu là điểm kế tiếp. pinned: điểm giao sau, giữ ở cuối tuyến theo thứ tự hiện hành.
+ *           notBeforeSeconds, notAfterSeconds: khung giờ khách hẹn, xe đến sớm thì chờ, đến muộn là trễ.
+ * Khung giờ mềm: xe đã chạy nên không thể bỏ đơn; thứ tự mới giảm tổng thời gian trễ trước, rồi mới giảm thời lượng.
+ * Thứ tự làm giảm trễ ít nhất 60 giây được áp dụng ngay, không cần đạt ngưỡng tiết kiệm.
  *  start:   khóa điểm vị trí xe
  *  profile: cấu hình định tuyến của xe
  *  travelAt, startSeconds: tùy chọn, thời gian phụ thuộc giờ; startSeconds là giờ hiện tại của xe
@@ -766,9 +808,10 @@ export function evaluateReroute({
     serviceSeconds,
     stopSeconds,
     objective: 'total',
+    windowMode: 'soft',
     orders: stops.map(s => ({
       id: s.id, code: String(s.id), point: s.point, weightKg: 0, parcels: 0, vehicleTypes: ['any'],
-      serviceSeconds: s.serviceSeconds, notBeforeSeconds: s.notBeforeSeconds ?? null,
+      serviceSeconds: s.serviceSeconds, notBeforeSeconds: s.notBeforeSeconds ?? null, notAfterSeconds: s.notAfterSeconds ?? null,
     })),
     vehicles: [{ id: 0, type: 'any', profile, capacityKg: Infinity }],
   };
@@ -779,7 +822,7 @@ export function evaluateReroute({
   }
   // Nhóm: điểm kế tiếp (nếu giữ) và các điểm cùng điểm giao với nó đứng đầu; điểm giao sau giữ ở cuối;
   // phần giữa gom theo điểm giao và giờ hẹn, theo thứ tự xuất hiện trong thứ tự hiện hành
-  const key = i => `${stops[i].point}|${stops[i].notBeforeSeconds ?? ''}|${stops[i].pinned ? 1 : 0}`;
+  const key = i => `${stops[i].point}|${stops[i].notBeforeSeconds ?? ''}|${stops[i].notAfterSeconds ?? ''}|${stops[i].pinned ? 1 : 0}`;
   const head = lockNext && stops.length ? current.filter(i => key(i) === key(0)) : [];
   const collect = list => {
     const m = new Map();
@@ -803,14 +846,19 @@ export function evaluateReroute({
   const proposed = result.routes[0].flatMap(k => groups[k]);
   const T2 = routeSeconds(P, 0, proposed, start);
   const G = T - T2;
+  const lateNow = routeSchedule(P, 0, current, { start }).lateSeconds;
+  const lateNew = routeSchedule(P, 0, proposed, { start }).lateSeconds;
   return {
     valid: true,
     currentSeconds: T,
     proposedSeconds: T2,
     savingSeconds: G,
     savingRatio: T > 0 ? G / T : 0,
-    // Điều kiện áp dụng ban đầu: G ≥ max(60 giây, 5% × T) (mục 3.4.6)
-    meetsThreshold: G > 0 && G >= Math.max(minSavingSeconds, minSavingRatio * T),
+    currentLateSeconds: lateNow,
+    proposedLateSeconds: lateNew,
+    // Điều kiện áp dụng: giảm trễ khung giờ ít nhất 60 giây, hoặc không trễ thêm và G ≥ max(60 giây, 5% × T) (mục 3.4.6)
+    meetsThreshold: lateNow - lateNew >= minSavingSeconds
+      || (lateNew <= lateNow + LATE_EPS && G > 0 && G >= Math.max(minSavingSeconds, minSavingRatio * T)),
     proposedStopIds: proposed.map(i => stops[i].id),
     flippedPairs: flippedPairs(current, proposed),
     evaluations: result.stats.evaluations,
@@ -820,12 +868,13 @@ export function evaluateReroute({
 /**
  * Lịch các điểm còn lại theo đúng thứ tự cho trước (giờ dự kiến đến từng điểm và giờ về kho), cùng mô hình với
  * lập kế hoạch: thời gian phụ thuộc giờ, dừng xe, giao từng đơn, chờ giờ hẹn. Dùng cho giờ dự kiến trên màn hình.
- * stops: [{ point, serviceSeconds?, notBeforeSeconds? }]. Trả về null nếu thiếu chặng.
+ * stops: [{ point, serviceSeconds?, notBeforeSeconds?, notAfterSeconds? }]. Trả về null nếu thiếu chặng; lateness cho biết
+ * đơn nào dự kiến trễ khung giờ và trễ bao nhiêu giây.
  */
 export function stopSchedule({ depot, travel = null, travelAt = null, startSeconds = 0, serviceSeconds = 0, stopSeconds = 0, profile, start, stops }) {
   const P = {
     depot, travel, travelAt, startSeconds, serviceSeconds, stopSeconds,
-    orders: stops.map(s => ({ point: s.point, serviceSeconds: s.serviceSeconds, notBeforeSeconds: s.notBeforeSeconds ?? null })),
+    orders: stops.map(s => ({ point: s.point, serviceSeconds: s.serviceSeconds, notBeforeSeconds: s.notBeforeSeconds ?? null, notAfterSeconds: s.notAfterSeconds ?? null })),
     vehicles: [{ profile }],
   };
   return routeSchedule(P, 0, stops.map((_, i) => i), { start, startSeconds });

@@ -555,3 +555,74 @@ test('Lịch các điểm còn lại cùng mô hình với lập kế hoạch', 
   s.arrivals.forEach((t, k) => near(t, r.arrivalSeconds[k]));
   near(s.end, r.returnSeconds);
 });
+
+// ---------------------------------------------------------------- Khung giờ giao (giờ sớm nhất, giờ muộn nhất)
+const windowsOf = d => (d.khung_gio ? { notBeforeSeconds: clockSeconds(d.khung_gio.tu), notAfterSeconds: clockSeconds(d.khung_gio.den) } : {});
+function problem60w(extra = {}) {
+  const P = problem60(extra);
+  return { ...P, orders: P.orders.map((o, i) => ({ ...o, ...windowsOf(kb60.don[i]) })) };
+}
+// Mọi đơn đã xếp bắt đầu giao trong khung giờ của nó
+function inWindows(P, out) {
+  return out.routes.every(r => r.orderIds.every((id, k) => {
+    const o = P.orders[id - 1];
+    const t = r.arrivalSeconds[k];
+    return (o.notBeforeSeconds == null || t >= o.notBeforeSeconds - 1e-6) && (o.notAfterSeconds == null || t <= o.notAfterSeconds + 1e-6);
+  }));
+}
+
+test('Khung giờ: đơn có giờ muộn nhất được giao kịp, không kịp thì chưa xếp với lý do riêng', () => {
+  const travel = (p, a, b) => (a === b ? 0 : 100);
+  const base = { depot: 'K', travel, vehicles: [{ id: 1, type: 'm', profile: 'x', capacityKg: 100 }] };
+  const order = (id, point, w = {}) => ({ id, code: point, point, weightKg: 1, vehicleTypes: ['m'], ...w });
+  // B phải bắt đầu giao trước giây 150 nên đứng đầu tuyến dù thứ tự nào cũng dài như nhau
+  const out = plan({ ...base, orders: [order(1, 'A'), order(2, 'B', { notAfterSeconds: 150 })] });
+  assert.equal(out.unassigned.length, 0);
+  assert.deepEqual(out.routes[0].orderIds, [2, 1]);
+  assert.ok(out.routes[0].arrivalSeconds[0] <= 150);
+  // Từ kho đến B mất 100 giây, không thể bắt đầu giao trước giây 50
+  const late = plan({ ...base, orders: [order(1, 'A'), order(2, 'B', { notAfterSeconds: 50 })] });
+  assert.deepEqual(late.unassigned, [{ orderId: 2, reason: 'Không kịp khung giờ khách hẹn' }]);
+  // Khung giờ đủ rộng: đến sớm thì chờ đến giờ sớm nhất
+  const wait = plan({ ...base, orders: [order(1, 'A', { notBeforeSeconds: 500, notAfterSeconds: 600 })] });
+  assert.equal(wait.routes[0].arrivalSeconds[0], 500);
+});
+
+test('Khung giờ kịch bản 60 đơn: mọi đơn đã xếp giao trong khung giờ, Local Search không làm trễ', () => {
+  const P = problem60w();
+  assert.equal(P.orders.filter(o => o.notAfterSeconds != null).length, 21);
+  const out = plan(P);
+  assert.ok(inWindows(P, out), 'có đơn giao ngoài khung giờ');
+  assert.ok(pointsTogether(P, out), 'có điểm giao bị tách');
+  assert.ok(out.unassigned.every(u => /khung giờ|trong ca/.test(u.reason)), JSON.stringify(out.unassigned));
+  for (const r of out.routes) {
+    const v = P.vehicles.find(x => x.id === r.vehicleId);
+    assert.ok(r.returnSeconds <= P.shiftEndSeconds + 1e-6 || !r.orderIds.length, `xe ${v.id} về sau giờ hết ca`);
+  }
+  // Insertion và từng bước Local Search đều giữ khung giờ
+  const first = insertion(P);
+  const better = localSearch(P, first);
+  for (const [k, r] of better.routes.entries()) {
+    const s = routeSchedule(P, k, r);
+    assert.equal(s.lateCount, 0);
+  }
+});
+
+test('Khung giờ khi đang giao: thứ tự mới giảm trễ được áp dụng dù không rút ngắn thời gian', () => {
+  const travel = (p, a, b) => (a === b ? 0 : 100);
+  // Đi A trước thì B đến giây 200, trễ 100 giây so với giờ muộn nhất 100; đi B trước thì không trễ, tổng thời gian như nhau
+  const stops = [{ id: 'a', point: 'A' }, { id: 'b', point: 'B', notAfterSeconds: 100 }];
+  const r = evaluateReroute({ depot: 'K', travel, profile: 'x', start: 'K', lockNext: false, stops });
+  assert.deepEqual(r.proposedStopIds, ['b', 'a']);
+  assert.equal(r.currentLateSeconds, 100);
+  assert.equal(r.proposedLateSeconds, 0);
+  assert.equal(r.savingSeconds, 0);
+  assert.equal(r.meetsThreshold, true);
+  // Lịch cho biết đơn nào dự kiến trễ
+  const s = stopSchedule({ depot: 'K', travel, profile: 'x', start: 'K', stops });
+  assert.deepEqual(s.lateness, [0, 100]);
+  assert.equal(s.lateCount, 1);
+  // Không có khung giờ thì vẫn theo ngưỡng tiết kiệm như cũ
+  const plain = evaluateReroute({ depot: 'K', travel, profile: 'x', start: 'K', lockNext: false, stops: stops.map(({ notAfterSeconds, ...x }) => x) });
+  assert.equal(plain.meetsThreshold, false);
+});
