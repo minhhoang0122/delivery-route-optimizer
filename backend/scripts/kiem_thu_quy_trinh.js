@@ -69,6 +69,12 @@ check(selfLock.status === 400, 'không tự khóa chính mình');
 console.log('Dispatcher: lập kế hoạch');
 const opt = (await api(disp, 'GET', '/planning/options')).data;
 check(opt.orders.length === 60, '60 đơn chờ xếp');
+// Dữ liệu mẫu có khung giờ theo giờ trong ngày (văn phòng 08:00–17:00, nhà riêng 17:00–21:00…). Kịch bản chạy ở bất kỳ giờ
+// nào nên bỏ khung giờ của các đơn mẫu trước khi lập kế hoạch; phần khung giờ được kiểm tra riêng ở cuối với đơn mới
+const windowed = (await api(disp, 'GET', '/orders?status=pending')).data.orders.filter(o => o.windowStart || o.windowEnd);
+check(windowed.length === 21, '21 đơn mẫu có khung giờ giao');
+for (const o of windowed) await api(disp, 'PUT', `/orders/${o.id}`, { ...o, windowStart: null, windowEnd: null });
+check(!(await api(disp, 'GET', '/orders?status=pending')).data.orders.some(o => o.windowStart || o.windowEnd), 'bỏ khung giờ của đơn mẫu (sửa đơn qua API)');
 check(opt.defaults.shiftEnd && !('maxRouteMinutes' in opt.defaults) && opt.vehicles.filter(v => !v.problem).every(v => v.capacityParcels > 0),
   'tùy chọn lập kế hoạch: giờ hết ca mặc định, không còn giới hạn thời lượng mỗi chuyến; xe có số kiện tối đa');
 const ready = opt.vehicles.filter(v => !v.problem).map(v => v.id);
@@ -282,7 +288,7 @@ const nearStop = pendA[0];
 if (lateStop) {
   const tv = await api(null, 'GET', `/public/tracking/${await tokenOf(lateStop.order.id)}`);
   const body = JSON.stringify(tv.data);
-  const ALLOWED = ['code', 'status', 'notBeforeAt', 'driverName', 'eta', 'stopsBefore', 'vehicle', 'destination', 'result', 'actions', 'updatedAt'];
+  const ALLOWED = ['code', 'status', 'notBeforeAt', 'window', 'driverName', 'eta', 'stopsBefore', 'vehicle', 'destination', 'result', 'actions', 'updatedAt'];
   check(tv.status === 200 && Object.keys(tv.data.tracking).every(k => ALLOWED.includes(k)) && tv.data.tracking.code === lateStop.order.code
     && !body.includes(lateStop.order.phone) && !body.includes(lateStop.order.recipientName) && !body.includes(lateStop.order.address)
     && !body.includes(ta.driver.phone) && !body.includes(ta.driver.name)
@@ -489,6 +495,31 @@ const dupOrder = await api(disp, 'POST', '/orders', { ...ok, code: 'DH-9002', ph
 check(dupOrder.status === 409 && dupOrder.data.error.code === 'DUPLICATE_ORDER', 'đơn trùng người nhận, địa chỉ, số điện thoại đang chờ xếp thì cảnh báo');
 check((await api(disp, 'POST', '/orders', { ...ok, code: 'DH-9002', allowDuplicate: true })).status === 201, 'xác nhận vẫn lưu thì lưu đơn trùng');
 check((await api(disp, 'POST', '/vehicles', { plate: '43B9-999.99', type: 'motorcycle', capacityKg: 800 })).status === 400, 'tải trọng ngoài khoảng hợp lý của loại xe bị từ chối');
+check((await api(disp, 'POST', '/orders', { ...ok, code: 'DH-9003', phone: '0905 000 003', windowStart: '17:00', windowEnd: '08:00' })).status === 400, 'khung giờ có giờ bắt đầu sau giờ kết thúc bị từ chối');
+check((await api(disp, 'POST', '/orders', { ...ok, code: 'DH-9003', phone: '0905 000 003', windowStart: '8h' })).status === 400, 'khung giờ sai dạng HH:MM bị từ chối');
+
+console.log('Dispatcher: khung giờ giao');
+// Hai đơn mới, lập kế hoạch với xe vừa rảnh: khung giờ đã qua thì chưa xếp được, khung giờ trong ca thì giao đúng khung
+const nowMs = Date.now();
+const hhmm = ms => clockText(new Date(ms));
+if (hhmm(nowMs - 3600_000) < hhmm(nowMs) && hhmm(nowMs) < hhmm(nowMs + 3 * 3600_000)) {
+  const past = (await api(disp, 'POST', '/orders', { ...ok, code: 'DH-9101', phone: '0905 000 101', windowStart: hhmm(nowMs - 3 * 3600_000), windowEnd: hhmm(nowMs - 3600_000) })).data.order;
+  const soon = (await api(disp, 'POST', '/orders', { ...ok, code: 'DH-9102', phone: '0905 000 102', lat: 16.061, lon: 108.21, windowStart: hhmm(nowMs + 3600_000), windowEnd: hhmm(nowMs + 2 * 3600_000) })).data.order;
+  check(past?.windowEnd === hhmm(nowMs - 3600_000) && soon?.windowStart === hhmm(nowMs + 3600_000), 'đơn mới lưu khung giờ giao');
+  let wr = (await api(disp, 'POST', '/planning/runs', { clientEventId: randomUUID(), orderIds: [past.id, soon.id], vehicleIds: [tA.vehicle.id], shiftEnd })).data.run;
+  for (let i = 0; i < 60 && wr.status === 'running'; i++) {
+    await new Promise(res => setTimeout(res, 300));
+    wr = (await api(disp, 'GET', `/planning/runs/${wr.id}`)).data.run;
+  }
+  const un = wr.result?.unassigned ?? [];
+  check(un.length === 1 && un[0].orderId === past.id && un[0].reason === 'Không kịp khung giờ khách hẹn', 'khung giờ đã qua: đơn chưa xếp, lý do "Không kịp khung giờ khách hẹn"');
+  const arr = wr.result?.routes.flatMap(x => x.arrivals).find(a => a.orderId === soon.id);
+  check(arr && new Date(arr.at).getTime() >= nowMs + 3600_000 - 60_000 && new Date(arr.at).getTime() <= nowMs + 2 * 3600_000 + 60_000,
+    'khung giờ trong ca: xe đến sớm thì chờ, giờ giao dự kiến nằm trong khung giờ');
+  for (const o of [past, soon]) await api(disp, 'POST', `/orders/${o.id}/cancel`);
+} else {
+  console.log('     bỏ qua: gần nửa đêm, khung giờ thử nghiệm vắt qua ngày');
+}
 
 console.log(fails ? `\n${fails}/${total} kiểm tra thất bại` : `\nTất cả ${total} kiểm tra đạt`);
 const { pool } = await import('../src/db.js');

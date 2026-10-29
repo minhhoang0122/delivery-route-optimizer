@@ -11,6 +11,7 @@ import { badRequest, conflict, notFound } from '../errors.js';
 import { atSeconds, clockText, nextClock, roundUp } from './clock.js';
 import { haversineM, locationKey } from './matrix.js';
 import { addEvent, addRouteVersion, currentOrder, fillGeometryLater, loadTrip, lockTrip, remainingContext } from './trips.js';
+import { clockLabel } from './window.js';
 
 const TOKEN = /^[0-9a-f]{64}$/;
 const MIN = 60_000;
@@ -18,7 +19,7 @@ const OPEN = ['assigned', 'in_progress'];
 
 async function orderByToken(token) {
   if (!TOKEN.test(String(token))) throw notFound('Không tìm thấy đơn');
-  const o = (await query('SELECT id, code, status, latitude, longitude, not_before_at FROM orders WHERE tracking_token = $1', [token])).rows[0];
+  const o = (await query('SELECT id, code, status, latitude, longitude, not_before_at, window_start, window_end FROM orders WHERE tracking_token = $1', [token])).rows[0];
   if (!o) throw notFound('Không tìm thấy đơn');
   return o;
 }
@@ -66,6 +67,8 @@ export async function trackingView(token) {
   const now = Date.now();
   const view = {
     code: o.code, status: o.status, notBeforeAt: o.not_before_at,
+    // Khung giờ giao đã đăng ký khi đặt hàng (HH:MM), khách thấy để biết hệ thống đang giao theo khung nào
+    window: o.window_start || o.window_end ? { start: clockLabel(o.window_start), end: clockLabel(o.window_end) } : null,
     driverName: null, eta: null, stopsBefore: null, vehicle: null, destination: null, result: null, actions: null,
     updatedAt: new Date(now),
   };

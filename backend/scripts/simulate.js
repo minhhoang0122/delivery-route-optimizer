@@ -449,9 +449,9 @@ async function prepare() {
   for (const d of scenario.don.slice(0, opt('orders', 12))) {
     const p = pointOf.get(d.diem);
     const { rows } = await query(
-      `INSERT INTO orders (code, recipient_name, phone, address, latitude, longitude, weight_kg, parcels)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
-      [`DH-${++last}`, d.nguoi_nhan, d.sdt, p.dia_chi, p.lat, p.lon, d.khoi_luong_kg, d.so_kien]);
+      `INSERT INTO orders (code, recipient_name, phone, address, latitude, longitude, weight_kg, parcels, window_start, window_end)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id`,
+      [`DH-${++last}`, d.nguoi_nhan, d.sdt, p.dia_chi, p.lat, p.lon, d.khoi_luong_kg, d.so_kien, d.khung_gio?.tu ?? null, d.khung_gio?.den ?? null]);
     for (const t of d.loai_xe) await query('INSERT INTO order_vehicle_types (order_id, vehicle_type) VALUES ($1, $2)', [rows[0].id, TYPE[t]]);
     orderIds.push(rows[0].id);
   }

@@ -7,7 +7,7 @@ Web App cho ba vai trò: quản trị viên quản lý tài khoản, điều ph�
 | `frontend` | Web App ReactJS (Vite, react-router, Leaflet) |
 | `backend` | Backend API Node.js + Express, kết nối PostgreSQL, gọi TomTom |
 | `optimization-engine` | Thuật toán phân công và lập tuyến, không phụ thuộc dịch vụ bản đồ |
-| `database/migrations` | Các file SQL tạo 18 bảng, chạy theo thứ tự 001 → 009 |
+| `database/migrations` | Các file SQL tạo 18 bảng, chạy theo thứ tự 001 → 010 |
 | `docs` | Sổ tay cơ sở dữ liệu và sổ tay backend, frontend |
 | `test_demo` | Thử nghiệm TomTom và thuật toán ban đầu (không thuộc mã chính) |
 
@@ -20,9 +20,10 @@ Cần Node.js 22 trở lên và PostgreSQL (cơ sở dữ liệu `lastmile`, rol
 ```
 psql -U lastmile_app -h localhost -p 5433 -d lastmile -1 -v ON_ERROR_STOP=1 -f database/migrations/008_so_kien_va_khung_gio.sql
 psql -U lastmile_app -h localhost -p 5433 -d lastmile -1 -v ON_ERROR_STOP=1 -f database/migrations/009_theo_doi_va_di_theo_tai_xe.sql
+psql -U lastmile_app -h localhost -p 5433 -d lastmile -1 -v ON_ERROR_STOP=1 -f database/migrations/010_khung_gio_giao.sql
 ```
 
-008 thêm số kiện (`vehicles.capacity_parcels`, `orders.parcels`) và khung giờ của đợt ma trận (`matrix_batches.depart_at`, `slot_seconds`); 009 thêm mã theo dõi và giờ khách hẹn của đơn (`orders.tracking_token`, `not_before_at`) cùng các lý do phiên bản tuyến và loại sự kiện mới. Sau 008, 009 chạy lại `npm run seed -- --reset` để nạp bộ dữ liệu 60 đơn.
+008 thêm số kiện (`vehicles.capacity_parcels`, `orders.parcels`) và khung giờ của đợt ma trận (`matrix_batches.depart_at`, `slot_seconds`); 009 thêm mã theo dõi và giờ khách hẹn của đơn (`orders.tracking_token`, `not_before_at`) cùng các lý do phiên bản tuyến và loại sự kiện mới. 010 thêm khung giờ giao trong ngày của đơn (`orders.window_start`, `window_end`). Sau 008, 009, 010 chạy lại `npm run seed -- --reset` để nạp bộ dữ liệu 60 đơn.
 
 **2. Backend.** Sao chép `backend/.env.example` thành `backend/.env`, điền mật khẩu PostgreSQL, `JWT_SECRET` và (nếu có) `TOMTOM_API_KEY`. Sau đó:
 
@@ -33,7 +34,7 @@ npm run seed
 npm run dev
 ```
 
-`npm run seed` nạp kịch bản 60 đơn trên 30 điểm giao ở trung tâm Đà Nẵng (kho 120 Nguyễn Văn Linh), 4 xe của kịch bản (3 xe máy 60 kg / 20 kiện, 1 xe tải nhỏ 750 kg / 120 kiện) kèm tài xế, người nhận và 4 ma trận TomTom đã ghi lúc 16:00, 16:30, 17:00, 17:30, nên lập kế hoạch theo giờ chạy được không cần khóa TomTom. Mật khẩu các tài khoản mẫu là giá trị `SEED_PASSWORD` trong `.env`. Tài khoản: `admin`, `dispatcher`, `dispatcher2`, `driver1` … `driver5` (`driver5` bị khóa, xe 5 đang bảo trì như thiết kế).
+`npm run seed` nạp kịch bản 60 đơn trên 30 điểm giao ở trung tâm Đà Nẵng (kho 120 Nguyễn Văn Linh), 4 xe của kịch bản (3 xe máy 60 kg / 20 kiện, 1 xe tải nhỏ 750 kg / 120 kiện) kèm tài xế, người nhận và 4 ma trận TomTom đã ghi lúc 16:00, 16:30, 17:00, 17:30, nên lập kế hoạch theo giờ chạy được không cần khóa TomTom. Mật khẩu các tài khoản mẫu là giá trị `SEED_PASSWORD` trong `.env`. 21 đơn có khung giờ giao theo loại địa chỉ: văn phòng 08:00–17:00, 5 nhà riêng 17:00–21:00, 2 nhà riêng 16:30–17:15 (`optimization-engine/experiments/them_khung_gio.js`). Khi lập kế hoạch, khung giờ là ràng buộc cứng: đơn không kịp khung giờ được để lại với lý do "Không kịp khung giờ khách hẹn". Khi xe đang giao, khung giờ là ràng buộc mềm: sắp lại tuyến ưu tiên giảm tổng thời gian trễ, và đơn dự kiến trễ hiện trong "Việc cần xử lý" của điều phối viên. Tài khoản: `admin`, `dispatcher`, `dispatcher2`, `driver1` … `driver5` (`driver5` bị khóa, xe 5 đang bảo trì như thiết kế).
 
 **3. Frontend.** Ở terminal khác:
 
@@ -81,7 +82,7 @@ Tổng quan ca làm việc liệt kê việc cần xử lý: vị trí xe cũ, c
 | `npm run simulate -- incident --trip 3 --factor 3` | Tạo "sự cố giả định" làm chặng phía trước chậm đi, để thử tự đổi tuyến |
 | `npm run simulate -- prepare` | Chuẩn bị một lượt demo mà không xóa dữ liệu: chốt chuyến đã về kho, tạo 12 đơn mới trên các điểm giao của kịch bản, lập kế hoạch (ca bắt đầu bây giờ) và giao chuyến |
 | `npm run simulate -- demo --trip active` | Chạy trọn các chuyến: xe chạy theo đường thật, dừng và giao đúng thời gian phục vụ, khoảng 10% điểm chưa giao được (`--fail`), `--defer` khách (mặc định 1) hẹn giao sau trên trang theo dõi đơn, chuyến nhiều điểm nhất gặp ùn tắc (`--no-jam` để bỏ), hệ thống tự đổi tuyến, xe về kho |
-| `npm run test:flow` | Kiểm thử nghiệp vụ và phân quyền qua API (120 kiểm tra), chạy sau `npm run seed -- --reset`, chỉ trên cơ sở dữ liệu thử (xem dưới) |
+| `npm run test:flow` | Kiểm thử nghiệp vụ và phân quyền qua API (127 kiểm tra), chạy sau `npm run seed -- --reset`, chỉ trên cơ sở dữ liệu thử (xem dưới) |
 | `npm test` (trong `optimization-engine`) | Kiểm thử thuật toán trên ma trận TomTom đã ghi |
 | `npm run experiments` (trong `optimization-engine`) | Thí nghiệm cho Chương 4 (mục 4.4), in bảng kết quả và ghi `experiments/ket_qua.json` |
 

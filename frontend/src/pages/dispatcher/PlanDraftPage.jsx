@@ -7,7 +7,7 @@ import { api, newEventId } from '../../api.js'
 import MapView, { Legend, MapOverlay } from '../../components/MapView.jsx'
 import { geoToLatLngs, NO_ROAD_LEGEND, noRoadRoute } from '../../components/tripMap.js'
 import { Alert, Badge, Button, Card, Dialog, Dot, ErrorBox, Loading, LoadError, PageHeader, Progress, Stat } from '../../components/ui.jsx'
-import { dateTime, duration, kg, km, parcels, PLAN_STATUS, routeHex, time, VEHICLE_TYPE } from '../../format.js'
+import { dateTime, deliveryWindow, duration, kg, km, parcels, PLAN_STATUS, routeHex, time, VEHICLE_TYPE } from '../../format.js'
 import { useAction, useLoad } from '../../hooks.js'
 
 export default function PlanDraftPage() {
@@ -146,7 +146,10 @@ export default function PlanDraftPage() {
                           return (
                             <div key={a.orderId} className="row between" style={{ gap: 8 }}>
                               <span className="caption"><span className="strong">{k + 1}.</span> {o?.code} · {o?.recipientName} · {o?.address}</span>
-                              <span className="caption strong tabular">{time(a.at)}</span>
+                              <span className="row" style={{ gap: 6 }}>
+                                {(o?.windowStart || o?.windowEnd) && <span className="tag-time">{deliveryWindow(o.windowStart, o.windowEnd)}</span>}
+                                <span className="caption strong tabular">{time(a.at)}</span>
+                              </span>
                             </div>
                           )
                         })}

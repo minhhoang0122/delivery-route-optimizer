@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { api } from '../../api.js'
 import { Chips, ErrorBox, Field, PageHeader, StatusBadge, Table, TableSkeleton } from '../../components/ui.jsx'
-import { appointment, kg, ORDER_STATUS, parcels, truckOnly, vehicleTypes } from '../../format.js'
+import { appointment, deliveryWindow, kg, ORDER_STATUS, parcels, truckOnly, vehicleTypes } from '../../format.js'
 import { useLoad } from '../../hooks.js'
 
 const COLUMNS = [
@@ -45,6 +45,7 @@ export default function OrdersPage() {
         <div className="col">
           <StatusBadge map={ORDER_STATUS} value={o.status} />
           {o.trip && <span className="caption muted">{o.trip.code}</span>}
+          {(o.windowStart || o.windowEnd) && <span className="tag-time">{deliveryWindow(o.windowStart, o.windowEnd)}</span>}
           {o.notBeforeAt && <span className="tag-time">{appointment(o.notBeforeAt)}</span>}
         </div>
       ),

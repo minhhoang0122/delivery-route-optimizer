@@ -7,7 +7,7 @@ import { api, newEventId } from '../../api.js'
 import MapView, { Legend, MapOverlay } from '../../components/MapView.jsx'
 import { CONGESTION_HEX, congestionRoutes, geoToLatLngs, isStale, NO_ROAD_LEGEND, noRoadRoute, staleAfter, stopState, tripLayers } from '../../components/tripMap.js'
 import { Alert, Badge, Button, Card, Checkbox, Dialog, ErrorBox, Field, KeyValue, Loading, LoadError, PageHeader, Stat, StatusBadge, StopItem } from '../../components/ui.jsx'
-import { ago, appointment, dateTime, distance, duration, kg, km, parcels, percent, routeHex, routeUpdate, time, TRIP_STATUS, VEHICLE_TYPE } from '../../format.js'
+import { ago, appointment, dateTime, deliveryWindow, distance, duration, kg, km, parcels, percent, routeHex, routeUpdate, time, TRIP_STATUS, VEHICLE_TYPE } from '../../format.js'
 import { LIVE_MS, useAction, useLoad, useNow } from '../../hooks.js'
 
 const EVENT_LABEL = {
@@ -24,7 +24,9 @@ function eventDetail(e, stopsById, versionNo) {
   switch (e.type) {
     case 'trip_assigned': return `${p.orderIds?.length} đơn · ${duration(p.objectiveSeconds)}`
     case 'attempt_recorded': return `${stopsById.get(p.stopId)?.order.code ?? ''} · ${p.result === 'delivered' ? 'giao thành công' : `chưa giao được (${p.reason})`}${p.distanceM != null ? ` · cách điểm giao ${distance(p.distanceM)}` : ''}`
-    case 'route_replanned': return `${routeUpdate(p.toVersion)} · tiết kiệm ${duration(p.savingSeconds)}`
+    case 'route_replanned': return p.lateBeforeSeconds > p.lateAfterSeconds
+      ? `${routeUpdate(p.toVersion)} · giảm trễ khung giờ ${duration(p.lateBeforeSeconds - p.lateAfterSeconds)}`
+      : `${routeUpdate(p.toVersion)} · tiết kiệm ${duration(p.savingSeconds)}`
     case 'reroute_evaluated': return p.valid ? `Thứ tự hiện tại ${duration(p.currentSeconds)}, thứ tự mới ${duration(p.proposedSeconds)}` : p.reason
     case 'route_acknowledged': return versionNo.get(p.routeVersionId) ? routeUpdate(versionNo.get(p.routeVersionId)) : ''
     case 'loading_mismatch': return `Thiếu ${p.missingOrderIds?.length ?? 0} kiện`
@@ -157,7 +159,9 @@ export default function TripDetailPage() {
                   ? `${s.attempt.result === 'delivered' ? 'Đã giao' : s.attempt.reason} ${time(s.attempt.occurredAt)} · ${s.order.code} · ${kg(s.order.weightKg)}${s.attempt.note ? ` · ${s.attempt.note}` : ''}`
                   : `${s.eta ? `Dự kiến ${time(s.eta)} · ` : ''}${s.order.code} · ${kg(s.order.weightKg)} · ${parcels(s.order.parcels)}${s.deferred ? ' · Giao sau' : ''}`}
                 right={s.attempt?.farFromStop ? <Badge tone="warning">Ghi cách điểm giao {distance(s.attempt.distanceM)}</Badge>
-                  : s.status === 'pending' && s.order.notBeforeAt ? <span className="tag-time">{appointment(s.order.notBeforeAt)}</span> : undefined} />
+                  : s.status === 'pending' && s.etaLateSeconds > 0 ? <Badge tone="warning">Trễ khung giờ {duration(s.etaLateSeconds)}</Badge>
+                  : s.status === 'pending' && s.order.notBeforeAt ? <span className="tag-time">{appointment(s.order.notBeforeAt)}</span>
+                  : s.status === 'pending' && (s.order.windowStart || s.order.windowEnd) ? <span className="tag-time">{deliveryWindow(s.order.windowStart, s.order.windowEnd)}</span> : undefined} />
             ))}
             {t.removedStops?.map(r => (
               <StopItem key={`r${r.stopId}`} state="failed" seq="–" name={r.orderCode} address={r.reason} meta={`Đơn về chờ xếp lúc ${time(r.at)}${t.status === 'in_progress' ? ' · tài xế mang kiện về kho' : ''}`} />

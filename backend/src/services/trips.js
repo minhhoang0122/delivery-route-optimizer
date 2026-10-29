@@ -12,6 +12,7 @@ import { atSeconds, localMidnight, secondsFrom } from './clock.js';
 import { distanceToLine } from './geometry.js';
 import { buildMatrix, combineMatrices, estimateSeconds, haversineM, loadBatches, locationKey, pointKey, storedTravel } from './matrix.js';
 import { routeGeometry } from './tomtom.js';
+import { clockLabel, windowSeconds } from './window.js';
 
 export const ACTIVE_STATUSES = ['assigned', 'in_progress', 'awaiting_reconciliation'];
 export const tripCode = id => `CH-${String(id).padStart(4, '0')}`;
@@ -158,7 +159,7 @@ export async function loadTrip(id, { withEvents = false } = {}) {
   const stopsRes = await query(
     `SELECT s.id, s.order_id, s.status, rs.sequence_no,
             o.code, o.recipient_name, o.phone, o.address, o.latitude, o.longitude, o.weight_kg, o.note, o.status AS order_status,
-            o.parcels, o.not_before_at,
+            o.parcels, o.not_before_at, o.window_start, o.window_end,
             a.result, a.reason, a.note AS attempt_note, a.occurred_at, a.received_at, a.distance_m AS attempt_distance_m,
             a.position_observed_at AS attempt_position_at, ru.role AS recorded_role,
             (SELECT count(*)::int FROM trip_stops f WHERE f.order_id = s.order_id AND f.status = 'failed') AS failed_attempts
@@ -217,16 +218,23 @@ export async function loadTrip(id, { withEvents = false } = {}) {
   const stored = await storedTravel([...coords.keys()], [t.routing_profile]);
   const pending = stops.filter(s => s.status === 'pending');
   const eta = new Map();
+  // Điểm dự kiến bắt đầu giao sau giờ kết thúc khung giờ: số giây trễ
+  const etaLate = new Map();
   let etaReturn = null;
   if (['assigned', 'in_progress'].includes(t.status)) {
     const schedule = stopSchedule({
       depot: depotKey(t),
       travelAt: etaTravel(stored, coords, { from: prev, position: fresh ? { lat: pos.latitude, lon: pos.longitude } : null }),
       startSeconds: secondsFrom(base, startMs), ...serviceOf(t), profile: t.routing_profile, start: fresh ? POSITION_KEY : prev,
-      stops: pending.map(s => ({ point: orderKey(s), notBeforeSeconds: s.not_before_at ? secondsFrom(base, s.not_before_at) : null })),
+      stops: pending.map(s => ({
+        point: orderKey(s), ...windowSeconds(base, { windowStart: s.window_start, windowEnd: s.window_end, notBeforeAt: s.not_before_at }),
+      })),
     });
     if (schedule) {
-      pending.forEach((s, k) => eta.set(s.id, atSeconds(base, schedule.arrivals[k]).getTime()));
+      pending.forEach((s, k) => {
+        eta.set(s.id, atSeconds(base, schedule.arrivals[k]).getTime());
+        if (schedule.lateness[k] > 0) etaLate.set(s.id, Math.round(schedule.lateness[k]));
+      });
       etaReturn = atSeconds(base, schedule.end);
     }
   }
@@ -263,6 +271,7 @@ export async function loadTrip(id, { withEvents = false } = {}) {
       seq: s.sequence_no ?? i + 1,
       status: s.status,
       eta: eta.get(s.id) ? new Date(eta.get(s.id)) : null,
+      etaLateSeconds: etaLate.get(s.id) ?? 0,
       deferred: deferred.has(s.id),
       order: {
         id: s.order_id, code: s.code, recipientName: s.recipient_name, phone: s.phone, address: s.address,
@@ -270,6 +279,8 @@ export async function loadTrip(id, { withEvents = false } = {}) {
         failedAttempts: s.failed_attempts,
         // Khách hẹn giao sau giờ này (trang theo dõi đơn); tài xế thấy thẻ "Khách hẹn HH:MM"
         notBeforeAt: s.not_before_at,
+        // Khung giờ giao trong ngày (HH:MM), null nếu không giới hạn đầu đó
+        windowStart: clockLabel(s.window_start), windowEnd: clockLabel(s.window_end),
       },
       attempt: s.result ? {
         result: s.result, reason: s.reason, note: s.attempt_note, occurredAt: s.occurred_at, receivedAt: s.received_at,
@@ -872,10 +883,7 @@ export async function evaluateTripReroute(tripId) {
   const service = { stopSeconds: trip.service.stopSeconds, serviceSeconds: trip.service.serviceSeconds };
   const base = localMidnight();
   const nowSeconds = secondsFrom(base, new Date());
-  const stops = remaining.map(s => ({
-    id: s.id, point: key(s), pinned: s.deferred,
-    notBeforeSeconds: s.order.notBeforeAt ? secondsFrom(base, s.order.notBeforeAt) : null,
-  }));
+  const stops = remaining.map(s => ({ id: s.id, point: key(s), pinned: s.deferred, ...windowSeconds(base, s.order) }));
   // Bước 1: chỉ các chặng nối tiếp theo thứ tự hiện hành (điểm kế tiếp → điểm sau → … → kho), k chặng cho k điểm,
   // đủ để phát hiện tăng thời gian. Với nguồn tomtom, mỗi lần kiểm tra chỉ tốn khoảng k yêu cầu Routing
   const chain = [...remaining.map(key), dKey];
@@ -997,6 +1005,8 @@ export async function applyReroute(tripId, eventId) {
       payload: {
         evaluationEventId: eventId, routeVersionId: rvId, fromVersion: fromNo, toVersion: fromNo + 1,
         savingSeconds: p.savingSeconds, batchIds: p.matrix.batchIds,
+        // Trễ khung giờ dự kiến trước và sau khi đổi (giây), để nhật ký ghi rõ đổi vì giao thông hay vì khung giờ
+        lateBeforeSeconds: Math.round(p.currentLateSeconds ?? 0), lateAfterSeconds: Math.round(p.proposedLateSeconds ?? 0),
       },
     });
     return { rvId, fromNo, p };
@@ -1049,7 +1059,7 @@ export async function remainingContext(trip, { from = null, notBefore = new Map(
   const travelAt = etaTravel(matrix.travelAt, coords);
   const stops = pending.map(s => {
     const nb = notBefore.has(s.id) ? notBefore.get(s.id) : s.order.notBeforeAt;
-    return { id: s.id, point: key(s), pinned: s.deferred, notBeforeSeconds: nb ? secondsFrom(base, nb) : null };
+    return { id: s.id, point: key(s), pinned: s.deferred, ...windowSeconds(base, { ...s.order, notBeforeAt: nb }) };
   });
   const byId = new Map(stops.map(s => [s.id, s]));
   return {

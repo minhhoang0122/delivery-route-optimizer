@@ -100,6 +100,8 @@ export const streetLevelOnly = type => !['Point Address', 'Address Range'].inclu
 
 /** Thẻ giờ khách hẹn trên điểm dừng, ví dụ "Khách hẹn 17:30". */
 export const appointment = t => (t ? `Khách hẹn ${time(t)}` : null)
+// Khung giờ giao trong ngày ("08:00", "17:00"); thiếu một đầu thì chỉ ghi đầu còn lại
+export const deliveryWindow = (from, to) => (from && to ? `Giao ${from}–${to}` : from ? `Giao sau ${from}` : to ? `Giao trước ${to}` : null)
 
 // Trạng thái đơn hiển thị cho khách trên trang theo dõi đơn
 export const CUSTOMER_STATUS = {

@@ -7,7 +7,7 @@ import { DriverScreen } from '../../layouts/DriverLayout.jsx'
 import { useDriver } from '../../layouts/driverContext.js'
 import { Alert, Button, Empty, ErrorBox, Loading, StatusBadge, StopItem } from '../../components/ui.jsx'
 import { stopState } from '../../components/tripMap.js'
-import { ago, appointment, kg, parcels, time, TRIP_STATUS, VEHICLE_TYPE } from '../../format.js'
+import { ago, appointment, deliveryWindow, kg, parcels, time, TRIP_STATUS, VEHICLE_TYPE } from '../../format.js'
 import { useAction, useNow } from '../../hooks.js'
 import { isHeld, removeItem } from '../../offline.js'
 
@@ -15,7 +15,11 @@ const mapsLink = o => `https://www.google.com/maps/dir/?api=1&destination=${o.la
 // Phiên bản tuyến do hệ thống tạo (đổi tuyến, đi theo tài xế, khách hẹn lại): ứng dụng báo ngắn "Tuyến đã cập nhật"
 const SYSTEM_ROUTE = ['replan', 'out_of_order', 'off_route', 'customer']
 /** Thẻ giờ khách hẹn trên điểm dừng. */
-const Appointment = ({ stop }) => (stop.order.notBeforeAt ? <span className="tag-time"><Clock size={12} />{appointment(stop.order.notBeforeAt)}</span> : null)
+// Giờ khách hẹn trên trang theo dõi được ưu tiên hiện, không có thì hiện khung giờ giao của đơn
+const Appointment = ({ stop }) => {
+  const text = stop.order.notBeforeAt ? appointment(stop.order.notBeforeAt) : deliveryWindow(stop.order.windowStart, stop.order.windowEnd)
+  return text ? <span className="tag-time"><Clock size={12} />{text}</span> : null
+}
 
 function NextStopCard({ stop, total }) {
   const o = stop.order

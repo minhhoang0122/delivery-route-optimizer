@@ -7,7 +7,7 @@ import { useParams } from 'react-router'
 import { api } from '../api.js'
 import MapView from '../components/MapView.jsx'
 import { Alert, Badge, Button, Dialog, ErrorBox, Field, KeyValue, Loading } from '../components/ui.jsx'
-import { ago, CUSTOMER_STATUS, time } from '../format.js'
+import { ago, CUSTOMER_STATUS, deliveryWindow, time } from '../format.js'
 import { useAction, useLoad, useNow } from '../hooks.js'
 
 const TONE = { delivered: 'success', needs_action: 'danger', in_delivery: 'purple', assigned: 'info', pending: 'neutral' }
@@ -65,6 +65,7 @@ export default function CustomerTrackingPage() {
               {t.driverName && <div className="grow"><KeyValue label="Tài xế" value={t.driverName} large /></div>}
             </div>
             {t.notBeforeAt && <span className="tag-time" style={{ alignSelf: 'flex-start', fontSize: 14 }}><Clock size={14} />Giao sau {time(t.notBeforeAt)}</span>}
+            {!t.notBeforeAt && t.window && <span className="tag-time" style={{ alignSelf: 'flex-start', fontSize: 14 }}><Clock size={14} />{deliveryWindow(t.window.start, t.window.end)}</span>}
           </section>
         )}
         {!t.eta && t.notBeforeAt && t.status !== 'delivered' && <Alert tone="info" title={`Giao sau ${time(t.notBeforeAt)}`} />}

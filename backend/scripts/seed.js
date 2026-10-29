@@ -101,9 +101,10 @@ try {
   for (const d of scenario.don) {
     const p = pointOf.get(d.diem);
     const { rows } = await client.query(
-      `INSERT INTO orders (code, recipient_name, phone, address, latitude, longitude, weight_kg, parcels, note)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id, latitude, longitude`,
-      [d.ma, d.nguoi_nhan, d.sdt, p.dia_chi, p.lat, p.lon, d.khoi_luong_kg, d.so_kien, NOTES.get(d.sdt) ?? null]);
+      `INSERT INTO orders (code, recipient_name, phone, address, latitude, longitude, weight_kg, parcels, note, window_start, window_end)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id, latitude, longitude`,
+      [d.ma, d.nguoi_nhan, d.sdt, p.dia_chi, p.lat, p.lon, d.khoi_luong_kg, d.so_kien, NOTES.get(d.sdt) ?? null,
+        d.khung_gio?.tu ?? null, d.khung_gio?.den ?? null]);
     for (const t of d.loai_xe) await client.query('INSERT INTO order_vehicle_types (order_id, vehicle_type) VALUES ($1, $2)', [rows[0].id, TYPE[t]]);
     if (!stored.has(d.diem)) stored.set(d.diem, rows[0]);
   }

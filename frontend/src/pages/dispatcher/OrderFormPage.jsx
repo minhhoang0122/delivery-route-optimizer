@@ -9,7 +9,7 @@ import { Alert, Button, Card, Checkbox, Dialog, ErrorBox, Field, Loading, LoadEr
 import { appointment, geocodeMatch, ORDER_STATUS, streetLevelOnly } from '../../format.js'
 import { useAction, useLoad } from '../../hooks.js'
 
-const EMPTY = { code: '', recipientName: '', phone: '', address: '', weightKg: '', parcels: '1', note: '', lat: null, lon: null, vehicleTypes: ['motorcycle', 'small_truck'] }
+const EMPTY = { code: '', recipientName: '', phone: '', address: '', weightKg: '', parcels: '1', note: '', lat: null, lon: null, vehicleTypes: ['motorcycle', 'small_truck'], windowStart: '', windowEnd: '' }
 
 export default function OrderFormPage() {
   const { id } = useParams()
@@ -19,7 +19,7 @@ export default function OrderFormPage() {
     return existing.error ? <LoadError error={existing.error} onRetry={existing.reload} notFound="Không tìm thấy đơn" back="/dispatcher/orders" /> : <Loading />
   }
   const order = existing.data?.order
-  const initial = order ? { ...order, weightKg: String(order.weightKg).replace('.', ','), parcels: String(order.parcels ?? 1), note: order.note ?? '' } : EMPTY
+  const initial = order ? { ...order, weightKg: String(order.weightKg).replace('.', ','), parcels: String(order.parcels ?? 1), note: order.note ?? '', windowStart: order.windowStart ?? '', windowEnd: order.windowEnd ?? '' } : EMPTY
   return <OrderForm key={id ?? 'new'} id={id} order={order} initial={initial} depot={depot.data?.depots[0]} />
 }
 
@@ -46,14 +46,15 @@ function OrderForm({ id, order, initial, depot: d }) {
   const [copied, setCopied] = useState(false)
   const copyLink = () => navigator.clipboard?.writeText(trackingUrl).then(() => setCopied(true)).catch(() => {})
   const typeError = touched && !form.vehicleTypes.length ? 'Chọn ít nhất một loại xe' : null
+  const windowError = form.windowStart && form.windowEnd && form.windowStart >= form.windowEnd ? 'Giờ bắt đầu phải trước giờ kết thúc' : null
   const pinError = touched && form.lat == null ? 'Bấm vào bản đồ để chọn vị trí giao' : null
   const toggleType = (t, on) => setForm({ ...form, vehicleTypes: on ? [...new Set([...form.vehicleTypes, t])] : form.vehicleTypes.filter(x => x !== t) })
 
   async function submit(e, allowDuplicate = false) {
     e?.preventDefault()
     setTouched(true)
-    if (!(weight > 0) || parcelsError || !form.vehicleTypes.length || form.lat == null) return
-    const body = { ...form, weightKg: weight, parcels: pieces, allowDuplicate }
+    if (!(weight > 0) || parcelsError || !form.vehicleTypes.length || form.lat == null || windowError) return
+    const body = { ...form, weightKg: weight, parcels: pieces, windowStart: form.windowStart || null, windowEnd: form.windowEnd || null, allowDuplicate }
     const ok = await save.run(() => (id ? api(`/orders/${id}`, { method: 'PUT', body }) : api('/orders', { method: 'POST', body })))
     if (ok) navigate('/dispatcher/orders')
   }
@@ -129,6 +130,13 @@ function OrderForm({ id, order, initial, depot: d }) {
               <div className="row" style={{ gap: 24 }}>
                 <Checkbox label="Xe máy" checked={form.vehicleTypes.includes('motorcycle')} onChange={v => toggleType('motorcycle', v)} />
                 <Checkbox label="Xe tải nhỏ" checked={form.vehicleTypes.includes('small_truck')} onChange={v => toggleType('small_truck', v)} />
+              </div>
+            </Field>
+            <Field label="Khung giờ giao" error={windowError}>
+              <div className="row" style={{ gap: 8, alignItems: 'center' }}>
+                <input type="time" className={`input${windowError ? ' invalid' : ''}`} value={form.windowStart} onChange={set('windowStart')} aria-label="Giao từ" />
+                <span className="muted">–</span>
+                <input type="time" className={`input${windowError ? ' invalid' : ''}`} value={form.windowEnd} onChange={set('windowEnd')} aria-label="Giao đến" />
               </div>
             </Field>
             <Field label="Ghi chú cho tài xế"><textarea className="textarea" value={form.note} onChange={set('note')} maxLength={255} placeholder="Ví dụ: gọi trước 10 phút" /></Field>

@@ -7,6 +7,8 @@ import { badRequest, conflict, HttpError, notFound } from '../errors.js';
 import { integer, mobilePhone, number, oneOf, paramId, phoneDigits, servicePoint, text } from '../validate.js';
 import { loadOrders } from '../services/planning.js';
 import { tripCode } from '../services/trips.js';
+import { parseClock } from '../services/clock.js';
+import { clockLabel } from '../services/window.js';
 
 const router = Router();
 router.use(requireRole('dispatcher'));
@@ -31,6 +33,9 @@ export const toOrder = o => ({
   createdAt: o.created_at,
   // Khách hẹn giao sau giờ này (trang theo dõi đơn) và mã theo dõi để điều phối viên gửi đường dẫn cho khách
   notBeforeAt: o.not_before_at,
+  // Khung giờ giao trong ngày (HH:MM), null nếu không giới hạn đầu đó
+  windowStart: clockLabel(o.window_start),
+  windowEnd: clockLabel(o.window_end),
   trackingToken: o.tracking_token,
   trip: o.trip_id ? { id: o.trip_id, code: tripCode(o.trip_id) } : null,
 });
@@ -90,8 +95,24 @@ function readOrder(body) {
     parcels: integer(body?.parcels ?? 1, 'số kiện', { min: 1, max: 999 }),
     note: text(body?.note, 'ghi chú', { required: false, max: 255 }),
     vehicleTypes,
+    ...readWindow(body),
     allowDuplicate: body?.allowDuplicate === true,
   };
+}
+
+/** Khung giờ giao "HH:MM"–"HH:MM", mỗi đầu có thể bỏ trống; có cả hai đầu thì giờ bắt đầu phải trước giờ kết thúc. */
+function readWindow(body) {
+  const one = (v, label) => {
+    if (v == null || v === '') return null;
+    if (parseClock(v) == null) throw badRequest(`${label} phải có dạng HH:MM`);
+    return String(v).trim().padStart(5, '0');
+  };
+  const windowStart = one(body?.windowStart, 'Giờ bắt đầu khung giờ giao');
+  const windowEnd = one(body?.windowEnd, 'Giờ kết thúc khung giờ giao');
+  if (windowStart && windowEnd && parseClock(windowStart) >= parseClock(windowEnd)) {
+    throw badRequest('Giờ bắt đầu khung giờ giao phải trước giờ kết thúc');
+  }
+  return { windowStart, windowEnd };
 }
 
 /**
@@ -121,9 +142,9 @@ router.post('/', async (req, res) => {
     if (dup.rows.length) throw conflict('Mã đơn đã tồn tại');
     await checkOrder(c, o);
     const { rows } = await c.query(
-      `INSERT INTO orders (code, recipient_name, phone, address, latitude, longitude, weight_kg, note, parcels)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`,
-      [o.code, o.recipientName, o.phone, o.address, o.lat, o.lon, o.weightKg, o.note, o.parcels]);
+      `INSERT INTO orders (code, recipient_name, phone, address, latitude, longitude, weight_kg, note, parcels, window_start, window_end)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id`,
+      [o.code, o.recipientName, o.phone, o.address, o.lat, o.lon, o.weightKg, o.note, o.parcels, o.windowStart, o.windowEnd]);
     for (const t of o.vehicleTypes) await c.query('INSERT INTO order_vehicle_types (order_id, vehicle_type) VALUES ($1, $2)', [rows[0].id, t]);
     return rows[0].id;
   });
@@ -145,8 +166,9 @@ router.put('/:id', async (req, res) => {
     await checkOrder(c, o, id);
     await c.query(
       `UPDATE orders SET code = $2, recipient_name = $3, phone = $4, address = $5, latitude = $6, longitude = $7,
-                         weight_kg = $8, note = $9, parcels = $10, version = version + 1 WHERE id = $1`,
-      [id, o.code, o.recipientName, o.phone, o.address, o.lat, o.lon, o.weightKg, o.note, o.parcels]);
+                         weight_kg = $8, note = $9, parcels = $10, window_start = $11, window_end = $12,
+                         version = version + 1 WHERE id = $1`,
+      [id, o.code, o.recipientName, o.phone, o.address, o.lat, o.lon, o.weightKg, o.note, o.parcels, o.windowStart, o.windowEnd]);
     await c.query('DELETE FROM order_vehicle_types WHERE order_id = $1', [id]);
     for (const t of o.vehicleTypes) await c.query('INSERT INTO order_vehicle_types (order_id, vehicle_type) VALUES ($1, $2)', [id, t]);
   });

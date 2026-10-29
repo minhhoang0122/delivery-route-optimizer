@@ -34,6 +34,16 @@ router.get('/', async (_req, res) => {
     if (t.status === 'in_progress' && ((t.lateSeconds ?? 0) > m.lateMinutes * 60 || overShift)) {
       todo.push({ type: 'late', ...base, etaReturn: t.etaReturn, plannedReturnAt: t.plannedReturnAt, shiftEndAt: t.shiftEndAt, lateSeconds: t.lateSeconds, overShift: Boolean(overShift) });
     }
+    // Đơn dự kiến bắt đầu giao sau giờ kết thúc khung giờ khách hẹn: gọi khách báo trước hoặc hẹn lại
+    if (t.status === 'in_progress') {
+      for (const s of t.stops) {
+        if (s.status !== 'pending' || !(s.etaLateSeconds > 0)) continue;
+        todo.push({
+          type: 'window_late', ...base, stopId: s.id, orderCode: s.order.code, recipientName: s.order.recipientName,
+          phone: s.order.phone, windowEnd: s.order.windowEnd, eta: s.eta, lateSeconds: s.etaLateSeconds,
+        });
+      }
+    }
     if (t.status === 'assigned' && now - new Date(t.createdAt).getTime() > m.assignedIdleMinutes * 60_000) {
       todo.push({ type: 'not_started', ...base, createdAt: t.createdAt });
     }
@@ -67,7 +77,7 @@ router.get('/', async (_req, res) => {
       stopsTotal: inProgress.reduce((s, t) => s + t.progress.total, 0),
       awaitingReconciliation: trips.filter(t => t.status === 'awaiting_reconciliation').length,
       assigned: trips.filter(t => t.status === 'assigned').length,
-      warnings: todo.filter(x => ['stale_position', 'loading_mismatch', 'late', 'not_started'].includes(x.type)).length,
+      warnings: todo.filter(x => ['stale_position', 'loading_mismatch', 'late', 'window_late', 'not_started'].includes(x.type)).length,
     },
     thresholds: { stalePositionSeconds: m.stalePositionSeconds, assignedIdleMinutes: m.assignedIdleMinutes, lateMinutes: m.lateMinutes },
     todo,

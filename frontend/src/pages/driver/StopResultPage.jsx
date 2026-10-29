@@ -9,7 +9,7 @@ import { DriverScreen } from '../../layouts/DriverLayout.jsx'
 import { useDriver } from '../../layouts/driverContext.js'
 import { useAuth } from '../../auth.jsx'
 import { Alert, Badge, Button, ErrorBox, Field, KeyValue, Loading } from '../../components/ui.jsx'
-import { appointment, DRIVER_FAIL_REASONS, kg, parcels } from '../../format.js'
+import { appointment, deliveryWindow, DRIVER_FAIL_REASONS, kg, parcels } from '../../format.js'
 import { useAction } from '../../hooks.js'
 import { enqueue, UNDO_MS } from '../../offline.js'
 
@@ -103,7 +103,7 @@ export default function StopResultPage() {
       </>}>
       <section className="card" style={{ gap: 16 }}>
         <div className="row between"><span className="h3">{o.code}</span><Badge tone="purple" large>Đang giao</Badge></div>
-        {o.notBeforeAt && <span className="tag-time" style={{ alignSelf: 'flex-start', fontSize: 14 }}><Clock size={14} />{appointment(o.notBeforeAt)}</span>}
+        {(o.notBeforeAt || o.windowStart || o.windowEnd) && <span className="tag-time" style={{ alignSelf: 'flex-start', fontSize: 14 }}><Clock size={14} />{o.notBeforeAt ? appointment(o.notBeforeAt) : deliveryWindow(o.windowStart, o.windowEnd)}</span>}
         <div className="stack">
           <KeyValue label="Người nhận" value={o.recipientName} large />
           <KeyValue label="Địa chỉ" value={o.address} large />

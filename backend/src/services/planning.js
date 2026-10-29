@@ -7,6 +7,7 @@ import { badRequest } from '../errors.js';
 import { atSeconds, localMidnight, nextClock, parseClock, roundUp, secondsFrom, todayAt } from './clock.js';
 import { buildMatrix, locationKey, pointKey } from './matrix.js';
 import { routeGeometry } from './tomtom.js';
+import { clockLabel, windowSeconds } from './window.js';
 
 const ACTIVE = `('assigned', 'in_progress', 'awaiting_reconciliation')`;
 
@@ -104,6 +105,7 @@ export async function prepareSnapshot({ orderIds, vehicleIds, shiftStart = null,
       id: o.id, code: o.code, version: o.version, recipientName: o.recipient_name, address: o.address,
       lat: o.latitude, lon: o.longitude, weightKg: o.weight_kg, parcels: o.parcels, vehicleTypes: o.vehicle_types,
       notBeforeAt: o.not_before_at,
+      windowStart: clockLabel(o.window_start), windowEnd: clockLabel(o.window_end),
     })),
     vehicles: vehicles.map(v => ({
       id: v.id, plate: v.plate, type: v.vehicle_type, profile: v.routing_profile, capacityKg: v.capacity_kg,
@@ -156,7 +158,8 @@ export async function runPlanning(runId, snapshot) {
       serviceSeconds: params.serviceSeconds ?? config.serviceSecondsPerOrder,
       orders: snapshot.orders.map(o => ({
         id: o.id, code: o.code, point: orderKey(o), weightKg: o.weightKg, parcels: o.parcels ?? 1, vehicleTypes: o.vehicleTypes,
-        notBeforeSeconds: o.notBeforeAt && new Date(o.notBeforeAt) > startAt ? secondsFrom(base, o.notBeforeAt) : null,
+        // Khung giờ giao và giờ khách hẹn (chỉ tính giờ hẹn còn sau giờ bắt đầu ca); lập kế hoạch coi khung giờ là ràng buộc cứng
+        ...windowSeconds(base, o, { after: startAt }),
       })),
       vehicles: [...snapshot.vehicles].sort((a, b) => a.id - b.id)
         .map(v => ({ id: v.id, type: v.type, profile: v.profile, capacityKg: v.capacityKg, capacityParcels: v.capacityParcels ?? undefined })),
