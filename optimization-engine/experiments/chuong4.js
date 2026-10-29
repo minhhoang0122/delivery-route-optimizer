@@ -297,7 +297,7 @@ const clock = s => { const m = Math.round(s / 60); return `${String(Math.floor(m
 const ms1 = x => x.toFixed(1).replace('.', ',');
 
 /** Bài toán 60 đơn. travel cho trước thì lập bằng một ma trận cố định, không thì phụ thuộc giờ (giao thông thật). */
-function problem60({ orders = kb60.don, objective = 'makespan', travel = null, shift = true, vehicles = null } = {}) {
+function problem60({ orders = kb60.don, objective = 'makespan', travel = null, shift = true, vehicles = null, windows = false, windowMode = 'hard' } = {}) {
   return {
     depot: 'KHO', objective,
     travel: travel ?? ((p, a, b) => truth60(p, a, b, H60)),
@@ -306,8 +306,13 @@ function problem60({ orders = kb60.don, objective = 'makespan', travel = null, s
     shiftEndSeconds: shift ? END60 : null,
     stopSeconds: kb60.phuc_vu.moi_diem_giay,
     serviceSeconds: kb60.phuc_vu.moi_don_giay,
-    orders: orders.map(d => ({ id: kb60.don.indexOf(d) + 1, code: d.ma, point: d.diem, weightKg: d.khoi_luong_kg, parcels: d.so_kien, vehicleTypes: d.loai_xe.map(t => TYPE[t]) })),
+    orders: orders.map(d => ({
+      id: kb60.don.indexOf(d) + 1, code: d.ma, point: d.diem, weightKg: d.khoi_luong_kg, parcels: d.so_kien, vehicleTypes: d.loai_xe.map(t => TYPE[t]),
+      // Khung giờ giao (mục g): chỉ dùng khi windows = true, các mục trước giữ nguyên bài toán không khung giờ
+      ...(windows && d.khung_gio ? { notBeforeSeconds: clockSeconds(d.khung_gio.tu), notAfterSeconds: clockSeconds(d.khung_gio.den) } : {}),
+    })),
     vehicles: vehicles ?? kb60.xe.map((x, i) => ({ id: i + 1, type: TYPE[x.loai], profile: x.cau_hinh, capacityKg: x.tai_trong_kg, capacityParcels: x.so_kien_toi_da })),
+    windowMode,
   };
 }
 const TRUTH = problem60();
@@ -547,6 +552,62 @@ for (const n of [15, 30, 45, 60]) {
 }
 table(['Số đơn', 'Số điểm giao', 'Insertion (ms)', 'Local Search đến khi hết cải thiện (ms)', 'Phép đánh giá', 'Giới hạn mặc định 100.000 phép / 2 s', 'Chặng mỗi cấu hình mỗi khung', `Tổng chặng (${PROFILES60.length} cấu hình × ${SLOTS60.length} khung)`],
   out.k60.scaling.map(e => [e.n, e.points, ms1(e.insertionMs), ms1(e.lsMs), e.evaluations, e.defaultStop === 'Không còn phương án cải thiện' ? 'đủ' : e.defaultStop, e.legsPerProfile, e.legsTotal]));
+
+// ---------------------------------------------------------------- g) Khung giờ giao
+// 21/60 đơn có khung giờ (experiments/them_khung_gio.js): văn phòng 08:00–17:00, 5 nhà riêng 17:00–21:00, 2 nhà riêng
+// 16:30–17:15. Ba cách, cùng giao thông thật, mọi kế hoạch được đo lại trên bài toán có khung giờ (tính trễ, không loại):
+//  - không có khung giờ trong dữ liệu (mốc so sánh, cùng kế hoạch như mục a);
+//  - bỏ qua khung giờ khi lập kế hoạch, tài xế giao theo đúng giờ của kế hoạch đó (không chờ): đếm đơn đến trước giờ
+//    sớm nhất (khách chưa có mặt) hoặc sau giờ muộn nhất;
+//  - bỏ qua khung giờ khi lập kế hoạch, tài xế chờ đến giờ sớm nhất khi đến sớm: thời gian chờ đẩy trễ các điểm sau;
+//  - khung giờ là ràng buộc cứng khi lập kế hoạch (cách của hệ thống).
+console.log('\nKhung giờ giao (kịch bản 60 đơn)');
+const WIN = problem60({ windows: true, windowMode: 'soft' });
+const windowed = WIN.orders.filter(o => o.notBeforeSeconds != null || o.notAfterSeconds != null).length;
+function windowMetrics(routes, unassigned, ms) {
+  let finish = H60, total = 0, wait = 0, outside = 0, late = 0, lateMax = 0, early = 0, served = 0;
+  routes.forEach((r, v) => {
+    if (!r.length) return;
+    const s = routeSchedule(WIN, v, r);
+    finish = Math.max(finish, s.end); total += s.seconds; wait += s.waitSeconds; served += r.length;
+    s.lateness.forEach(x => { if (x > 0) { outside++; late += x; lateMax = Math.max(lateMax, x); } });
+  });
+  // Giao trước giờ sớm nhất không xảy ra vì xe chờ; đếm để chứng minh
+  routes.forEach((r, v) => {
+    if (!r.length) return;
+    routeSchedule(WIN, v, r).arrivals.forEach((t, k) => { const nb = WIN.orders[r[k]].notBeforeSeconds; if (nb != null && t < nb - 1e-6) early++; });
+  });
+  return { finish, total, wait, outside, late, lateMax, early, served, unassigned: unassigned.length, ms };
+}
+const noWin = planned(problem60(), BIG);
+const ignore = noWin;
+// Theo đúng giờ của kế hoạch không khung giờ (không chờ): so giờ đến với khung giờ của từng đơn
+const PLAIN = problem60();
+const asPlanned = { finish: H60, total: 0, wait: 0, outside: 0, early: 0, late: 0, lateMax: 0, served: 0, unassigned: noWin.unassigned.length, ms: noWin.ms };
+noWin.routes.forEach((r, v) => {
+  if (!r.length) return;
+  const s = routeSchedule(PLAIN, v, r);
+  asPlanned.finish = Math.max(asPlanned.finish, s.end); asPlanned.total += s.seconds; asPlanned.served += r.length;
+  s.arrivals.forEach((t, k) => {
+    const o = WIN.orders[r[k]];
+    if (o.notBeforeSeconds != null && t < o.notBeforeSeconds - 1e-6) { asPlanned.outside++; asPlanned.early++; }
+    else if (o.notAfterSeconds != null && t > o.notAfterSeconds + 1e-6) {
+      asPlanned.outside++; asPlanned.late += t - o.notAfterSeconds; asPlanned.lateMax = Math.max(asPlanned.lateMax, t - o.notAfterSeconds);
+    }
+  });
+});
+const hard = planned(problem60({ windows: true }), BIG);
+out.k60.windows = {
+  windowedOrders: windowed,
+  rows: [
+    { key: 'asPlanned', ...asPlanned },
+    { key: 'ignore', ...windowMetrics(ignore.routes, ignore.unassigned, ignore.ms) },
+    { key: 'hard', ...windowMetrics(hard.routes, hard.unassigned, hard.ms) },
+  ],
+};
+const WLABEL = { asPlanned: 'Bỏ qua khung giờ, giao theo giờ kế hoạch', ignore: 'Bỏ qua khung giờ, chờ khi đến sớm', hard: 'Khung giờ là ràng buộc cứng' };
+table(['Cách lập kế hoạch', 'Xe cuối về kho', 'Tổng thời lượng (phút)', 'Chờ đến giờ sớm nhất (phút)', 'Đơn ngoài khung giờ (sớm/trễ)', 'Tổng trễ (phút)', 'Trễ lớn nhất (phút)', 'Đơn chưa xếp', 'Thời gian tính (ms)'],
+  out.k60.windows.rows.map(e => [WLABEL[e.key], clock(e.finish), minutes(e.total), minutes(e.wait), `${e.outside}/${windowed} (${e.early}/${e.outside - e.early})`, minutes(e.late), minutes(e.lateMax), e.unassigned, ms1(e.ms)]));
 
 if (process.argv.includes('--json')) {
   writeFileSync(new URL('./ket_qua.json', import.meta.url), JSON.stringify(out, null, 2));
