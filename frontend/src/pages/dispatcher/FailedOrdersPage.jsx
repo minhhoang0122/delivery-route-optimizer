@@ -1,9 +1,9 @@
 // D04 Đơn chưa giao được (UC08): đơn chỉ quay về danh sách chờ, chuyển hoàn hoặc ghi thất lạc sau khi đối chiếu và chốt chuyến.
-// Chưa quá số lần giao tối đa thì mặc định giao lại; quá số lần thì Dispatcher phải quyết định.
+// Chưa quá số lần giao tối đa thì mặc định giao lại, khách từ chối nhận thì mặc định chuyển hoàn; quá số lần thì Dispatcher phải quyết định.
 import { useNavigate } from 'react-router'
 import { api } from '../../api.js'
 import { Alert, Badge, Button, ErrorBox, PageHeader, Table, TableSkeleton } from '../../components/ui.jsx'
-import { time } from '../../format.js'
+import { REFUSED_REASON, time } from '../../format.js'
 import { useLoad } from '../../hooks.js'
 
 const COLUMNS = [
@@ -32,7 +32,8 @@ export default function FailedOrdersPage() {
       attempt: o => `${o.attemptNo}/${data.maxDeliveryAttempts}`,
       reason: o => <div className="col"><span className="strong">{o.reason}</span>{o.note && <span className="caption muted">{o.note}</span>}</div>,
       time: o => time(o.occurredAt),
-      status: o => (o.attemptNo >= data.maxDeliveryAttempts ? <Badge tone="warning">Cần quyết định</Badge> : <Badge>Giao lại</Badge>),
+      status: o => (o.attemptNo >= data.maxDeliveryAttempts ? <Badge tone="warning">Cần quyết định</Badge>
+        : o.reason === REFUSED_REASON ? <Badge>Chuyển hoàn</Badge> : <Badge>Giao lại</Badge>),
       actions: o => o.trip.status === 'awaiting_reconciliation'
         ? <Button variant="ghost" onClick={() => navigate(`/dispatcher/trips/${o.trip.id}/reconcile`)}>Đối chiếu chuyến</Button>
         : <span className="caption muted">Chờ tài xế về kho</span>,

@@ -82,7 +82,8 @@ export const ROUTE_HEX = ['#1f5fae', '#e8590c', '#2b7a3b', '#6b3fa0', '#b83280']
 export const routeHex = vehicleId => ROUTE_HEX[((Number(vehicleId) - 1) % 5 + 5) % 5]
 
 // Lý do tài xế chọn khi chưa giao được; INCIDENT_REASON do điều phối viên ghi khi kết thúc chuyến do sự cố
-export const DRIVER_FAIL_REASONS = ['Vắng nhà', 'Không liên lạc được', 'Sai địa chỉ', 'Khách từ chối nhận', 'Khác']
+export const REFUSED_REASON = 'Khách từ chối nhận'
+export const DRIVER_FAIL_REASONS = ['Vắng nhà', 'Không liên lạc được', 'Sai địa chỉ', REFUSED_REASON, 'Khác']
 export const INCIDENT_REASON = 'Sự cố xe/tài xế'
 export const FAIL_REASONS = [...DRIVER_FAIL_REASONS, INCIDENT_REASON]
 

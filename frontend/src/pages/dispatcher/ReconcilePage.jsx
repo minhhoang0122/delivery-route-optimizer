@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router'
 import { api, newEventId } from '../../api.js'
 import { Alert, Badge, Button, Card, Checkbox, ErrorBox, Loading, LoadError, Metric, PageHeader, Radio, StatusBadge, StopItem, Table } from '../../components/ui.jsx'
-import { DECISION, kg, time, TRIP_STATUS } from '../../format.js'
+import { DECISION, kg, REFUSED_REASON, time, TRIP_STATUS } from '../../format.js'
 import { LIVE_MS, useAction, useLoad } from '../../hooks.js'
 
 export default function ReconcilePage() {
@@ -33,7 +33,12 @@ export default function ReconcilePage() {
   const returned = new Set(t.returnReport?.returnedOrderIds ?? [])
   const aborted = Boolean(t.returnReport?.aborted)
   const max = t.maxDeliveryAttempts
-  const defaultOf = s => (returned.has(s.order.id) && s.order.failedAttempts < max ? 'requeue' : null)
+  // Khách đã từ chối nhận thì giao lại vô ích: mặc định chuyển hoàn, Dispatcher vẫn đổi được
+  const defaultOf = s => {
+    if (!returned.has(s.order.id)) return null
+    if (s.attempt?.reason === REFUSED_REASON) return 'return_to_sender'
+    return s.order.failedAttempts < max ? 'requeue' : null
+  }
   const decisionOf = s => decisions[s.order.id] ?? defaultOf(s)
   const undecided = failed.filter(s => !decisionOf(s))
   const unreturned = failed.filter(s => !returned.has(s.order.id))
