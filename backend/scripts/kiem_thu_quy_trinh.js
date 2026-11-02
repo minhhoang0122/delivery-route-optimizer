@@ -499,14 +499,14 @@ check((await api(disp, 'POST', '/orders', { ...ok, code: 'DH-9003', phone: '0905
 check((await api(disp, 'POST', '/orders', { ...ok, code: 'DH-9003', phone: '0905 000 003', windowStart: '8h' })).status === 400, 'khung giờ sai dạng HH:MM bị từ chối');
 
 console.log('Dispatcher: khung giờ giao');
-// Hai đơn mới, lập kế hoạch với xe vừa rảnh: khung giờ đã qua thì chưa xếp được, khung giờ trong ca thì giao đúng khung
-const nowMs = Date.now();
-const hhmm = ms => clockText(new Date(ms));
-if (hhmm(nowMs - 3600_000) < hhmm(nowMs) && hhmm(nowMs) < hhmm(nowMs + 3 * 3600_000)) {
-  const past = (await api(disp, 'POST', '/orders', { ...ok, code: 'DH-9101', phone: '0905 000 101', windowStart: hhmm(nowMs - 3 * 3600_000), windowEnd: hhmm(nowMs - 3600_000) })).data.order;
-  const soon = (await api(disp, 'POST', '/orders', { ...ok, code: 'DH-9102', phone: '0905 000 102', lat: 16.061, lon: 108.21, windowStart: hhmm(nowMs + 3600_000), windowEnd: hhmm(nowMs + 2 * 3600_000) })).data.order;
-  check(past?.windowEnd === hhmm(nowMs - 3600_000) && soon?.windowStart === hhmm(nowMs + 3600_000), 'đơn mới lưu khung giờ giao');
-  let wr = (await api(disp, 'POST', '/planning/runs', { clientEventId: randomUUID(), orderIds: [past.id, soon.id], vehicleIds: [tA.vehicle.id], shiftEnd })).data.run;
+// Hai đơn mới, lập kế hoạch với xe vừa rảnh trong ca cố định 09:00–18:00 hôm nay (không phụ thuộc giờ chạy kiểm thử):
+// khung giờ kết thúc trước giờ bắt đầu ca thì chưa xếp được, khung giờ trong ca thì giao đúng khung
+{
+  const at = h => { const d = new Date(); d.setHours(h, 0, 0, 0); return d.getTime(); };
+  const past = (await api(disp, 'POST', '/orders', { ...ok, code: 'DH-9101', phone: '0905 000 101', windowStart: '06:00', windowEnd: '08:00' })).data.order;
+  const soon = (await api(disp, 'POST', '/orders', { ...ok, code: 'DH-9102', phone: '0905 000 102', lat: 16.061, lon: 108.21, windowStart: '10:00', windowEnd: '11:00' })).data.order;
+  check(past?.windowEnd === '08:00' && soon?.windowStart === '10:00', 'đơn mới lưu khung giờ giao');
+  let wr = (await api(disp, 'POST', '/planning/runs', { clientEventId: randomUUID(), orderIds: [past.id, soon.id], vehicleIds: [tA.vehicle.id], shiftStart: '09:00', shiftEnd: '18:00' })).data.run;
   for (let i = 0; i < 60 && wr.status === 'running'; i++) {
     await new Promise(res => setTimeout(res, 300));
     wr = (await api(disp, 'GET', `/planning/runs/${wr.id}`)).data.run;
@@ -514,11 +514,9 @@ if (hhmm(nowMs - 3600_000) < hhmm(nowMs) && hhmm(nowMs) < hhmm(nowMs + 3 * 3600_
   const un = wr.result?.unassigned ?? [];
   check(un.length === 1 && un[0].orderId === past.id && un[0].reason === 'Không kịp khung giờ khách hẹn', 'khung giờ đã qua: đơn chưa xếp, lý do "Không kịp khung giờ khách hẹn"');
   const arr = wr.result?.routes.flatMap(x => x.arrivals).find(a => a.orderId === soon.id);
-  check(arr && new Date(arr.at).getTime() >= nowMs + 3600_000 - 60_000 && new Date(arr.at).getTime() <= nowMs + 2 * 3600_000 + 60_000,
+  check(arr && new Date(arr.at).getTime() >= at(10) - 60_000 && new Date(arr.at).getTime() <= at(11) + 60_000,
     'khung giờ trong ca: xe đến sớm thì chờ, giờ giao dự kiến nằm trong khung giờ');
   for (const o of [past, soon]) await api(disp, 'POST', `/orders/${o.id}/cancel`);
-} else {
-  console.log('     bỏ qua: gần nửa đêm, khung giờ thử nghiệm vắt qua ngày');
 }
 
 console.log(fails ? `\n${fails}/${total} kiểm tra thất bại` : `\nTất cả ${total} kiểm tra đạt`);

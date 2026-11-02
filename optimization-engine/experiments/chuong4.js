@@ -4,6 +4,7 @@
 // từ 4 ma trận ghi lúc 16:00–17:30 Thứ Hai 26/10/2026 (ma_tran_60_*.json). Chạy lại được, không gọi TomTom:
 //   node experiments/chuong4.js            in bảng kết quả
 //   node experiments/chuong4.js --json     ghi thêm experiments/ket_qua.json
+//   node experiments/chuong4.js --out=x.json   ghi kết quả ra tệp khác (chạy lặp để kiểm chứng, không đè ket_qua.json)
 // Mục thời gian phụ thuộc giờ dùng thêm ma_tran_1630.json và ma_tran_1700.json (ghi bằng ghi_ma_tran.js).
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import {
@@ -617,4 +618,9 @@ table(['Cách lập kế hoạch', 'Xe cuối về kho', 'Tổng thời lượng
 if (process.argv.includes('--json')) {
   writeFileSync(new URL('./ket_qua.json', import.meta.url), JSON.stringify(out, null, 2));
   console.log('Đã ghi experiments/ket_qua.json');
+}
+const outArg = process.argv.find(a => a.startsWith('--out='));
+if (outArg) {
+  writeFileSync(outArg.slice(6), JSON.stringify(out, null, 2));
+  console.log('Đã ghi', outArg.slice(6));
 }
