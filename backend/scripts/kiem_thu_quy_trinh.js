@@ -307,6 +307,7 @@ check((await api(null, 'GET', `/public/tracking/${'0'.repeat(64)}`)).status === 
 // Khách hẹn giao sau giờ dự kiến của điểm cuối: hệ thống tự sắp lại, đơn xuống sau, không giao trước giờ hẹn
 const lastEta = Math.max(...pendA.map(s => new Date(s.eta).getTime()));
 const later = clockText(roundUp(new Date(lastEta + 15 * 60_000), 30));
+let yOrder = null;
 const X = pendA.slice(1, -1).find(s => ptOf(s) !== ptOf(pendA[0]) && far(s));
 if (X) {
   const before = pendA.findIndex(s => s.id === X.id);
@@ -324,15 +325,18 @@ if (X) {
   check(dvw.needsAck && dvw.stops.find(s => s.id === X.id).order.notBeforeAt, 'ứng dụng tài xế nhận tuyến mới, điểm có giờ khách hẹn');
   await api(drv[uA], 'POST', `/driver/trips/${tA.id}/route-ack`, { clientEventId: randomUUID(), routeVersionId: dvw.routeVersion.id });
 
-  // Khách hẹn sau giờ hết ca: không kịp trong ca, đơn ra khỏi chuyến, về chờ xếp ca sau
+  // Khách hẹn sau giờ hết ca khi xe đang giao: không kịp trong ca, kiện còn trên xe nên điểm thành chưa giao được, mang về kho
   const Y = pendA2.slice(1).find(s => s.id !== X.id && ptOf(s) !== ptOf(pendA2[0]) && far(s));
   if (Y) {
     const dy = await api(null, 'POST', `/public/tracking/${await tokenOf(Y.order.id)}/defer`, { time: clockText(new Date(endAt.getTime() + 30 * 60_000)) });
     ta = await view();
-    check(dy.status === 200 && dy.data.tracking.status === 'pending' && !ta.stops.some(s => s.id === Y.id) && ta.removedStops.some(x => x.orderId === Y.order.id)
-      && (await api(disp, 'GET', `/orders/${Y.order.id}`)).data.order.status === 'pending'
-      && ta.events.some(e => e.type === 'customer_deferred' && e.payload.outcome === 'requeued' && e.payload.orderId === Y.order.id),
-    'khách hẹn sau giờ hết ca: đơn tự ra khỏi chuyến, về chờ xếp ca sau, tài xế thấy kiện cần mang về');
+    const yStop = ta.stops.find(s => s.id === Y.id);
+    check(dy.status === 200 && dy.data.tracking.status === 'needs_action' && yStop?.status === 'failed' && yStop.attempt?.reason === 'Khách hẹn lại'
+      && !ta.removedStops.some(x => x.orderId === Y.order.id)
+      && (await api(disp, 'GET', `/orders/${Y.order.id}`)).data.order.status === 'needs_action'
+      && ta.events.some(e => e.type === 'customer_deferred' && e.payload.outcome === 'carried_back' && e.payload.orderId === Y.order.id),
+    'khách hẹn sau giờ hết ca khi xe đang giao: điểm thành chưa giao được, kiện theo xe về kho, đơn chưa về chờ xếp');
+    yOrder = Y.order.id;
     const dvy = (await api(drv[uA], 'GET', '/driver/current-trip')).data.trip;
     if (dvy.needsAck) await api(drv[uA], 'POST', `/driver/trips/${tA.id}/route-ack`, { clientEventId: randomUUID(), routeVersionId: dvy.routeVersion.id });
   }
@@ -405,7 +409,7 @@ for (const s of restA) {
   await api(drv[uA], 'POST', `/driver/trips/${tA.id}/stops/${s.id}/attempts`, s === sLost
     ? { clientEventId: randomUUID(), result: 'failed', reason: 'Khách từ chối nhận' } : { clientEventId: randomUUID(), result: 'delivered' });
 }
-const ret = await api(drv[uA], 'POST', `/driver/trips/${tA.id}/return`, { clientEventId: randomUUID(), returnedOrderIds: [stops[1].order.id] });
+const ret = await api(drv[uA], 'POST', `/driver/trips/${tA.id}/return`, { clientEventId: randomUUID(), returnedOrderIds: [stops[1].order.id, ...(yOrder ? [yOrder] : [])] });
 check(ret.status === 200 && ret.data.trip.status === 'awaiting_reconciliation', 'báo về kho, có kiện chưa giao được thì chờ đối chiếu');
 
 console.log('Dispatcher: đối chiếu và chốt chuyến');
@@ -428,6 +432,7 @@ const close = await closeA(lostDecision);
 check(close.status === 200 && close.data.trip.status === 'closed', 'chốt chuyến: kiện mang về không cần chọn, mặc định giao lại');
 const o2 = (await api(disp, 'GET', `/orders/${stops[1].order.id}`)).data.order;
 check(o2.status === 'pending', 'đơn chưa giao được đã mang về trở về chờ xếp sau khi chốt');
+if (yOrder) check((await api(disp, 'GET', `/orders/${yOrder}`)).data.order.status === 'pending', 'đơn khách hẹn lại khi xe đang giao về chờ xếp sau khi chốt chuyến');
 if (sLost) check((await api(disp, 'GET', `/orders/${sLost.order.id}`)).data.order.status === 'lost', 'kiện không mang về được ghi Thất lạc');
 const hist = (await api(drv[uA], 'GET', '/driver/trips')).data.trips;
 check(hist.some(h => h.id === tA.id && h.status === 'closed'), 'tài xế xem lại chuyến đã chốt');

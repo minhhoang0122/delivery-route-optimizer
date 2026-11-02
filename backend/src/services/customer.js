@@ -3,14 +3,16 @@
 // xe khi chỉ còn tối đa 2 điểm dừng (bảo vệ vị trí tài xế), kết quả giao và tên gọi của tài xế. Không có thông tin của khách
 // khác, không có số điện thoại tài xế.
 // Khách hẹn "giao sau HH:MM": hệ thống tự sắp lại các điểm còn lại (Optimization Engine, xe đến sớm thì chờ); không kịp trước
-// giờ hết ca thì đơn ra khỏi chuyến, về chờ xếp ca sau. Khách hẹn ngày khác: đơn ra khỏi chuyến, về chờ xếp. Điều phối viên
+// giờ hết ca thì đơn ra khỏi chuyến, về chờ xếp ca sau. Khách hẹn ngày khác: đơn ra khỏi chuyến, về chờ xếp. Xe đã xuất phát thì
+// kiện đang trên xe: điểm thành chưa giao được (CUSTOMER_REASON), kiện theo xe về kho và về chờ xếp khi chốt chuyến. Điều phối viên
 // và tài xế không phải thao tác; nhật ký chuyến ghi người thực hiện là khách hàng.
+import { randomUUID } from 'node:crypto';
 import { config } from '../config.js';
 import { query, transaction } from '../db.js';
 import { badRequest, conflict, notFound } from '../errors.js';
 import { atSeconds, clockText, nextClock, roundUp } from './clock.js';
 import { haversineM, locationKey } from './matrix.js';
-import { addEvent, addRouteVersion, currentOrder, fillGeometryLater, loadTrip, lockTrip, remainingContext } from './trips.js';
+import { addEvent, addRouteVersion, currentOrder, CUSTOMER_REASON, fillGeometryLater, loadTrip, lockTrip, remainingContext } from './trips.js';
 import { clockLabel } from './window.js';
 
 const TOKEN = /^[0-9a-f]{64}$/;
@@ -105,13 +107,23 @@ async function openStop(o) {
 }
 
 /**
- * Bỏ một điểm khỏi chuyến (khách hẹn lại): đơn về chờ xếp, giờ hẹn bỏ đi (ca sau xếp lại từ đầu), chuyến có phiên bản tuyến
- * mới gồm các điểm còn lại theo thứ tự cũ. Chuyến chưa xuất phát không còn điểm nào thì tự thu hồi.
+ * Bỏ một điểm khỏi chuyến (khách hẹn lại), giờ hẹn bỏ đi (ca sau xếp lại từ đầu). Chuyến chưa xuất phát: đơn về chờ xếp ngay.
+ * Chuyến đang giao: kiện còn trên xe nên điểm thành chưa giao được, đơn chờ đối chiếu như kiện chưa giao được khác và mặc định
+ * về chờ xếp khi chốt chuyến. Chuyến có phiên bản tuyến mới gồm các điểm còn lại theo thứ tự cũ. Chuyến chưa xuất phát không
+ * còn điểm nào thì tự thu hồi.
  */
-async function removeStop(c, t, { stopId, orderId, seconds }) {
-  await c.query(`UPDATE trip_stops SET status = 'removed' WHERE id = $1`, [stopId]);
-  await c.query('DELETE FROM active_assignments WHERE stop_id = $1', [stopId]);
-  await c.query(`UPDATE orders SET status = 'pending', not_before_at = NULL, version = version + 1 WHERE id = $1`, [orderId]);
+async function removeStop(c, t, { stopId, orderId, seconds, note }) {
+  if (t.status === 'in_progress') {
+    await c.query(
+      `INSERT INTO delivery_attempts (stop_id, client_event_id, result, reason, note, occurred_at)
+       VALUES ($1, $2, 'failed', $3, $4, now())`, [stopId, randomUUID(), CUSTOMER_REASON, note]);
+    await c.query(`UPDATE trip_stops SET status = 'failed' WHERE id = $1`, [stopId]);
+    await c.query(`UPDATE orders SET status = 'needs_action', not_before_at = NULL, version = version + 1 WHERE id = $1`, [orderId]);
+  } else {
+    await c.query(`UPDATE trip_stops SET status = 'removed' WHERE id = $1`, [stopId]);
+    await c.query('DELETE FROM active_assignments WHERE stop_id = $1', [stopId]);
+    await c.query(`UPDATE orders SET status = 'pending', not_before_at = NULL, version = version + 1 WHERE id = $1`, [orderId]);
+  }
   const order = await currentOrder(c, t);
   if (!order.length && t.status === 'assigned') {
     await c.query(`UPDATE trips SET status = 'revoked', closed_at = now(), state_version = state_version + 1 WHERE id = $1`, [t.id]);
@@ -169,10 +181,10 @@ export async function customerDefer(token, hhmm) {
       if (t.state_version !== trip.stateVersion) return 'stale';
       const base = { by: 'customer', stopId: stop.id, orderId: o.id, orderCode: o.code, notBeforeAt };
       if (!feasible) {
-        const v = await removeStop(c, t, { stopId: stop.id, orderId: o.id, seconds: restSeconds });
+        const v = await removeStop(c, t, { stopId: stop.id, orderId: o.id, seconds: restSeconds, note: 'Không kịp giao trước giờ hết ca' });
         await addEvent(c, {
           tripId: t.id, actorId: null, type: 'customer_deferred',
-          payload: { ...base, outcome: 'requeued', reasonText: 'Không kịp giao trước giờ hết ca', ...v, start: { lat: ctx.start.lat, lon: ctx.start.lon } },
+          payload: { ...base, outcome: t.status === 'in_progress' ? 'carried_back' : 'requeued', reasonText: 'Không kịp giao trước giờ hết ca', ...v, start: { lat: ctx.start.lat, lon: ctx.start.lon } },
         });
         return { v, points: v.stopIds };
       }
@@ -214,10 +226,10 @@ export async function customerReschedule(token) {
     const out = await transaction(async c => {
       const t = await lockTrip(c, trip.id);
       if (t.state_version !== trip.stateVersion) return 'stale';
-      const v = await removeStop(c, t, { stopId: stop.id, orderId: o.id, seconds });
+      const v = await removeStop(c, t, { stopId: stop.id, orderId: o.id, seconds, note: 'Khách hẹn ngày khác' });
       await addEvent(c, {
         tripId: t.id, actorId: null, type: 'customer_rescheduled',
-        payload: { by: 'customer', stopId: stop.id, orderId: o.id, orderCode: o.code, reasonText: 'Khách hẹn ngày khác', ...v, start: { lat: ctx.start.lat, lon: ctx.start.lon } },
+        payload: { by: 'customer', stopId: stop.id, orderId: o.id, orderCode: o.code, reasonText: 'Khách hẹn ngày khác', carried: t.status === 'in_progress', ...v, start: { lat: ctx.start.lat, lon: ctx.start.lon } },
       });
       return v;
     });

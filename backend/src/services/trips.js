@@ -22,6 +22,8 @@ const stale = message => new HttpError(409, 'STALE', message);
 
 /** Lý do Dispatcher ghi cho các điểm chưa giao khi kết thúc chuyến do sự cố (không nằm trong danh sách Driver chọn). */
 export const INCIDENT_REASON = 'Sự cố xe/tài xế';
+/** Lý do ghi cho điểm khách hẹn lại khi kiện đã lên xe (customer.js); không tính vào số lần giao không thành công. */
+export const CUSTOMER_REASON = 'Khách hẹn lại';
 /** Quyết định khi đối chiếu cho đơn chưa giao được: giao lại (xếp vào kế hoạch sau), chuyển hoàn, thất lạc. */
 export const DECISIONS = ['requeue', 'return_to_sender', 'lost'];
 
@@ -162,7 +164,8 @@ export async function loadTrip(id, { withEvents = false } = {}) {
             o.parcels, o.not_before_at, o.window_start, o.window_end,
             a.result, a.reason, a.note AS attempt_note, a.occurred_at, a.received_at, a.distance_m AS attempt_distance_m,
             a.position_observed_at AS attempt_position_at, ru.role AS recorded_role,
-            (SELECT count(*)::int FROM trip_stops f WHERE f.order_id = s.order_id AND f.status = 'failed') AS failed_attempts
+            (SELECT count(*)::int FROM trip_stops f JOIN delivery_attempts fa ON fa.stop_id = f.id
+               WHERE f.order_id = s.order_id AND f.status = 'failed' AND fa.reason <> '${CUSTOMER_REASON}') AS failed_attempts
        FROM trip_stops s
        JOIN orders o ON o.id = s.order_id
        LEFT JOIN route_stops rs ON rs.stop_id = s.id AND rs.route_version_id = $2
@@ -297,8 +300,8 @@ export async function loadTrip(id, { withEvents = false } = {}) {
     },
     loadKg: Math.round(stops.reduce((sum, s) => sum + s.weight_kg, 0) * 100) / 100,
     loadParcels: stops.reduce((sum, s) => sum + s.parcels, 0),
-    // Kiện khách hẹn ngày khác (hoặc không kịp giờ hẹn) đã bỏ khỏi chuyến khi đang giao: tài xế mang về kho
-    removedStops: reports.filter(r => r.event_type === 'customer_rescheduled' || (r.event_type === 'customer_deferred' && r.payload.outcome === 'requeued'))
+    // Đơn khách hẹn lại đã bỏ khỏi chuyến trước khi xuất phát (khi đang giao, điểm thành chưa giao được và kiện được đối chiếu như thường)
+    removedStops: reports.filter(r => (r.event_type === 'customer_rescheduled' && !r.payload.carried) || (r.event_type === 'customer_deferred' && r.payload.outcome === 'requeued'))
       .map(r => ({ stopId: r.payload.stopId, orderId: r.payload.orderId, orderCode: r.payload.orderCode, reason: r.payload.reasonText, at: r.created_at })),
     position: pos && {
       id: pos.id, lat: pos.latitude, lon: pos.longitude, observedAt: pos.observed_at,
@@ -760,7 +763,8 @@ export async function closeTrip(tripId, user, { stateVersion, goodsMatched, deci
     if (t.state_version !== stateVersion) throw stale('Dữ liệu chuyến đã thay đổi, tải lại trước khi chốt');
     const stops = (await c.query(
       `SELECT s.order_id, s.status, o.code,
-              (SELECT count(*)::int FROM trip_stops f WHERE f.order_id = s.order_id AND f.status = 'failed') AS attempts
+              (SELECT count(*)::int FROM trip_stops f JOIN delivery_attempts fa ON fa.stop_id = f.id
+               WHERE f.order_id = s.order_id AND f.status = 'failed' AND fa.reason <> '${CUSTOMER_REASON}') AS attempts
          FROM trip_stops s JOIN orders o ON o.id = s.order_id WHERE s.trip_id = $1 AND s.status <> 'removed'`, [tripId])).rows;
     if (stops.some(s => s.status === 'pending')) throw conflict('Còn điểm chưa có kết quả, chưa thể chốt chuyến');
     const report = (await c.query(

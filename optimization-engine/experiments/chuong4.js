@@ -294,7 +294,7 @@ const END60 = clockSeconds(kb60.ca.ket_thuc);
 const PROFILES60 = [...new Set(kb60.xe.map(x => x.cau_hinh))];
 const fifo60 = fifoCheck(SLOTS60, PROFILES60, [kb60.kho, ...kb60.diem].map(d => d.ma));
 const BIG = { maxEvaluations: 5_000_000, maxMs: 600_000 };   // đủ lớn để Local Search tự dừng ở cực tiểu địa phương
-const clock = s => { const m = Math.round(s / 60); return `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`; };
+const clock = s => { const m = Math.floor(s / 60); return `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`; };
 const ms1 = x => x.toFixed(1).replace('.', ',');
 
 /** Bài toán 60 đơn. travel cho trước thì lập bằng một ma trận cố định, không thì phụ thuộc giờ (giao thông thật). */
