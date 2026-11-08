@@ -1,0 +1,290 @@
+{
+  "luc": "2026-10-10T22:46:50.472Z",
+  "ket_qua": [
+    {
+      "ma": "T10",
+      "ten": "Khóa sai bị từ chối",
+      "muc": "2.4.3",
+      "ket": "ĐẠT",
+      "chiTiet": "HTTP 401, phân loại \"khóa sai hoặc không có quyền\" nên không thử lại"
+    },
+    {
+      "ma": "T01",
+      "ten": "Khóa API và kết nối (Kho → Chợ Hàn, car)",
+      "muc": "2.4.1",
+      "ket": "ĐẠT",
+      "chiTiet": "4,8 km · 11 phút 03 giây · phản hồi 217 ms · điểm bám đường lệch tối đa 94 m"
+    },
+    {
+      "ma": "T02",
+      "ten": "Dữ liệu giao thông tại Đà Nẵng",
+      "muc": "2.4.3",
+      "ket": "ĐẠT",
+      "chiTiet": "không kẹt xe 638 s · lịch sử 663 s · trực tiếp 663 s · trễ do giao thông 0 s (05:46:31, trễ 0 s có thể chỉ do đường đang thông thoáng)"
+    },
+    {
+      "ma": "T03",
+      "ten": "Gửi nhầm thứ tự kinh độ, vĩ độ",
+      "muc": "2.1.1",
+      "ket": "ĐẠT",
+      "chiTiet": "bị từ chối ngay (vĩ độ 108 không hợp lệ): BAD_INPUT Invalid request: malformed coordinate at index [0]: [108.202200,16.054400]"
+    },
+    {
+      "ma": "T04",
+      "ten": "Xe máy – motorcycle (beta), Kho → Sơn Trà",
+      "muc": "2.4.1",
+      "ket": "ĐẠT",
+      "chiTiet": "7,3 km · 14 phút 33 giây · ô tô 7,3 km · 14 phút 33 giây · đoạn chế độ \"other\" 0 m (0,0%)"
+    },
+    {
+      "ma": "T05",
+      "ten": "Xe tải nhỏ – truck, Kho → Sơn Trà",
+      "muc": "2.4.1",
+      "ket": "ĐẠT",
+      "chiTiet": "8,8 km · 20 phút 01 giây · ô tô 7,3 km · 14 phút 33 giây · đoạn chế độ \"other\" 0 m (0,0%)"
+    },
+    {
+      "ma": "T06",
+      "ten": "Giữ thứ tự điểm Kho → A → B → C → Kho",
+      "muc": "3.4.2",
+      "ket": "ĐẠT",
+      "chiTiet": "4 chặng, điểm cuối mỗi chặng lệch tối đa 126 m, không có optimizedWaypoints · 29,1 km · 62 phút 37 giây"
+    },
+    {
+      "ma": "T04b",
+      "ten": "Ma trận xe máy so với ô tô và xe tải (20 cặp)",
+      "muc": "2.4.1",
+      "ket": "THÔNG TIN",
+      "chiTiet": "xe máy khác ô tô ở 2/20 cặp · xe tải chậm hơn xe máy trung bình 27,1%"
+    },
+    {
+      "ma": "T07",
+      "ten": "Batch Routing đồng bộ (61 mục trong 1 lần gọi)",
+      "muc": "2.4.2",
+      "ket": "ĐẠT",
+      "chiTiet": "60/60 mục hợp lệ thành công, mục cố ý lỗi trả 400 (MAP_MATCHING_FAILURE Engine error while executing route request: MAP_MATCHING_FAILURE: Destination (16.2, 108.6)) mà không làm hỏng mục khác · 12223 ms · không có giá trị 0 ngoài đường chéo: đúng"
+    },
+    {
+      "ma": "T08",
+      "ten": "Thời gian hai chiều khác nhau",
+      "muc": "2.1.2",
+      "ket": "THÔNG TIN",
+      "chiTiet": "11/20 cặp lệch ≥ max(60 s, 10%) · lệch lớn nhất B↔C (truck): 1652 s và 1095 s"
+    },
+    {
+      "ma": "T09",
+      "ten": "Chặng không có tuyến (Kho → giữa biển)",
+      "muc": "2.4.3, NFR06",
+      "ket": "ĐẠT",
+      "chiTiet": "HTTP 400, nhận diện là \"không có tuyến hoặc tham số sai\", không thử lại, không gán 0: MAP_MATCHING_FAILURE Engine error while executing route request: MAP_MATCHING_FAILURE: Destination (16.2, 108.6)"
+    },
+    {
+      "ma": "T11",
+      "ten": "departAt theo giờ, xe máy Kho → Sơn Trà, ngày 2026-10-12",
+      "muc": "2.4.3, 4.2.4",
+      "ket": "THÔNG TIN",
+      "chiTiet": "06:30 910 s · 09:30 973 s · 12:00 988 s · 16:00 999 s · 17:30 1036 s · 20:00 950 s"
+    },
+    {
+      "ma": "T12",
+      "ten": "Ô bản đồ nền TomTom (Map Display)",
+      "muc": "2.5.3",
+      "ket": "ĐẠT",
+      "chiTiet": "image/png, 26941 byte, 392 ms"
+    },
+    {
+      "ma": "T13",
+      "ten": "Geocoding địa chỉ mẫu \"45 Lê Duẩn, Hải Châu\"",
+      "muc": "4.2.2",
+      "ket": "ĐẠT",
+      "chiTiet": "Số 45, Đường Lê Duẩn, Đà Nẵng, Đà Nẵng, Đà Nẵng, 50206 → 16.0709724, 108.2189146 (loại Point Address, độ khớp 0,99)"
+    },
+    {
+      "ma": "T14",
+      "ten": "Thời gian phản hồi của TomTom",
+      "muc": "NFR09",
+      "ket": "THÔNG TIN",
+      "chiTiet": "17 lần gọi · trung vị 216 ms · lớn nhất 12002 ms"
+    }
+  ],
+  "du_lieu": {
+    "T01": {
+      "lengthInMeters": 4771,
+      "travelTimeInSeconds": 663,
+      "trafficDelayInSeconds": 0,
+      "trafficLengthInMeters": 0,
+      "departureTime": "2026-10-11T05:46:32+07:00",
+      "arrivalTime": "2026-10-11T05:57:35+07:00",
+      "noTrafficTravelTimeInSeconds": 638,
+      "historicTrafficTravelTimeInSeconds": 663,
+      "liveTrafficIncidentsTravelTimeInSeconds": 663
+    },
+    "T04": {
+      "lengthInMeters": 7253,
+      "travelTimeInSeconds": 873,
+      "trafficDelayInSeconds": 0,
+      "trafficLengthInMeters": 0,
+      "departureTime": "2026-10-11T05:46:33+07:00",
+      "arrivalTime": "2026-10-11T06:01:06+07:00"
+    },
+    "T05": {
+      "lengthInMeters": 8810,
+      "travelTimeInSeconds": 1201,
+      "trafficDelayInSeconds": 0,
+      "trafficLengthInMeters": 0,
+      "departureTime": "2026-10-11T05:46:33+07:00",
+      "arrivalTime": "2026-10-11T06:06:34+07:00"
+    },
+    "T07": {
+      "thoi_gian": {
+        "car": {
+          "KHO>A": 663,
+          "KHO>B": 873,
+          "KHO>C": 1259,
+          "KHO>D": 1196,
+          "A>KHO": 533,
+          "A>B": 478,
+          "A>C": 1241,
+          "A>D": 1179,
+          "B>KHO": 941,
+          "B>A": 577,
+          "B>C": 1061,
+          "B>D": 1520,
+          "C>KHO": 1274,
+          "C>A": 1187,
+          "C>B": 911,
+          "C>D": 2097,
+          "D>KHO": 947,
+          "D>A": 1145,
+          "D>B": 1339,
+          "D>C": 2019
+        },
+        "motorcycle": {
+          "KHO>A": 663,
+          "KHO>B": 873,
+          "KHO>C": 1259,
+          "KHO>D": 1196,
+          "A>KHO": 533,
+          "A>B": 478,
+          "A>C": 1241,
+          "A>D": 1179,
+          "B>KHO": 941,
+          "B>A": 577,
+          "B>C": 1061,
+          "B>D": 1520,
+          "C>KHO": 1274,
+          "C>A": 1187,
+          "C>B": 911,
+          "C>D": 2097,
+          "D>KHO": 947,
+          "D>A": 1144,
+          "D>B": 1339,
+          "D>C": 2018
+        },
+        "truck": {
+          "KHO>A": 951,
+          "KHO>B": 1201,
+          "KHO>C": 1569,
+          "KHO>D": 1279,
+          "A>KHO": 569,
+          "A>B": 754,
+          "A>C": 1335,
+          "A>D": 1365,
+          "B>KHO": 1221,
+          "B>A": 908,
+          "B>C": 1652,
+          "B>D": 2018,
+          "C>KHO": 1384,
+          "C>A": 1368,
+          "C>B": 1095,
+          "C>D": 2275,
+          "D>KHO": 1015,
+          "D>A": 1343,
+          "D>B": 2377,
+          "D>C": 2248
+        }
+      },
+      "quang_duong": {
+        "car": {
+          "KHO>A": 4771,
+          "KHO>B": 7253,
+          "KHO>C": 11398,
+          "KHO>D": 9894,
+          "A>KHO": 3430,
+          "A>B": 3403,
+          "A>C": 11134,
+          "A>D": 9490,
+          "B>KHO": 6663,
+          "B>A": 3839,
+          "B>C": 9176,
+          "B>D": 12689,
+          "C>KHO": 11735,
+          "C>A": 9637,
+          "C>B": 8445,
+          "C>D": 19192,
+          "D>KHO": 8450,
+          "D>A": 9380,
+          "D>B": 12053,
+          "D>C": 19153
+        },
+        "motorcycle": {
+          "KHO>A": 4771,
+          "KHO>B": 7253,
+          "KHO>C": 11398,
+          "KHO>D": 9894,
+          "A>KHO": 3430,
+          "A>B": 3403,
+          "A>C": 11134,
+          "A>D": 9490,
+          "B>KHO": 6663,
+          "B>A": 3839,
+          "B>C": 9176,
+          "B>D": 12689,
+          "C>KHO": 11735,
+          "C>A": 9637,
+          "C>B": 8445,
+          "C>D": 19192,
+          "D>KHO": 8450,
+          "D>A": 9380,
+          "D>B": 12053,
+          "D>C": 19153
+        },
+        "truck": {
+          "KHO>A": 5007,
+          "KHO>B": 8810,
+          "KHO>C": 12441,
+          "KHO>D": 9351,
+          "A>KHO": 3430,
+          "A>B": 4753,
+          "A>C": 11134,
+          "A>D": 10435,
+          "B>KHO": 8522,
+          "B>A": 6644,
+          "B>C": 12461,
+          "B>D": 15526,
+          "C>KHO": 11268,
+          "C>A": 11145,
+          "C>B": 9246,
+          "C>D": 18725,
+          "D>KHO": 8450,
+          "D>A": 10046,
+          "D>B": 19219,
+          "D>C": 19691
+        }
+      }
+    },
+    "T11": [
+      "06:30 910 s",
+      "09:30 973 s",
+      "12:00 988 s",
+      "16:00 999 s",
+      "17:30 1036 s",
+      "20:00 950 s"
+    ]
+  },
+  "dem": {
+    "routing": 74,
+    "search": 1,
+    "tile": 1
+  }
+}

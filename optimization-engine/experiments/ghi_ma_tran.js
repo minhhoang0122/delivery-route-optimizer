@@ -21,8 +21,11 @@ const lay = ten => { const i = args.indexOf(ten); return i >= 0 ? args[i + 1] : 
 const fixture = name => new URL(`../test/fixtures/${name}`, import.meta.url);
 const KICH_BAN = lay('--kich-ban');
 // Tổng số request Routing tối đa cho mọi lần chạy của script, đếm riêng cho từng bộ điểm
-const GIOI_HAN_REQUEST = KICH_BAN ? 8000 : 1800;
-const TIEN_TO = KICH_BAN ? 'ma_tran_60_' : 'ma_tran_';
+// --ngay YYYY-MM-DD: ghi thêm một ngày khác (08/11), file mang ngày trong tên, đếm request riêng theo tháng chạy
+const NGAY_RIENG = lay('--ngay');
+const THANG = new Date(Date.now() + 7 * 3600e3).toISOString().slice(0, 7);
+const GIOI_HAN_REQUEST = Number(lay('--gioi-han')) || (KICH_BAN ? 8000 : 1800);
+const TIEN_TO = (KICH_BAN ? 'ma_tran_60_' : 'ma_tran_') + (NGAY_RIENG ? NGAY_RIENG.replaceAll('-', '') + '_' : '');
 
 function docKhoa() {
   const f = new URL('../../backend/.env', import.meta.url);
@@ -53,10 +56,11 @@ function thuHaiKeTiep() {
 }
 const NGAY = lay('--ngay') ?? thuHaiKeTiep();
 const departAt = gio => `${NGAY}T${gio}:00+07:00`;
-const nhan = gio => `Thứ Hai ${NGAY.slice(8, 10)}/${NGAY.slice(5, 7)}/${NGAY.slice(0, 4)} ${gio}`;
+const THU = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'][new Date(`${NGAY}T12:00:00Z`).getUTCDay()];
+const nhan = gio => `${THU} ${NGAY.slice(8, 10)}/${NGAY.slice(5, 7)}/${NGAY.slice(0, 4)} ${gio}`;
 
 // Đếm request đã dùng qua các lần chạy (không chứa khóa)
-const FILE_DEM = new URL(KICH_BAN ? './.dem_request_tomtom_60.json' : './.dem_request_tomtom.json', import.meta.url);
+const FILE_DEM = new URL(NGAY_RIENG ? `./.dem_request_tomtom_${THANG}.json` : (KICH_BAN ? './.dem_request_tomtom_60.json' : './.dem_request_tomtom.json'), import.meta.url);
 let daDung = existsSync(FILE_DEM) ? JSON.parse(readFileSync(FILE_DEM, 'utf8')).routing : 0;
 const ghiDem = () => writeFileSync(FILE_DEM, JSON.stringify({ routing: daDung }));
 

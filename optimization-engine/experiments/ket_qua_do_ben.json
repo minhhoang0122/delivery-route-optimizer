@@ -1,0 +1,7366 @@
+{
+ "chay_luc": "2026-11-08T10:47:16.531Z",
+ "so_bo": 30,
+ "ils_cap": 1000000,
+ "sweep": [
+  {
+   "ngay": "20261026",
+   "nhan": "Thứ Hai 26/10",
+   "bo": 30,
+   "sweepChuaXep": 0,
+   "sweepVeSauCa": 1,
+   "engineChuaXep": 0,
+   "engineVeSauCa": 0,
+   "honPhut": {
+    "mean": 18.970082845225765,
+    "min": 3.806721831859613,
+    "median": 17.82247197061091,
+    "max": 46.853341244473754
+   },
+   "engineTotHon": 30,
+   "sweepHopLe": 29
+  },
+  {
+   "ngay": "20261112",
+   "nhan": "Thứ Năm 12/11",
+   "bo": 30,
+   "sweepChuaXep": 0,
+   "sweepVeSauCa": 1,
+   "engineChuaXep": 0,
+   "engineVeSauCa": 0,
+   "honPhut": {
+    "mean": 19.28068687497657,
+    "min": -0.7351572208800159,
+    "median": 19.05779227284802,
+    "max": 47.86780356209881
+   },
+   "engineTotHon": 29,
+   "sweepHopLe": 29
+  },
+  {
+   "ngay": "20261114",
+   "nhan": "Thứ Bảy 14/11",
+   "bo": 30,
+   "sweepChuaXep": 0,
+   "sweepVeSauCa": 1,
+   "engineChuaXep": 0,
+   "engineVeSauCa": 0,
+   "honPhut": {
+    "mean": 18.706964905186105,
+    "min": -1.2337051788371658,
+    "median": 17.079252844154325,
+    "max": 42.6649712196966
+   },
+   "engineTotHon": 29,
+   "sweepHopLe": 29
+  }
+ ],
+ "windows": [
+  {
+   "ngay": "20261026",
+   "nhan": "Thứ Hai 26/10",
+   "bo": 30,
+   "donCoKhung": {
+    "mean": 20.6,
+    "min": 14,
+    "median": 21,
+    "max": 25
+   },
+   "engineChuaXep": 0,
+   "donChuaXep": 0,
+   "ilsChuaXep": 0,
+   "treKhung": 0,
+   "muonHonKhongKhungPhut": {
+    "mean": 8.358781542924918,
+    "min": -3.5290283309564985,
+    "median": 9.723782345219055,
+    "max": 33.824431510283226
+   },
+   "cachIlsPhut": {
+    "mean": 1.6758170752400676,
+    "min": 0,
+    "median": 0,
+    "max": 7.511478647930926
+   },
+   "cachIlsPhanTram": {
+    "mean": 2.0921530183842703,
+    "min": 0,
+    "median": 0,
+    "max": 8.249702303363323
+   },
+   "soSanhIls": 30,
+   "engineMs": {
+    "mean": 41.12763333333421,
+    "min": 7.655200000001059,
+    "median": 36.01490000000922,
+    "max": 115.04069999999774
+   }
+  },
+  {
+   "ngay": "20261112",
+   "nhan": "Thứ Năm 12/11",
+   "bo": 30,
+   "donCoKhung": {
+    "mean": 20.6,
+    "min": 14,
+    "median": 21,
+    "max": 25
+   },
+   "engineChuaXep": 0,
+   "donChuaXep": 0,
+   "ilsChuaXep": 0,
+   "treKhung": 3,
+   "muonHonKhongKhungPhut": {
+    "mean": 8.63404844228732,
+    "min": -1.007093639258407,
+    "median": 7.051418229728612,
+    "max": 37.18374559947236
+   },
+   "cachIlsPhut": {
+    "mean": 1.7491996386218591,
+    "min": 0,
+    "median": 0.2272388888887993,
+    "max": 10.355484291995527
+   },
+   "cachIlsPhanTram": {
+    "mean": 2.183956516701851,
+    "min": 0,
+    "median": 0.2556912286649219,
+    "max": 13.41525214801826
+   },
+   "soSanhIls": 30,
+   "engineMs": {
+    "mean": 32.14095333333486,
+    "min": 8.196700000000419,
+    "median": 27.3295999999973,
+    "max": 70.65540000001783
+   }
+  },
+  {
+   "ngay": "20261114",
+   "nhan": "Thứ Bảy 14/11",
+   "bo": 30,
+   "donCoKhung": {
+    "mean": 20.6,
+    "min": 14,
+    "median": 21,
+    "max": 25
+   },
+   "engineChuaXep": 0,
+   "donChuaXep": 0,
+   "ilsChuaXep": 0,
+   "treKhung": 6,
+   "muonHonKhongKhungPhut": {
+    "mean": 8.673933369511463,
+    "min": -4.916581124301592,
+    "median": 9.252845728492442,
+    "max": 32.654060445654856
+   },
+   "cachIlsPhut": {
+    "mean": 1.3174621612617718,
+    "min": 0,
+    "median": 0.3049596915352595,
+    "max": 6.449583622685046
+   },
+   "cachIlsPhanTram": {
+    "mean": 1.6490613096894393,
+    "min": 0,
+    "median": 0.41272119574402405,
+    "max": 8.126780230585032
+   },
+   "soSanhIls": 30,
+   "engineMs": {
+    "mean": 26.107786666664953,
+    "min": 6.090800000005402,
+    "median": 24.23259999998845,
+    "max": 65.28980000002775
+   }
+  }
+ ],
+ "outOfSample": [
+  {
+   "ngay": "20261026",
+   "nhan": "Thứ Hai 26/10",
+   "bo": 30,
+   "phuThuocGioHonCoDinhPhut": {
+    "mean": 0.23955735156784722,
+    "min": -7.074594175282497,
+    "median": 0,
+    "max": 11.212975123246846
+   },
+   "boPhuThuocGioTotHon": 11,
+   "boCoDinhTotHon": 13,
+   "thuaSoVoiDungNgayPhut": {
+    "mean": 0,
+    "min": 0,
+    "median": 0,
+    "max": 0
+   },
+   "haiMocThuaBonMocPhut": {
+    "mean": -0.3781065620350273,
+    "min": -7.074594175282497,
+    "median": 0,
+    "max": 7.8277261414699755
+   },
+   "veSauCa": {
+    "tdMon": 0,
+    "stMon": 0,
+    "two": 0
+   }
+  },
+  {
+   "ngay": "20261112",
+   "nhan": "Thứ Năm 12/11",
+   "bo": 30,
+   "phuThuocGioHonCoDinhPhut": {
+    "mean": 0.20340304452943297,
+    "min": -7.06403320424591,
+    "median": 0,
+    "max": 11.254107138763114
+   },
+   "boPhuThuocGioTotHon": 12,
+   "boCoDinhTotHon": 12,
+   "thuaSoVoiDungNgayPhut": {
+    "mean": 0.22180297892944917,
+    "min": -6.651310884059179,
+    "median": 0,
+    "max": 7.06403320424591
+   },
+   "haiMocThuaBonMocPhut": {
+    "mean": -0.46803821985809513,
+    "min": -6.420465337241694,
+    "median": 0,
+    "max": 3.274294609748176
+   },
+   "veSauCa": {
+    "tdMon": 0,
+    "stMon": 0,
+    "two": 0
+   }
+  },
+  {
+   "ngay": "20261114",
+   "nhan": "Thứ Bảy 14/11",
+   "bo": 30,
+   "phuThuocGioHonCoDinhPhut": {
+    "mean": 0.19915187079574226,
+    "min": -7.1718961168553506,
+    "median": 0,
+    "max": 12.647565654798989
+   },
+   "boPhuThuocGioTotHon": 10,
+   "boCoDinhTotHon": 14,
+   "thuaSoVoiDungNgayPhut": {
+    "mean": 0.36839484490545155,
+    "min": -6.666666666666667,
+    "median": 0,
+    "max": 7.1718961168553506
+   },
+   "haiMocThuaBonMocPhut": {
+    "mean": -0.0649455121604276,
+    "min": -3.585004006288606,
+    "median": 0,
+    "max": 6.121406525463074
+   },
+   "veSauCa": {
+    "tdMon": 0,
+    "stMon": 0,
+    "two": 0
+   }
+  }
+ ],
+ "sensitivity": [
+  {
+   "stop": 60,
+   "moto": 0.7,
+   "engineVePhut": {
+    "mean": 70.9532041976615,
+    "min": 56.39164825479857,
+    "median": 70.73208411312771,
+    "max": 100.40679330128636
+   },
+   "engineChuaXep": 0,
+   "greedyChuaXep": 0,
+   "sweepChuaXep": 0,
+   "honGreedyPhut": 0.21601984645656364,
+   "honTongPhut": 33.25466476665442,
+   "honSweepPhut": 15.254938988320506,
+   "engineVeSauCa": 0
+  },
+  {
+   "stop": 60,
+   "moto": 0.85,
+   "engineVePhut": {
+    "mean": 72.75569635651166,
+    "min": 58.75091580621532,
+    "median": 71.14445387719158,
+    "max": 100.40679330128636
+   },
+   "engineChuaXep": 0,
+   "greedyChuaXep": 0,
+   "sweepChuaXep": 0,
+   "honGreedyPhut": -0.3186177717156937,
+   "honTongPhut": 38.98002696326211,
+   "honSweepPhut": 15.84082277771201,
+   "engineVeSauCa": 0
+  },
+  {
+   "stop": 60,
+   "moto": 1,
+   "engineVePhut": {
+    "mean": 74.0750727006367,
+    "min": 60.999500996205825,
+    "median": 74.17159539498644,
+    "max": 100.40679330128636
+   },
+   "engineChuaXep": 0,
+   "greedyChuaXep": 0,
+   "sweepChuaXep": 0,
+   "honGreedyPhut": 0.6693990862522857,
+   "honTongPhut": 39.12500404855982,
+   "honSweepPhut": 18.317315984701555,
+   "engineVeSauCa": 0
+  },
+  {
+   "stop": 90,
+   "moto": 0.7,
+   "engineVePhut": {
+    "mean": 73.97765775312996,
+    "min": 58.88905256704723,
+    "median": 73.29069820629496,
+    "max": 102.90781766095
+   },
+   "engineChuaXep": 0,
+   "greedyChuaXep": 0,
+   "sweepChuaXep": 0,
+   "honGreedyPhut": 0.08464287822801345,
+   "honTongPhut": 31.30423661862575,
+   "honSweepPhut": 15.587258019083158,
+   "engineVeSauCa": 0
+  },
+  {
+   "stop": 90,
+   "moto": 0.85,
+   "engineVePhut": {
+    "mean": 74.69825487765006,
+    "min": 62.11831040942743,
+    "median": 73.21831228373158,
+    "max": 102.90781766095
+   },
+   "engineChuaXep": 0,
+   "greedyChuaXep": 0,
+   "sweepChuaXep": 0,
+   "honGreedyPhut": 2.0738374822341052,
+   "honTongPhut": 34.16198511759498,
+   "honSweepPhut": 17.46412344005626,
+   "engineVeSauCa": 0
+  },
+  {
+   "stop": 90,
+   "moto": 1,
+   "engineVePhut": {
+    "mean": 77.31767786285214,
+    "min": 64.1776987914059,
+    "median": 76.2926948166399,
+    "max": 102.90781766095
+   },
+   "engineChuaXep": 0,
+   "greedyChuaXep": 0,
+   "sweepChuaXep": 0,
+   "honGreedyPhut": 0.9363484996655986,
+   "honTongPhut": 35.738405294793964,
+   "honSweepPhut": 18.970082845225765,
+   "engineVeSauCa": 0
+  },
+  {
+   "stop": 180,
+   "moto": 0.7,
+   "engineVePhut": {
+    "mean": 82.22245382271512,
+    "min": 66.19717325125215,
+    "median": 82.6320757490818,
+    "max": 110.41162872686218
+   },
+   "engineChuaXep": 0,
+   "greedyChuaXep": 1,
+   "sweepChuaXep": 0,
+   "honGreedyPhut": 0.15538460840438886,
+   "honTongPhut": 26.023139668735666,
+   "honSweepPhut": 17.168070868768233,
+   "engineVeSauCa": 0
+  },
+  {
+   "stop": 180,
+   "moto": 0.85,
+   "engineVePhut": {
+    "mean": 84.06466817415723,
+    "min": 68.80433146720716,
+    "median": 83.42767034606199,
+    "max": 110.41162872686218
+   },
+   "engineChuaXep": 0,
+   "greedyChuaXep": 1,
+   "sweepChuaXep": 0,
+   "honGreedyPhut": 0.30524105593697115,
+   "honTongPhut": 27.21745748773531,
+   "honSweepPhut": 18.47419235864645,
+   "engineVeSauCa": 0
+  },
+  {
+   "stop": 180,
+   "moto": 1,
+   "engineVePhut": {
+    "mean": 86.39776281260362,
+    "min": 74.3742625674285,
+    "median": 84.60706986187616,
+    "max": 110.41162872686218
+   },
+   "engineChuaXep": 0,
+   "greedyChuaXep": 0,
+   "sweepChuaXep": 0,
+   "honGreedyPhut": 1.1931557776795512,
+   "honTongPhut": 27.059023361181694,
+   "honSweepPhut": 21.202239227912933,
+   "engineVeSauCa": 0
+  }
+ ],
+ "ms": 314084.1424,
+ "rows": {
+  "sweep": [
+   {
+    "ngay": "20261026",
+    "seed": 1,
+    "engine": {
+     "finish": 61894.31289524862,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63009.59225700823,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 2,
+    "engine": {
+     "finish": 62338.957681213134,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63408.30599944979,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 3,
+    "engine": {
+     "finish": 62075.25873325648,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 62742.84265061592,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 4,
+    "engine": {
+     "finish": 63082.16069382057,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63748.198543836166,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 5,
+    "engine": {
+     "finish": 62025.32755076433,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 62253.7308606759,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 6,
+    "engine": {
+     "finish": 62304.63083841564,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63347.39082386205,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 7,
+    "engine": {
+     "finish": 62113.671884193835,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63184.021190144944,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 8,
+    "engine": {
+     "finish": 63148.820742129625,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 65960.02121679805,
+     "vehicles": 4,
+     "lateShift": 1,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 9,
+    "engine": {
+     "finish": 61770.6988959297,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63150.099314434294,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 10,
+    "engine": {
+     "finish": 61569.22366737074,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 64075.31873939283,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 11,
+    "engine": {
+     "finish": 62978.619438920236,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63372.75358266027,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 12,
+    "engine": {
+     "finish": 62001.72537520976,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 62832.16811416049,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 13,
+    "engine": {
+     "finish": 62406.81817946228,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63769.954350130916,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 14,
+    "engine": {
+     "finish": 62338.026132226165,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63734.18897546196,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 15,
+    "engine": {
+     "finish": 62191.21976591578,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63009.891802470374,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 16,
+    "engine": {
+     "finish": 62559.462922020284,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63034.087368066284,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 17,
+    "engine": {
+     "finish": 62187.0921231299,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63947.622909689104,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 18,
+    "engine": {
+     "finish": 61450.661927484354,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 62414.73909311797,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 19,
+    "engine": {
+     "finish": 62842.247824100814,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63246.55146409007,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 20,
+    "engine": {
+     "finish": 61943.43810938301,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 62943.47353339778,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 21,
+    "engine": {
+     "finish": 61901.20397565521,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63346.84994813092,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 22,
+    "engine": {
+     "finish": 61762.33455928686,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 64351.34524087029,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 23,
+    "engine": {
+     "finish": 63774.469059657,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 64621.49539834092,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 24,
+    "engine": {
+     "finish": 62695.78053600866,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63403.27074629179,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 25,
+    "engine": {
+     "finish": 62177.561688998394,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 62776.80444071047,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 26,
+    "engine": {
+     "finish": 61623.57652067683,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 62643.80048716343,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 27,
+    "engine": {
+     "finish": 62020.4431301764,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63367.61962900991,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 28,
+    "engine": {
+     "finish": 61804.35765748151,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 62987.15614423437,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 29,
+    "engine": {
+     "finish": 62268.10528567335,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63434.0527185626,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 30,
+    "engine": {
+     "finish": 61921.61235932436,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63200.6217317621,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 1,
+    "engine": {
+     "finish": 61756.93014973217,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63007.09122385002,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 2,
+    "engine": {
+     "finish": 62265.66616486137,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63409.133701232255,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 3,
+    "engine": {
+     "finish": 61824.1770366311,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 62730.88520998939,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 4,
+    "engine": {
+     "finish": 63088.466531987884,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63758.735054862904,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 5,
+    "engine": {
+     "finish": 62275.34755676435,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 62231.238123511546,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 6,
+    "engine": {
+     "finish": 62707.44066187414,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63350.063769814195,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 7,
+    "engine": {
+     "finish": 62385.89892138804,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63183.84822825987,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 8,
+    "engine": {
+     "finish": 63095.11401722845,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 65967.18223095438,
+     "vehicles": 4,
+     "lateShift": 1,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 9,
+    "engine": {
+     "finish": 61560.61415365669,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63415.31230949588,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 10,
+    "engine": {
+     "finish": 61643.47894751482,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 64092.067349819066,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 11,
+    "engine": {
+     "finish": 62564.36408947047,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63383.57640612199,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 12,
+    "engine": {
+     "finish": 62292.55209790318,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 62850.75208306383,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 13,
+    "engine": {
+     "finish": 62396.573541601436,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63777.08035234918,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 14,
+    "engine": {
+     "finish": 62319.61735868013,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63759.03344426465,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 15,
+    "engine": {
+     "finish": 62219.92331109087,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63014.85160679724,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 16,
+    "engine": {
+     "finish": 62573.82476788216,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 62849.93633124479,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 17,
+    "engine": {
+     "finish": 62389.844260040874,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63952.99216523035,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 18,
+    "engine": {
+     "finish": 61569.843838274726,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 62405.164337920694,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 19,
+    "engine": {
+     "finish": 62844.04860224524,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63268.42865567975,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 20,
+    "engine": {
+     "finish": 61765.73448625388,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 62968.352252479504,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 21,
+    "engine": {
+     "finish": 61892.836878881644,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63322.227013355,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 22,
+    "engine": {
+     "finish": 61762.1462369873,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 64349.81382520197,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 23,
+    "engine": {
+     "finish": 63352.481817840795,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 64621.237108149544,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 24,
+    "engine": {
+     "finish": 62385.8188307559,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63461.952183844915,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 25,
+    "engine": {
+     "finish": 62168.12991488749,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 62819.953714127594,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 26,
+    "engine": {
+     "finish": 61622.48064995504,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 62682.74141284591,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 27,
+    "engine": {
+     "finish": 61980.13192603633,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63321.59469443838,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 28,
+    "engine": {
+     "finish": 61953.87210763629,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63021.69118185779,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 29,
+    "engine": {
+     "finish": 62255.148532545405,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63446.01828189324,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 30,
+    "engine": {
+     "finish": 62026.87959461255,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63221.669107522735,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 1,
+    "engine": {
+     "finish": 61770.47635870015,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63079.16238427252,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 2,
+    "engine": {
+     "finish": 62058.56554392683,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63449.45150211321,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 3,
+    "engine": {
+     "finish": 61914.331524752255,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 62692.96797791748,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 4,
+    "engine": {
+     "finish": 63275.01366044677,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63712.826574105646,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 5,
+    "engine": {
+     "finish": 62267.68923131351,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 62193.66692058328,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 6,
+    "engine": {
+     "finish": 62689.56381979167,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63333.80399336837,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 7,
+    "engine": {
+     "finish": 62289.60706490834,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63185.37026732982,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 8,
+    "engine": {
+     "finish": 63096.738538901845,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 65192.68258524858,
+     "vehicles": 4,
+     "lateShift": 1,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 9,
+    "engine": {
+     "finish": 61593.92272338909,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63150.303391719375,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 10,
+    "engine": {
+     "finish": 61653.01308181267,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63992.920782644476,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 11,
+    "engine": {
+     "finish": 62574.20699136371,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63392.88738349169,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 12,
+    "engine": {
+     "finish": 62035.37651773302,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 62819.98498343176,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 13,
+    "engine": {
+     "finish": 62344.832138981095,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63816.34317591936,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 14,
+    "engine": {
+     "finish": 62247.98949062108,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63691.214441095806,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 15,
+    "engine": {
+     "finish": 62241.687039552075,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63031.96560420398,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 16,
+    "engine": {
+     "finish": 62545.60668594176,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 62918.760166853135,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 17,
+    "engine": {
+     "finish": 62066.69181097222,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63941.56052006855,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 18,
+    "engine": {
+     "finish": 61540.272949018545,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 62372.448459354724,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 19,
+    "engine": {
+     "finish": 62871.48893188148,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63388.39670720869,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 20,
+    "engine": {
+     "finish": 62005.41415103849,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 62942.99125684169,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 21,
+    "engine": {
+     "finish": 61733.93490937458,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63311.28464525386,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 22,
+    "engine": {
+     "finish": 61817.93654482794,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 64377.83481800974,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 23,
+    "engine": {
+     "finish": 63325.12062180265,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 64609.75569880849,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 24,
+    "engine": {
+     "finish": 62361.726125,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63386.48129564926,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 25,
+    "engine": {
+     "finish": 62151.06129582189,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 62782.146877789535,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 26,
+    "engine": {
+     "finish": 61655.913990892564,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 62616.25560305676,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 27,
+    "engine": {
+     "finish": 61822.218952335745,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 62780.34123183498,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 28,
+    "engine": {
+     "finish": 61793.28812993243,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 62894.93858247511,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 29,
+    "engine": {
+     "finish": 62251.41965503429,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63358.85081529979,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 30,
+    "engine": {
+     "finish": 61865.66688322091,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "sweep": {
+     "finish": 63115.713546674946,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   }
+  ],
+  "windows": [
+   {
+    "ngay": "20261026",
+    "seed": 1,
+    "windowed": 23,
+    "engine": {
+     "finish": 62495.10583151825,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 61894.31289524862,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62200.85,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 22.786299999999983
+   },
+   {
+    "ngay": "20261026",
+    "seed": 2,
+    "windowed": 24,
+    "engine": {
+     "finish": 62931.14893070044,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 62338.957681213134,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62560.95022222222,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 43.74249999999938
+   },
+   {
+    "ngay": "20261026",
+    "seed": 3,
+    "windowed": 18,
+    "engine": {
+     "finish": 62402.32258169339,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 62075.25873325648,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62109.9,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 50.70550000000003
+   },
+   {
+    "ngay": "20261026",
+    "seed": 4,
+    "windowed": 18,
+    "engine": {
+     "finish": 63513.77941358025,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 63082.16069382057,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 63063.09069470439,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 3,
+     "unassigned": 0
+    },
+    "ms": 59.31970000000001
+   },
+   {
+    "ngay": "20261026",
+    "seed": 5,
+    "windowed": 23,
+    "engine": {
+     "finish": 62382.75,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 62025.32755076433,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62382.75,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 55.48559999999998
+   },
+   {
+    "ngay": "20261026",
+    "seed": 6,
+    "windowed": 22,
+    "engine": {
+     "finish": 62907.848,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 62304.63083841564,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62907.848,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 51.35849999999846
+   },
+   {
+    "ngay": "20261026",
+    "seed": 7,
+    "windowed": 19,
+    "engine": {
+     "finish": 62709.2,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 62113.671884193835,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62709.2,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 63.89229999999952
+   },
+   {
+    "ngay": "20261026",
+    "seed": 8,
+    "windowed": 17,
+    "engine": {
+     "finish": 63100.74352576838,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 63148.820742129625,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62952.450078693655,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 75.06780000000072
+   },
+   {
+    "ngay": "20261026",
+    "seed": 9,
+    "windowed": 22,
+    "engine": {
+     "finish": 62473.7,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 61770.6988959297,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62473.7,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 28.802199999998265
+   },
+   {
+    "ngay": "20261026",
+    "seed": 10,
+    "windowed": 23,
+    "engine": {
+     "finish": 62377.2,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 61569.22366737074,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62377.2,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 68.68159999999989
+   },
+   {
+    "ngay": "20261026",
+    "seed": 11,
+    "windowed": 25,
+    "engine": {
+     "finish": 62829.88405555556,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 62978.619438920236,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62800.25,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 58.34629999999743
+   },
+   {
+    "ngay": "20261026",
+    "seed": 12,
+    "windowed": 19,
+    "engine": {
+     "finish": 62649.78405555556,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 62001.72537520976,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62456.80811111111,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 115.04069999999774
+   },
+   {
+    "ngay": "20261026",
+    "seed": 13,
+    "windowed": 22,
+    "engine": {
+     "finish": 63531.609444444446,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 62406.81817946228,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 63531.609444444446,
+     "vehicles": 3,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 26.445400000004156
+   },
+   {
+    "ngay": "20261026",
+    "seed": 14,
+    "windowed": 19,
+    "engine": {
+     "finish": 62511.788349656395,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 62338.026132226165,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62246.630287891676,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 18.55680000000575
+   },
+   {
+    "ngay": "20261026",
+    "seed": 15,
+    "windowed": 20,
+    "engine": {
+     "finish": 62751.722203225436,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 62191.21976591578,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62709.2,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 28.900000000001455
+   },
+   {
+    "ngay": "20261026",
+    "seed": 16,
+    "windowed": 20,
+    "engine": {
+     "finish": 62499.30489685432,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 62559.462922020284,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62499.30489685432,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 61.38969999999972
+   },
+   {
+    "ngay": "20261026",
+    "seed": 17,
+    "windowed": 18,
+    "engine": {
+     "finish": 62830.53441666666,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 62187.0921231299,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62830.53441666666,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 26.10570000000007
+   },
+   {
+    "ngay": "20261026",
+    "seed": 18,
+    "windowed": 23,
+    "engine": {
+     "finish": 62291.8,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 61450.661927484354,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62291.8,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 23.384100000002945
+   },
+   {
+    "ngay": "20261026",
+    "seed": 19,
+    "windowed": 20,
+    "engine": {
+     "finish": 63052.16586507519,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 62842.247824100814,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 63052.16586507519,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 19.817799999997078
+   },
+   {
+    "ngay": "20261026",
+    "seed": 20,
+    "windowed": 23,
+    "engine": {
+     "finish": 63972.904,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 61943.43810938301,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 63972.904,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 7.655200000001059
+   },
+   {
+    "ngay": "20261026",
+    "seed": 21,
+    "windowed": 23,
+    "engine": {
+     "finish": 62337,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 61901.20397565521,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62337,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 52.05399999999645
+   },
+   {
+    "ngay": "20261026",
+    "seed": 22,
+    "windowed": 24,
+    "engine": {
+     "finish": 62345.7615,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 61762.33455928686,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62345.7615,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 26.438099999999395
+   },
+   {
+    "ngay": "20261026",
+    "seed": 23,
+    "windowed": 23,
+    "engine": {
+     "finish": 63585.174331464696,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 63774.469059657,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 63585.174331464696,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 8.305700000011711
+   },
+   {
+    "ngay": "20261026",
+    "seed": 24,
+    "windowed": 18,
+    "engine": {
+     "finish": 62484.03883615127,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 62695.78053600866,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62349.18637903572,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 62.725399999995716
+   },
+   {
+    "ngay": "20261026",
+    "seed": 25,
+    "windowed": 21,
+    "engine": {
+     "finish": 62920.584416666665,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 62177.561688998394,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62920.584416666665,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 26.72280000000319
+   },
+   {
+    "ngay": "20261026",
+    "seed": 26,
+    "windowed": 18,
+    "engine": {
+     "finish": 62339.81908333333,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 61623.57652067683,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62219.4,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 20.97960000000603
+   },
+   {
+    "ngay": "20261026",
+    "seed": 27,
+    "windowed": 14,
+    "engine": {
+     "finish": 62382.75,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 62020.4431301764,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62382.75,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 36.01490000000922
+   },
+   {
+    "ngay": "20261026",
+    "seed": 28,
+    "windowed": 16,
+    "engine": {
+     "finish": 62375.445,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 61804.35765748151,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62038.2,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 26.20810000000347
+   },
+   {
+    "ngay": "20261026",
+    "seed": 29,
+    "windowed": 21,
+    "engine": {
+     "finish": 62580.85797026622,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 62268.10528567335,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62243.053327913585,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 17.976699999999255
+   },
+   {
+    "ngay": "20261026",
+    "seed": 30,
+    "windowed": 22,
+    "engine": {
+     "finish": 62650.90022222222,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 61921.61235932436,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62650.90022222222,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 50.919999999998254
+   },
+   {
+    "ngay": "20261112",
+    "seed": 1,
+    "windowed": 23,
+    "engine": {
+     "finish": 62507.25,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 61756.93014973217,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62199.95,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 16.95110000000568
+   },
+   {
+    "ngay": "20261112",
+    "seed": 2,
+    "windowed": 24,
+    "engine": {
+     "finish": 62568.7,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 62265.66616486137,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62568.7,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 67.47980000000098
+   },
+   {
+    "ngay": "20261112",
+    "seed": 3,
+    "windowed": 18,
+    "engine": {
+     "finish": 62215.033320152776,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 61824.1770366311,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62108.3,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 65.73279999999795
+   },
+   {
+    "ngay": "20261112",
+    "seed": 4,
+    "windowed": 18,
+    "engine": {
+     "finish": 63511.5516257716,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 63088.466531987884,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 63018.80366857754,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 42.88769999999204
+   },
+   {
+    "ngay": "20261112",
+    "seed": 5,
+    "windowed": 23,
+    "engine": {
+     "finish": 62624.75,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 62275.34755676435,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62383.25,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 29.186000000001513
+   },
+   {
+    "ngay": "20261112",
+    "seed": 6,
+    "windowed": 22,
+    "engine": {
+     "finish": 62945.97733333333,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 62707.44066187414,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62932.343,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 23.373200000001816
+   },
+   {
+    "ngay": "20261112",
+    "seed": 7,
+    "windowed": 19,
+    "engine": {
+     "finish": 62713.8,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 62385.89892138804,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62659.70916724489,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 53.82979999999225
+   },
+   {
+    "ngay": "20261112",
+    "seed": 8,
+    "windowed": 17,
+    "engine": {
+     "finish": 63095.11401722845,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 63095.11401722845,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62958.14437234899,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 58.32709999999497
+   },
+   {
+    "ngay": "20261112",
+    "seed": 9,
+    "windowed": 22,
+    "engine": {
+     "finish": 62474.9,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 61560.61415365669,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62474.9,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 17.940499999996973
+   },
+   {
+    "ngay": "20261112",
+    "seed": 10,
+    "windowed": 23,
+    "engine": {
+     "finish": 62390.7,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 61643.47894751482,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62390.7,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 46.51369999999588
+   },
+   {
+    "ngay": "20261112",
+    "seed": 11,
+    "windowed": 25,
+    "engine": {
+     "finish": 62804.75,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 62564.36408947047,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62804.75,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 19.25
+   },
+   {
+    "ngay": "20261112",
+    "seed": 12,
+    "windowed": 19,
+    "engine": {
+     "finish": 62659.6865,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 62292.55209790318,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62472.7,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 32.21960000001127
+   },
+   {
+    "ngay": "20261112",
+    "seed": 13,
+    "windowed": 22,
+    "engine": {
+     "finish": 63553.34416666667,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 3,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 62396.573541601436,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 63553.34416666667,
+     "vehicles": 3,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 14.551700000010896
+   },
+   {
+    "ngay": "20261112",
+    "seed": 14,
+    "windowed": 19,
+    "engine": {
+     "finish": 62852.84138888889,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 62319.61735868013,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62231.51233136916,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 9.178000000014435
+   },
+   {
+    "ngay": "20261112",
+    "seed": 15,
+    "windowed": 20,
+    "engine": {
+     "finish": 62750.1879418377,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 62219.92331109087,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62713.8,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 23.747299999988172
+   },
+   {
+    "ngay": "20261112",
+    "seed": 16,
+    "windowed": 20,
+    "engine": {
+     "finish": 62513.39914952665,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 62573.82476788216,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62513.39914952665,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 21.00119999999879
+   },
+   {
+    "ngay": "20261112",
+    "seed": 17,
+    "windowed": 18,
+    "engine": {
+     "finish": 62841.23975,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 62389.844260040874,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62841.23975,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 34.5684000000183
+   },
+   {
+    "ngay": "20261112",
+    "seed": 18,
+    "windowed": 23,
+    "engine": {
+     "finish": 62291.6,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 61569.843838274726,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62291.6,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 24.15470000001369
+   },
+   {
+    "ngay": "20261112",
+    "seed": 19,
+    "windowed": 20,
+    "engine": {
+     "finish": 63056.37121500218,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 62844.04860224524,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 63056.37121500218,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 20.961699999985285
+   },
+   {
+    "ngay": "20261112",
+    "seed": 20,
+    "windowed": 23,
+    "engine": {
+     "finish": 63996.75922222222,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 61765.73448625388,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 63996.75922222222,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 8.196700000000419
+   },
+   {
+    "ngay": "20261112",
+    "seed": 21,
+    "windowed": 23,
+    "engine": {
+     "finish": 62335,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 61892.836878881644,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62335,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 49.935700000001816
+   },
+   {
+    "ngay": "20261112",
+    "seed": 22,
+    "windowed": 24,
+    "engine": {
+     "finish": 62514.70444444445,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 61762.1462369873,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62352.5,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 22.40129999999772
+   },
+   {
+    "ngay": "20261112",
+    "seed": 23,
+    "windowed": 23,
+    "engine": {
+     "finish": 63582.952893240166,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 63352.481817840795,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 63582.952893240166,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 15.665700000012293
+   },
+   {
+    "ngay": "20261112",
+    "seed": 24,
+    "windowed": 18,
+    "engine": {
+     "finish": 62530.995333318606,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 62385.8188307559,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62385.8188307559,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 34.976499999989755
+   },
+   {
+    "ngay": "20261112",
+    "seed": 25,
+    "windowed": 21,
+    "engine": {
+     "finish": 62931.68975,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 62168.12991488749,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62931.68975,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 17.294099999999162
+   },
+   {
+    "ngay": "20261112",
+    "seed": 26,
+    "windowed": 18,
+    "engine": {
+     "finish": 62278.710735112945,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 61622.48064995504,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62226,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 13.885899999993853
+   },
+   {
+    "ngay": "20261112",
+    "seed": 27,
+    "windowed": 14,
+    "engine": {
+     "finish": 62392.26473944444,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 61980.13192603633,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62383.25,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 42.411900000006426
+   },
+   {
+    "ngay": "20261112",
+    "seed": 28,
+    "windowed": 16,
+    "engine": {
+     "finish": 62262.5,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 61953.87210763629,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62044.5,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 39.62150000000838
+   },
+   {
+    "ngay": "20261112",
+    "seed": 29,
+    "windowed": 21,
+    "engine": {
+     "finish": 62625.20065514683,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 62255.148532545405,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62261.4273148642,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 70.65540000001783
+   },
+   {
+    "ngay": "20261112",
+    "seed": 30,
+    "windowed": 22,
+    "engine": {
+     "finish": 62658.7,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 62026.87959461255,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62658.7,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 27.3295999999973
+   },
+   {
+    "ngay": "20261114",
+    "seed": 1,
+    "windowed": 23,
+    "engine": {
+     "finish": 62220.25,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 61770.47635870015,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62220.25,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 30.966499999980442
+   },
+   {
+    "ngay": "20261114",
+    "seed": 2,
+    "windowed": 24,
+    "engine": {
+     "finish": 62665.5259390494,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 62058.56554392683,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62594.7,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 23.11760000002687
+   },
+   {
+    "ngay": "20261114",
+    "seed": 3,
+    "windowed": 18,
+    "engine": {
+     "finish": 62420.25652872697,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 61914.331524752255,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62128.5,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 25.714000000007218
+   },
+   {
+    "ngay": "20261114",
+    "seed": 4,
+    "windowed": 18,
+    "engine": {
+     "finish": 62980.018792988674,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 3,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 63275.01366044677,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62884.99078697512,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 19.533699999999953
+   },
+   {
+    "ngay": "20261114",
+    "seed": 5,
+    "windowed": 23,
+    "engine": {
+     "finish": 62613.75,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 62267.68923131351,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62403.75,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 42.65529999998398
+   },
+   {
+    "ngay": "20261114",
+    "seed": 6,
+    "windowed": 22,
+    "engine": {
+     "finish": 62883.05866666667,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 62689.56381979167,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62883.05866666667,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 24.23259999998845
+   },
+   {
+    "ngay": "20261114",
+    "seed": 7,
+    "windowed": 19,
+    "engine": {
+     "finish": 62737,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 62289.60706490834,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62640.70915803157,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 21.32620000001043
+   },
+   {
+    "ngay": "20261114",
+    "seed": 8,
+    "windowed": 17,
+    "engine": {
+     "finish": 63096.738538901845,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 63096.738538901845,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62987.450458246145,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 37.40869999999995
+   },
+   {
+    "ngay": "20261114",
+    "seed": 9,
+    "windowed": 22,
+    "engine": {
+     "finish": 62495.5,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 61593.92272338909,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62495.5,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 22.59460000001127
+   },
+   {
+    "ngay": "20261114",
+    "seed": 10,
+    "windowed": 23,
+    "engine": {
+     "finish": 62356.1,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 61653.01308181267,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62356.1,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 13.487899999978254
+   },
+   {
+    "ngay": "20261114",
+    "seed": 11,
+    "windowed": 25,
+    "engine": {
+     "finish": 62828.75,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 62574.20699136371,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62828.75,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 14.836999999999534
+   },
+   {
+    "ngay": "20261114",
+    "seed": 12,
+    "windowed": 19,
+    "engine": {
+     "finish": 62642.817777777775,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 62035.37651773302,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62440.4,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 27.431400000001304
+   },
+   {
+    "ngay": "20261114",
+    "seed": 13,
+    "windowed": 22,
+    "engine": {
+     "finish": 63503.83833333333,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 3,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 62344.832138981095,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 63503.83833333333,
+     "vehicles": 3,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 34.705199999996694
+   },
+   {
+    "ngay": "20261114",
+    "seed": 14,
+    "windowed": 19,
+    "engine": {
+     "finish": 62556.29184300398,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 62247.98949062108,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62220.25,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 14.646200000017416
+   },
+   {
+    "ngay": "20261114",
+    "seed": 15,
+    "windowed": 20,
+    "engine": {
+     "finish": 62796.85778326162,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 62241.687039552075,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62737,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 12.681000000011409
+   },
+   {
+    "ngay": "20261114",
+    "seed": 16,
+    "windowed": 20,
+    "engine": {
+     "finish": 62487.71477229922,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 62545.60668594176,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62487.71477229922,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 26.64309999998659
+   },
+   {
+    "ngay": "20261114",
+    "seed": 17,
+    "windowed": 18,
+    "engine": {
+     "finish": 62883.96466666667,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 62066.69181097222,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62824.12,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 10.633700000005774
+   },
+   {
+    "ngay": "20261114",
+    "seed": 18,
+    "windowed": 23,
+    "engine": {
+     "finish": 62312,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 61540.272949018545,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62312,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 26.420000000012806
+   },
+   {
+    "ngay": "20261114",
+    "seed": 19,
+    "windowed": 20,
+    "engine": {
+     "finish": 63095.877749963984,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 62871.48893188148,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 63095.877749963984,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 55.882600000011735
+   },
+   {
+    "ngay": "20261114",
+    "seed": 20,
+    "windowed": 23,
+    "engine": {
+     "finish": 63964.65777777778,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 62005.41415103849,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 63964.65777777778,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 7.528800000000047
+   },
+   {
+    "ngay": "20261114",
+    "seed": 21,
+    "windowed": 23,
+    "engine": {
+     "finish": 62332.5,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 61733.93490937458,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62332.5,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 16.79969999997411
+   },
+   {
+    "ngay": "20261114",
+    "seed": 22,
+    "windowed": 24,
+    "engine": {
+     "finish": 62528.4,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 61817.93654482794,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62341.5,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 18.523099999991246
+   },
+   {
+    "ngay": "20261114",
+    "seed": 23,
+    "windowed": 23,
+    "engine": {
+     "finish": 63563.87496311029,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 63325.12062180265,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 63563.87496311029,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 6.090800000005402
+   },
+   {
+    "ngay": "20261114",
+    "seed": 24,
+    "windowed": 18,
+    "engine": {
+     "finish": 62748.701142361104,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 62361.726125,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62361.726125,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 15.905199999979232
+   },
+   {
+    "ngay": "20261114",
+    "seed": 25,
+    "windowed": 21,
+    "engine": {
+     "finish": 62910.84266666667,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 62151.06129582189,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62888.76789488308,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 51.64429999998538
+   },
+   {
+    "ngay": "20261114",
+    "seed": 26,
+    "windowed": 18,
+    "engine": {
+     "finish": 62214.8,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 61655.913990892564,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62214.8,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 24.34580000001006
+   },
+   {
+    "ngay": "20261114",
+    "seed": 27,
+    "windowed": 14,
+    "engine": {
+     "finish": 62403.75,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 61822.218952335745,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62403.75,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 36.88870000001043
+   },
+   {
+    "ngay": "20261114",
+    "seed": 28,
+    "windowed": 16,
+    "engine": {
+     "finish": 62051.69758149212,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 61793.28812993243,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62033.4,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 65.28980000002775
+   },
+   {
+    "ngay": "20261114",
+    "seed": 29,
+    "windowed": 21,
+    "engine": {
+     "finish": 62493.61990436214,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 62251.41965503429,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62267.78685185186,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 38.31419999996433
+   },
+   {
+    "ngay": "20261114",
+    "seed": 30,
+    "windowed": 22,
+    "engine": {
+     "finish": 62684.7,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "noWin": {
+     "finish": 61865.66688322091,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ils": {
+     "finish": 62684.7,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "ms": 16.98589999997057
+   }
+  ],
+  "outOfSample": [
+   {
+    "ngay": "20261026",
+    "seed": 1,
+    "own": {
+     "finish": 61894.31289524862,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 61894.31289524862,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 61981.47923487413,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 61981.47923487413,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 1,
+    "own": {
+     "finish": 61756.93014973217,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 61901.94291389328,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 61997.87759092903,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 61895.0506674481,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 1,
+    "own": {
+     "finish": 61770.47635870015,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 61862.611638631766,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 61985.5832168346,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 61743.144371137605,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 2,
+    "own": {
+     "finish": 62338.957681213134,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 62338.957681213134,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 62338.957681213134,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 62338.957681213134,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 2,
+    "own": {
+     "finish": 62265.66616486137,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 62364.4980158853,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 62364.4980158853,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 62265.66616486137,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 2,
+    "own": {
+     "finish": 62058.56554392683,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 62291.16765882909,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 62291.16765882909,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 61896.17268329146,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 3,
+    "own": {
+     "finish": 62075.25873325648,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 62075.25873325648,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 62326.77913175555,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 62282.04945981164,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 3,
+    "own": {
+     "finish": 61824.1770366311,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 62092.404598230736,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 62297.38533582029,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 61824.1770366311,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 3,
+    "own": {
+     "finish": 61914.331524752255,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 62065.90514402396,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 62202.62889024801,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 61809.22961485405,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 4,
+    "own": {
+     "finish": 63082.16069382057,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 63082.16069382057,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 63152.72318803736,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 62859.277468144246,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 4,
+    "own": {
+     "finish": 63088.466531987884,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 63081.04526936465,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 63188.187199727035,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 63088.466531987884,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 4,
+    "own": {
+     "finish": 63275.01366044677,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 63004.73744789417,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 63104.01217403652,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 63059.91342006945,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 5,
+    "own": {
+     "finish": 62025.32755076433,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 62025.32755076433,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 61990.590688024524,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 62494.991119252525,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 5,
+    "own": {
+     "finish": 62275.34755676435,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 62029.06627087909,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 61989.91944648508,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 62096.338165868045,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 5,
+    "own": {
+     "finish": 62267.68923131351,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 62050.44097566953,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 61932.23486889512,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 62267.68923131351,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 6,
+    "own": {
+     "finish": 62304.63083841564,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 62304.63083841564,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 62304.63083841564,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 62304.63083841564,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 6,
+    "own": {
+     "finish": 62707.44066187414,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 62308.36200883059,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 62308.36200883059,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 62707.44066187414,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 6,
+    "own": {
+     "finish": 62689.56381979167,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 62289.56381979167,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 62289.56381979167,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 62689.56381979167,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 7,
+    "own": {
+     "finish": 62113.671884193835,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 62113.671884193835,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 62043.55765370187,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 62094.78704414287,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 7,
+    "own": {
+     "finish": 62385.89892138804,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 62127.62991069094,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 62077.27245003913,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 62000.67100115354,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 7,
+    "own": {
+     "finish": 62289.60706490834,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 62098.325925842866,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 62097.098018865734,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 62289.60706490834,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 8,
+    "own": {
+     "finish": 63148.820742129625,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 63148.820742129625,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 63148.820742129625,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 63148.820742129625,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 8,
+    "own": {
+     "finish": 63095.11401722845,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 63155.0460740749,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 63155.0460740749,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 63155.0460740749,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 8,
+    "own": {
+     "finish": 63096.738538901845,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 63097.52733998783,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 63097.52733998783,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 63097.52733998783,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 9,
+    "own": {
+     "finish": 61770.6988959297,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 61770.6988959297,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 61719.50585074741,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 61642.879617876715,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 9,
+    "own": {
+     "finish": 61560.61415365669,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 61773.95761052427,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 61708.60802792644,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 61757.07183024158,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 9,
+    "own": {
+     "finish": 61593.92272338909,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 61709.32285994027,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 61670.37150472367,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 61593.92272338909,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 10,
+    "own": {
+     "finish": 61569.22366737074,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 61569.22366737074,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 61631.3855186755,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 61569.22366737074,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 10,
+    "own": {
+     "finish": 61643.47894751482,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 61549.244562710715,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 61645.7088496912,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 61643.47894751482,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 10,
+    "own": {
+     "finish": 61653.01308181267,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 61514.54380478608,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 61655.272243497355,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 61675.69704587377,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 11,
+    "own": {
+     "finish": 62978.619438920236,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 62978.619438920236,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 62554.143788403286,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 62554.143788403286,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 11,
+    "own": {
+     "finish": 62564.36408947047,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 62988.20608172523,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 62564.36408947047,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 62564.36408947047,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 11,
+    "own": {
+     "finish": 62574.20699136371,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 63004.52075837503,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 62574.20699136371,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 62574.20699136371,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 12,
+    "own": {
+     "finish": 62001.72537520976,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 62001.72537520976,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 62674.50388260457,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 62001.72537520976,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 12,
+    "own": {
+     "finish": 62292.55209790318,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 62005.56008627645,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 62680.806514602235,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 62031.13884954194,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 12,
+    "own": {
+     "finish": 62035.37651773302,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 61950.29516737586,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 62709.1491066638,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 62007.807623459026,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 13,
+    "own": {
+     "finish": 62406.81817946228,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 62406.81817946228,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 62301.871909051784,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 62406.81817946228,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 13,
+    "own": {
+     "finish": 62396.573541601436,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 62396.573541601436,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 62306.91899631916,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 62396.573541601436,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 13,
+    "own": {
+     "finish": 62344.832138981095,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 62344.832138981095,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 62239.471294290655,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 62239.471294290655,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 14,
+    "own": {
+     "finish": 62338.026132226165,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 62338.026132226165,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 62323.60142252413,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 62338.026132226165,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 14,
+    "own": {
+     "finish": 62319.61735868013,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 62319.61735868013,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 62306.52019781442,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 62160.54369336974,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 14,
+    "own": {
+     "finish": 62247.98949062108,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 62257.95732315083,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 62247.98949062108,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 62247.98949062108,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 15,
+    "own": {
+     "finish": 62191.21976591578,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 62191.21976591578,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 62191.21976591578,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 62191.21976591578,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 15,
+    "own": {
+     "finish": 62219.92331109087,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 62219.92331109087,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 62219.92331109087,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 62219.92331109087,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 15,
+    "own": {
+     "finish": 62241.687039552075,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 62241.687039552075,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 62241.687039552075,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 62256.8185582477,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 16,
+    "own": {
+     "finish": 62559.462922020284,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 62559.462922020284,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 62401.42546983506,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 62559.462922020284,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 16,
+    "own": {
+     "finish": 62573.82476788216,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 62550.150322932495,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 62405.33405146184,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 62550.150322932495,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 16,
+    "own": {
+     "finish": 62545.60668594176,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 62477.05600500206,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 62337.31336188158,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 62545.60668594176,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 17,
+    "own": {
+     "finish": 62187.0921231299,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 62187.0921231299,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 62397.73254667522,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 62397.73254667522,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 17,
+    "own": {
+     "finish": 62389.844260040874,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 62186.428844509835,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 62389.844260040874,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 62389.844260040874,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 17,
+    "own": {
+     "finish": 62066.69181097222,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 62181.90036455163,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 62377.00608420053,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 62433.9762025,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 18,
+    "own": {
+     "finish": 61450.661927484354,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 61450.661927484354,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 61613.302618737616,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 61450.661927484354,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 18,
+    "own": {
+     "finish": 61569.843838274726,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 61428.52442300091,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 61592.449572604324,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 61569.843838274726,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 18,
+    "own": {
+     "finish": 61540.272949018545,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 61431.507668033424,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 61544.37181304667,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 61488.72207841383,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 19,
+    "own": {
+     "finish": 62842.247824100814,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 62842.247824100814,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 62842.247824100814,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 62842.247824100814,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 19,
+    "own": {
+     "finish": 62844.04860224524,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 62844.04860224524,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 62844.04860224524,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 62844.04860224524,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 19,
+    "own": {
+     "finish": 62871.48893188148,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 62871.48893188148,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 62871.48893188148,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 62871.48893188148,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 20,
+    "own": {
+     "finish": 61943.43810938301,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 61943.43810938301,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 61918.96813373906,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 61759.05457062462,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 20,
+    "own": {
+     "finish": 61765.73448625388,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 61980.87939777986,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 61898.33896454089,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 61765.73448625388,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 20,
+    "own": {
+     "finish": 62005.41415103849,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 61895.0307149809,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 61891.76987055615,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 61901.28108656619,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 21,
+    "own": {
+     "finish": 61901.20397565521,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 61901.20397565521,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 61940.00814056543,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 61765.73003378154,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 21,
+    "own": {
+     "finish": 61892.836878881644,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 61905.30206462266,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 61922.169101417814,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 61836.43823403478,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 21,
+    "own": {
+     "finish": 61733.93490937458,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 61929.34406752117,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 61917.77358106117,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 61745.27295030567,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 22,
+    "own": {
+     "finish": 61762.33455928686,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 61762.33455928686,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 61695.84151334656,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 61664.75341831427,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 22,
+    "own": {
+     "finish": 61762.1462369873,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 61773.387267716906,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 61672.67510265252,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 61773.387267716906,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 22,
+    "own": {
+     "finish": 61817.93654482794,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 61817.93654482794,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 61664.36831315202,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 61817.93654482794,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 23,
+    "own": {
+     "finish": 63774.469059657,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 63774.469059657,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 63781.53358685783,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 63774.469059657,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 23,
+    "own": {
+     "finish": 63352.481817840795,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 63770.96093155506,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 63773.481817840795,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 63352.481817840795,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 23,
+    "own": {
+     "finish": 63325.12062180265,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 63749.99193587999,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 63729.17380734728,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 63325.12062180265,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 24,
+    "own": {
+     "finish": 62695.78053600866,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 62695.78053600866,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 62349.18637903572,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 62349.18637903572,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 24,
+    "own": {
+     "finish": 62385.8188307559,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 62733.4114034699,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 62385.8188307559,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 62385.8188307559,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 24,
+    "own": {
+     "finish": 62361.726125,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 62721.49384667696,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 62361.726125,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 62361.726125,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 25,
+    "own": {
+     "finish": 62177.561688998394,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 62177.561688998394,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 62177.561688998394,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 62177.561688998394,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 25,
+    "own": {
+     "finish": 62168.12991488749,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 62168.12991488749,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 62168.12991488749,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 62168.12991488749,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 25,
+    "own": {
+     "finish": 62151.06129582189,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 62151.06129582189,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 62151.06129582189,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 62151.06129582189,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 26,
+    "own": {
+     "finish": 61623.57652067683,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 61623.57652067683,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 61575.61594215831,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 61623.57652067683,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 26,
+    "own": {
+     "finish": 61622.48064995504,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 61602.23105902475,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 61594.411057568366,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 61630.30812973077,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 26,
+    "own": {
+     "finish": 61655.913990892564,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 61589.48609963184,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 61559.225003497435,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 61655.913990892564,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 27,
+    "own": {
+     "finish": 62020.4431301764,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 62020.4431301764,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 62091.147036759874,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 61729.8633049511,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 27,
+    "own": {
+     "finish": 61980.13192603633,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 62039.61107043811,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 62067.869269206625,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 61877.36557007831,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 27,
+    "own": {
+     "finish": 61822.218952335745,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 62064.46970106296,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 62009.25336340818,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 61879.74125841007,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 28,
+    "own": {
+     "finish": 61804.35765748151,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 61804.35765748151,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 61976.05478840563,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 61804.35765748151,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 28,
+    "own": {
+     "finish": 61953.87210763629,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 61808.05391546609,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 61968.25031355293,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 61865.029970117954,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 28,
+    "own": {
+     "finish": 61793.28812993243,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 61733.329980134076,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 61952.31649008857,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 61971.99539167577,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 29,
+    "own": {
+     "finish": 62268.10528567335,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 62268.10528567335,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 62266.18075092027,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 62493.595226122045,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 29,
+    "own": {
+     "finish": 62255.148532545405,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 62285.2056490527,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 62304.136300668724,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 62255.148532545405,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 29,
+    "own": {
+     "finish": 62251.41965503429,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 62260.683002060076,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 62279.60212154115,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 62279.60212154115,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261026",
+    "seed": 30,
+    "own": {
+     "finish": 61921.61235932436,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 61921.61235932436,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 61892.44566974586,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 61889.945147098544,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261112",
+    "seed": 30,
+    "own": {
+     "finish": 62026.87959461255,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 61949.22986613314,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 61906.402559296235,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 62027.237845290685,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   },
+   {
+    "ngay": "20261114",
+    "seed": 30,
+    "own": {
+     "finish": 61865.66688322091,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "tdMon": {
+     "finish": 61865.66688322091,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "stMon": {
+     "finish": 61897.945630866736,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    },
+    "two": {
+     "finish": 61865.66688322091,
+     "vehicles": 4,
+     "lateShift": 0,
+     "lateWin": 0,
+     "unassigned": 0
+    }
+   }
+  ]
+ }
+}

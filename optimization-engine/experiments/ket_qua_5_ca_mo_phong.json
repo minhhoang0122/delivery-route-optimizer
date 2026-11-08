@@ -1,0 +1,144 @@
+[
+ {
+  "lan": 1,
+  "don": 60,
+  "thanhCong": 53,
+  "chuaGiao": 7,
+  "lyDo": {
+   "Sai địa chỉ": 2,
+   "Không liên lạc được": 3,
+   "Khách từ chối nhận": 2
+  },
+  "phienBan": {
+   "customer": 1,
+   "initial": 4
+  },
+  "danhGiaDoiTuyen": 0,
+  "doiTuyenGiaoThong": 0,
+  "khachHenLai": 1,
+  "giaoLech": 0,
+  "xacNhanTuyenMoiGiay": [
+   3.258
+  ],
+  "lechGioDenPhut": {
+   "tb": 4.397705555555556,
+   "max": 42.7392
+  },
+  "veKhoChamHonKeHoachPhut": -1.4622166666666667,
+  "chuyenVeKho": 4,
+  "donChoSauCa": 0
+ },
+ {
+  "lan": 2,
+  "don": 60,
+  "thanhCong": 50,
+  "chuaGiao": 10,
+  "lyDo": {
+   "Khách từ chối nhận": 5,
+   "Vắng nhà": 1,
+   "Sai địa chỉ": 3,
+   "Không liên lạc được": 1
+  },
+  "phienBan": {
+   "customer": 1,
+   "initial": 4
+  },
+  "danhGiaDoiTuyen": 0,
+  "doiTuyenGiaoThong": 0,
+  "khachHenLai": 1,
+  "giaoLech": 0,
+  "xacNhanTuyenMoiGiay": [
+   3.188
+  ],
+  "lechGioDenPhut": {
+   "tb": 4.438614166666665,
+   "max": 25.625083333333333
+  },
+  "veKhoChamHonKeHoachPhut": 2.3760666666666665,
+  "chuyenVeKho": 4,
+  "donChoSauCa": 0
+ },
+ {
+  "lan": 3,
+  "don": 60,
+  "thanhCong": 48,
+  "chuaGiao": 12,
+  "lyDo": {
+   "Vắng nhà": 2,
+   "Không liên lạc được": 5,
+   "Sai địa chỉ": 5
+  },
+  "phienBan": {
+   "customer": 2,
+   "initial": 4
+  },
+  "danhGiaDoiTuyen": 0,
+  "doiTuyenGiaoThong": 0,
+  "khachHenLai": 2,
+  "giaoLech": 0,
+  "xacNhanTuyenMoiGiay": [
+   3.199,
+   3.177
+  ],
+  "lechGioDenPhut": {
+   "tb": 4.737759444444444,
+   "max": 27.5037
+  },
+  "veKhoChamHonKeHoachPhut": 2.434283333333333,
+  "chuyenVeKho": 4,
+  "donChoSauCa": 0
+ },
+ {
+  "lan": 4,
+  "don": 60,
+  "thanhCong": 58,
+  "chuaGiao": 2,
+  "lyDo": {
+   "Vắng nhà": 2
+  },
+  "phienBan": {
+   "initial": 4
+  },
+  "danhGiaDoiTuyen": 0,
+  "doiTuyenGiaoThong": 0,
+  "khachHenLai": 0,
+  "giaoLech": 0,
+  "xacNhanTuyenMoiGiay": [],
+  "lechGioDenPhut": {
+   "tb": 2.3143024999999997,
+   "max": 4.05395
+  },
+  "veKhoChamHonKeHoachPhut": -5.232716666666667,
+  "chuyenVeKho": 4,
+  "donChoSauCa": 0
+ },
+ {
+  "lan": 5,
+  "don": 60,
+  "thanhCong": 52,
+  "chuaGiao": 8,
+  "lyDo": {
+   "Không liên lạc được": 3,
+   "Khách từ chối nhận": 4,
+   "Sai địa chỉ": 1
+  },
+  "phienBan": {
+   "customer": 1,
+   "initial": 4
+  },
+  "danhGiaDoiTuyen": 0,
+  "doiTuyenGiaoThong": 0,
+  "khachHenLai": 1,
+  "giaoLech": 0,
+  "xacNhanTuyenMoiGiay": [
+   3.213
+  ],
+  "lechGioDenPhut": {
+   "tb": 4.3395519444444455,
+   "max": 25.724183333333333
+  },
+  "veKhoChamHonKeHoachPhut": 2.4938666666666665,
+  "chuyenVeKho": 4,
+  "donChoSauCa": 0
+ }
+]

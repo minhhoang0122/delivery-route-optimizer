@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Demo điều phối giao hàng</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <style>
+    :root {
+      --nen: #f6f7f9; --the: #ffffff; --vien: #e2e5ea; --chu: #1c2430; --phu: #5b6675;
+      --chinh: #c8102e; --dat: #15803d; --canh-bao: #b45309;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      display: grid; grid-template-columns: 420px 1fr; background: var(--nen); color: var(--chu);
+      font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+    aside { overflow-y: auto; border-right: 1px solid var(--vien); background: var(--the); }
+    #banDo { height: 100%; }
+    header { padding: 16px 20px 12px; border-bottom: 1px solid var(--vien); }
+    h1 { margin: 0; font-size: 18px; }
+    h2 { margin: 0 0 8px; font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--phu); }
+    header p, footer { margin: 4px 0 0; color: var(--phu); font-size: 12px; }
+    section { padding: 14px 20px; border-bottom: 1px solid var(--vien); }
+    section:empty { display: none; }
+    label { display: block; margin-bottom: 10px; font-size: 12px; color: var(--phu); }
+    select, input[type=number] {
+      display: block; width: 100%; margin-top: 4px; padding: 7px 8px; font: inherit; color: var(--chu);
+      border: 1px solid var(--vien); border-radius: 6px; background: #fff;
+    }
+    .hang { display: flex; align-items: center; gap: 6px; color: var(--chu); font-size: 13px; }
+    .hang input[type=number] { display: inline-block; width: 64px; margin: 0; padding: 4px 6px; }
+    button {
+      width: 100%; padding: 9px 12px; font: 600 14px system-ui, sans-serif; color: #fff; background: var(--chinh);
+      border: 0; border-radius: 6px; cursor: pointer;
+    }
+    button:disabled { opacity: .5; cursor: progress; }
+    button.phu { color: var(--chinh); background: #fff; border: 1px solid var(--chinh); }
+    .so { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .so div { padding: 8px; background: var(--nen); border-radius: 6px; }
+    .so b { display: block; font-size: 17px; }
+    .so span { font-size: 11px; color: var(--phu); }
+    .ghi-chu { margin: 8px 0 0; font-size: 12px; color: var(--phu); }
+    .chuyen { padding: 10px 0; border-top: 1px solid var(--vien); }
+    .chuyen:first-of-type { border-top: 0; padding-top: 0; }
+    .chuyen .dau { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+    .chuyen .mau { width: 12px; height: 12px; border-radius: 3px; flex: none; }
+    .chuyen .chi-so { margin-top: 2px; font-size: 12px; color: var(--phu); }
+    .chuyen .thu-tu { margin-top: 4px; font-size: 12px; word-break: break-word; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; }
+    th, td { padding: 5px 4px; text-align: right; border-bottom: 1px solid var(--vien); }
+    th:first-child, td:first-child { text-align: left; }
+    th { color: var(--phu); font-weight: 600; }
+    .dat { color: var(--dat); font-weight: 600; }
+    .khong { color: var(--phu); }
+    .loi { color: var(--chinh); }
+    footer { padding: 14px 20px 20px; }
+    .nhan-diem {
+      display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%;
+      color: #fff; font: 700 11px system-ui, sans-serif; border: 2px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,.4);
+    }
+    .nhan-kho {
+      display: grid; place-items: center; width: 28px; height: 28px; border-radius: 6px; background: #111827;
+      color: #fff; font: 700 12px system-ui, sans-serif; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,.5);
+    }
+    @media (max-width: 860px) {
+      body { grid-template-columns: 1fr; grid-template-rows: auto 60vh; }
+      aside { border-right: 0; border-bottom: 1px solid var(--vien); }
+    }
+  </style>
+</head>
+<body>
+  <aside>
+    <header>
+      <h1>Demo điều phối giao hàng</h1>
+      <p id="moTa">Kho Hải Châu, Đà Nẵng</p>
+    </header>
+    <section>
+      <label>Dữ liệu giao thông (ma trận đã ghi từ TomTom)<select id="maTran"></select></label>
+      <label>Thuật toán<select id="bienThe"></select></label>
+      <label class="hang"><input type="checkbox" id="coGioiHan"> Giới hạn mỗi chuyến
+        <input type="number" id="gioiHan" value="45" min="10" step="5"> phút</label>
+      <button id="chay">Lập kế hoạch</button>
+    </section>
+    <section id="tongQuan"></section>
+    <section id="dsChuyen"></section>
+    <section id="chuaXep"></section>
+    <section>
+      <h2>Giao thông thay đổi</h2>
+      <label>Đánh giá lại theo ma trận<select id="maTranDoi"></select></label>
+      <button id="danhGia" class="phu" disabled>Đánh giá đổi tuyến</button>
+      <p class="ghi-chu">Giả định mỗi xe đã giao khoảng 1/3 số điểm và đang đứng tại điểm vừa giao. Điểm kế tiếp bị khóa,
+        chỉ các điểm phía sau được đổi thứ tự. Áp dụng khi G ≥ max(60 giây, 5% × T).</p>
+      <div id="ketQuaDoi"></div>
+    </section>
+    <footer>Thời gian di chuyển lấy từ ma trận TomTom đã ghi. Đường trên bản đồ do TomTom Calculate Route tính theo đúng
+      thứ tự thuật toán chọn (computeBestOrder=false). Đường nét đứt là phần tuyến đề xuất sau khi đổi.</footer>
+  </aside>
+  <main id="banDo"></main>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script type="module" src="/web/app.mjs"></script>
+</body>
+</html>

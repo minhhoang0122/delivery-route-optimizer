@@ -1,0 +1,682 @@
+{
+  "ma_tran": "ma_tran_20261012_1600.json",
+  "ma_tran_doi": "ma_tran_20261012_1730.json",
+  "lap_ke_hoach": [
+    {
+      "bien_the": "Insertion Heuristic",
+      "T": 9974,
+      "chuyenDaiNhat": 9974,
+      "soXe": 1,
+      "soDonDaXep": 20,
+      "chuaXep": 0,
+      "chuyen": [
+        {
+          "v": 0,
+          "soDon": 0,
+          "kg": 0,
+          "giay": 0
+        },
+        {
+          "v": 1,
+          "soDon": 0,
+          "kg": 0,
+          "giay": 0
+        },
+        {
+          "v": 2,
+          "soDon": 0,
+          "kg": 0,
+          "giay": 0
+        },
+        {
+          "v": 3,
+          "soDon": 20,
+          "kg": 211.2,
+          "giay": 9974
+        },
+        {
+          "v": 4,
+          "soDon": 0,
+          "kg": 0,
+          "giay": 0
+        }
+      ],
+      "thong_ke": {
+        "ms": 0.5340999999999951,
+        "danhGia": 0
+      },
+      "tuyen": [
+        [],
+        [],
+        [],
+        [
+          "DH-1028",
+          "DH-1023",
+          "DH-1046",
+          "DH-1026",
+          "DH-1049",
+          "DH-1021",
+          "DH-1042",
+          "DH-1022",
+          "DH-1041",
+          "DH-1045",
+          "DH-1040",
+          "DH-1032",
+          "DH-1044",
+          "DH-1047",
+          "DH-1025",
+          "DH-1029",
+          "DH-1048",
+          "DH-1043",
+          "DH-1024",
+          "DH-1039"
+        ],
+        []
+      ]
+    },
+    {
+      "bien_the": "Insertion + Relocate/Swap (đề tài)",
+      "T": 9785,
+      "chuyenDaiNhat": 9785,
+      "soXe": 1,
+      "soDonDaXep": 20,
+      "chuaXep": 0,
+      "chuyen": [
+        {
+          "v": 0,
+          "soDon": 0,
+          "kg": 0,
+          "giay": 0
+        },
+        {
+          "v": 1,
+          "soDon": 0,
+          "kg": 0,
+          "giay": 0
+        },
+        {
+          "v": 2,
+          "soDon": 0,
+          "kg": 0,
+          "giay": 0
+        },
+        {
+          "v": 3,
+          "soDon": 20,
+          "kg": 211.20000000000002,
+          "giay": 9785
+        },
+        {
+          "v": 4,
+          "soDon": 0,
+          "kg": 0,
+          "giay": 0
+        }
+      ],
+      "thong_ke": {
+        "ms": 9.6772,
+        "danhGia": 3846,
+        "soBuoc": 5,
+        "dung": "không còn phương án cải thiện"
+      },
+      "tuyen": [
+        [],
+        [],
+        [],
+        [
+          "DH-1023",
+          "DH-1046",
+          "DH-1026",
+          "DH-1049",
+          "DH-1021",
+          "DH-1042",
+          "DH-1022",
+          "DH-1041",
+          "DH-1044",
+          "DH-1045",
+          "DH-1040",
+          "DH-1032",
+          "DH-1047",
+          "DH-1043",
+          "DH-1024",
+          "DH-1048",
+          "DH-1029",
+          "DH-1025",
+          "DH-1039",
+          "DH-1028"
+        ],
+        []
+      ]
+    },
+    {
+      "bien_the": "Như đề tài, bỏ giới hạn 10.000",
+      "T": 9785,
+      "chuyenDaiNhat": 9785,
+      "soXe": 1,
+      "soDonDaXep": 20,
+      "chuaXep": 0,
+      "chuyen": [
+        {
+          "v": 0,
+          "soDon": 0,
+          "kg": 0,
+          "giay": 0
+        },
+        {
+          "v": 1,
+          "soDon": 0,
+          "kg": 0,
+          "giay": 0
+        },
+        {
+          "v": 2,
+          "soDon": 0,
+          "kg": 0,
+          "giay": 0
+        },
+        {
+          "v": 3,
+          "soDon": 20,
+          "kg": 211.20000000000002,
+          "giay": 9785
+        },
+        {
+          "v": 4,
+          "soDon": 0,
+          "kg": 0,
+          "giay": 0
+        }
+      ],
+      "thong_ke": {
+        "ms": 6.121900000000004,
+        "danhGia": 3846,
+        "soBuoc": 5,
+        "dung": "không còn phương án cải thiện"
+      },
+      "tuyen": [
+        [],
+        [],
+        [],
+        [
+          "DH-1023",
+          "DH-1046",
+          "DH-1026",
+          "DH-1049",
+          "DH-1021",
+          "DH-1042",
+          "DH-1022",
+          "DH-1041",
+          "DH-1044",
+          "DH-1045",
+          "DH-1040",
+          "DH-1032",
+          "DH-1047",
+          "DH-1043",
+          "DH-1024",
+          "DH-1048",
+          "DH-1029",
+          "DH-1025",
+          "DH-1039",
+          "DH-1028"
+        ],
+        []
+      ]
+    },
+    {
+      "bien_the": "Insertion + Relocate/Swap/Or-opt/2-opt",
+      "T": 9494,
+      "chuyenDaiNhat": 9494,
+      "soXe": 1,
+      "soDonDaXep": 20,
+      "chuaXep": 0,
+      "chuyen": [
+        {
+          "v": 0,
+          "soDon": 0,
+          "kg": 0,
+          "giay": 0
+        },
+        {
+          "v": 1,
+          "soDon": 0,
+          "kg": 0,
+          "giay": 0
+        },
+        {
+          "v": 2,
+          "soDon": 0,
+          "kg": 0,
+          "giay": 0
+        },
+        {
+          "v": 3,
+          "soDon": 20,
+          "kg": 211.20000000000002,
+          "giay": 9494
+        },
+        {
+          "v": 4,
+          "soDon": 0,
+          "kg": 0,
+          "giay": 0
+        }
+      ],
+      "thong_ke": {
+        "ms": 13.681300000000007,
+        "danhGia": 10000,
+        "soBuoc": 6,
+        "dung": "đạt giới hạn phép đánh giá"
+      },
+      "tuyen": [
+        [],
+        [],
+        [],
+        [
+          "DH-1023",
+          "DH-1046",
+          "DH-1026",
+          "DH-1049",
+          "DH-1045",
+          "DH-1040",
+          "DH-1032",
+          "DH-1044",
+          "DH-1021",
+          "DH-1042",
+          "DH-1022",
+          "DH-1041",
+          "DH-1047",
+          "DH-1043",
+          "DH-1024",
+          "DH-1048",
+          "DH-1029",
+          "DH-1025",
+          "DH-1039",
+          "DH-1028"
+        ],
+        []
+      ]
+    },
+    {
+      "bien_the": "Regret-2 + Relocate/Swap",
+      "T": 9494,
+      "chuyenDaiNhat": 9494,
+      "soXe": 1,
+      "soDonDaXep": 20,
+      "chuaXep": 0,
+      "chuyen": [
+        {
+          "v": 0,
+          "soDon": 0,
+          "kg": 0,
+          "giay": 0
+        },
+        {
+          "v": 1,
+          "soDon": 0,
+          "kg": 0,
+          "giay": 0
+        },
+        {
+          "v": 2,
+          "soDon": 0,
+          "kg": 0,
+          "giay": 0
+        },
+        {
+          "v": 3,
+          "soDon": 20,
+          "kg": 211.20000000000002,
+          "giay": 9494
+        },
+        {
+          "v": 4,
+          "soDon": 0,
+          "kg": 0,
+          "giay": 0
+        }
+      ],
+      "thong_ke": {
+        "ms": 4.539999999999992,
+        "danhGia": 4487,
+        "soBuoc": 6,
+        "dung": "không còn phương án cải thiện"
+      },
+      "tuyen": [
+        [],
+        [],
+        [],
+        [
+          "DH-1023",
+          "DH-1046",
+          "DH-1026",
+          "DH-1049",
+          "DH-1045",
+          "DH-1040",
+          "DH-1032",
+          "DH-1044",
+          "DH-1021",
+          "DH-1042",
+          "DH-1022",
+          "DH-1041",
+          "DH-1047",
+          "DH-1043",
+          "DH-1024",
+          "DH-1048",
+          "DH-1029",
+          "DH-1025",
+          "DH-1039",
+          "DH-1028"
+        ],
+        []
+      ]
+    },
+    {
+      "bien_the": "k-medoids + Insertion + Relocate/Swap",
+      "T": 11411,
+      "chuyenDaiNhat": 3568,
+      "soXe": 4,
+      "soDonDaXep": 20,
+      "chuaXep": 0,
+      "chuyen": [
+        {
+          "v": 0,
+          "soDon": 4,
+          "kg": 13,
+          "giay": 1402
+        },
+        {
+          "v": 1,
+          "soDon": 5,
+          "kg": 17.099999999999998,
+          "giay": 2916
+        },
+        {
+          "v": 2,
+          "soDon": 0,
+          "kg": 0,
+          "giay": 0
+        },
+        {
+          "v": 3,
+          "soDon": 7,
+          "kg": 33.7,
+          "giay": 3525
+        },
+        {
+          "v": 4,
+          "soDon": 4,
+          "kg": 147.4,
+          "giay": 3568
+        }
+      ],
+      "thong_ke": {
+        "ms": 4.681700000000006,
+        "danhGia": 3516,
+        "soBuoc": 5,
+        "dung": "không còn phương án cải thiện"
+      },
+      "tuyen": [
+        [
+          "DH-1040",
+          "DH-1045",
+          "DH-1044",
+          "DH-1032"
+        ],
+        [
+          "DH-1028",
+          "DH-1023",
+          "DH-1026",
+          "DH-1049",
+          "DH-1046"
+        ],
+        [],
+        [
+          "DH-1021",
+          "DH-1042",
+          "DH-1022",
+          "DH-1041",
+          "DH-1047",
+          "DH-1043",
+          "DH-1024"
+        ],
+        [
+          "DH-1039",
+          "DH-1029",
+          "DH-1048",
+          "DH-1025"
+        ]
+      ]
+    },
+    {
+      "bien_the": "ILS tham chiếu (300.000 phép đánh giá)",
+      "T": 9494,
+      "chuyenDaiNhat": 9494,
+      "soXe": 1,
+      "soDonDaXep": 20,
+      "chuaXep": 0,
+      "chuyen": [
+        {
+          "v": 0,
+          "soDon": 0,
+          "kg": 0,
+          "giay": 0
+        },
+        {
+          "v": 1,
+          "soDon": 0,
+          "kg": 0,
+          "giay": 0
+        },
+        {
+          "v": 2,
+          "soDon": 0,
+          "kg": 0,
+          "giay": 0
+        },
+        {
+          "v": 3,
+          "soDon": 20,
+          "kg": 211.20000000000002,
+          "giay": 9494
+        },
+        {
+          "v": 4,
+          "soDon": 0,
+          "kg": 0,
+          "giay": 0
+        }
+      ],
+      "thong_ke": {
+        "ms": 113.629,
+        "danhGia": 142397,
+        "dung": "80 lượt khởi động lại"
+      },
+      "tuyen": [
+        [],
+        [],
+        [],
+        [
+          "DH-1023",
+          "DH-1046",
+          "DH-1026",
+          "DH-1049",
+          "DH-1045",
+          "DH-1040",
+          "DH-1032",
+          "DH-1044",
+          "DH-1021",
+          "DH-1042",
+          "DH-1022",
+          "DH-1041",
+          "DH-1047",
+          "DH-1043",
+          "DH-1024",
+          "DH-1048",
+          "DH-1029",
+          "DH-1025",
+          "DH-1039",
+          "DH-1028"
+        ],
+        []
+      ]
+    }
+  ],
+  "gioi_han_chuyen_phut": 60,
+  "co_gioi_han": [
+    {
+      "bien_the": "Insertion + Relocate/Swap (đề tài)",
+      "T": 11639,
+      "chuyenDaiNhat": 3568,
+      "soXe": 4,
+      "chuaXep": 0
+    },
+    {
+      "bien_the": "Regret-2 + Relocate/Swap",
+      "T": 11360,
+      "chuyenDaiNhat": 3568,
+      "soXe": 4,
+      "chuaXep": 0
+    },
+    {
+      "bien_the": "k-medoids + Insertion + Relocate/Swap",
+      "T": 11411,
+      "chuyenDaiNhat": 3568,
+      "soXe": 4,
+      "chuaXep": 0
+    },
+    {
+      "bien_the": "ILS tham chiếu (300.000 phép đánh giá)",
+      "T": 11204,
+      "chuyenDaiNhat": 3568,
+      "soXe": 4,
+      "chuaXep": 0
+    }
+  ],
+  "doi_tuyen": [
+    {
+      "xe": "XE1",
+      "daGiao": 2,
+      "conLai": 5,
+      "kichHoat": true,
+      "cu": 2545,
+      "moi": 2683,
+      "tang": 138,
+      "T": 2936,
+      "T2": 2936,
+      "G": 0,
+      "datNguong": false,
+      "tuyenMoi": [
+        15,
+        2,
+        5,
+        19,
+        16
+      ],
+      "danhGia": 18,
+      "tuyenCu": [
+        "DH-1045",
+        "DH-1023",
+        "DH-1026",
+        "DH-1049",
+        "DH-1046"
+      ],
+      "tuyenMoiMa": [
+        "DH-1045",
+        "DH-1023",
+        "DH-1026",
+        "DH-1049",
+        "DH-1046"
+      ]
+    },
+    {
+      "xe": "XE2",
+      "daGiao": 1,
+      "conLai": 4,
+      "kichHoat": false,
+      "cu": 1650,
+      "moi": 1769,
+      "tang": 119,
+      "T": 1846,
+      "T2": 1846,
+      "G": 0,
+      "datNguong": false,
+      "tuyenMoi": [
+        11,
+        12,
+        13,
+        0
+      ],
+      "danhGia": 9,
+      "tuyenCu": [
+        "DH-1041",
+        "DH-1042",
+        "DH-1043",
+        "DH-1021"
+      ],
+      "tuyenMoiMa": [
+        "DH-1041",
+        "DH-1042",
+        "DH-1043",
+        "DH-1021"
+      ]
+    },
+    {
+      "xe": "XE4",
+      "daGiao": 1,
+      "conLai": 3,
+      "kichHoat": false,
+      "cu": 1766,
+      "moi": 1823,
+      "tang": 57,
+      "T": 3135,
+      "T2": 3135,
+      "G": 0,
+      "datNguong": false,
+      "tuyenMoi": [
+        7,
+        18,
+        4
+      ],
+      "danhGia": 3,
+      "tuyenCu": [
+        "DH-1029",
+        "DH-1048",
+        "DH-1025"
+      ],
+      "tuyenMoiMa": [
+        "DH-1029",
+        "DH-1048",
+        "DH-1025"
+      ]
+    },
+    {
+      "xe": "XE5",
+      "daGiao": 1,
+      "conLai": 3,
+      "kichHoat": false,
+      "cu": 1309,
+      "moi": 1404,
+      "tang": 95,
+      "T": 1619,
+      "T2": 1619,
+      "G": 0,
+      "datNguong": false,
+      "tuyenMoi": [
+        10,
+        17,
+        3
+      ],
+      "danhGia": 3,
+      "tuyenCu": [
+        "DH-1040",
+        "DH-1047",
+        "DH-1024"
+      ],
+      "tuyenMoiMa": [
+        "DH-1040",
+        "DH-1047",
+        "DH-1024"
+      ]
+    }
+  ]
+}

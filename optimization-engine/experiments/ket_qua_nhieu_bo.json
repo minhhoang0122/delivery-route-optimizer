@@ -1,0 +1,5113 @@
+{
+ "chay_luc": "2026-11-08T07:36:41.127Z",
+ "so_bo": 30,
+ "ils_cap": 1000000,
+ "ms": 210061.9807,
+ "summary": [
+  {
+   "ngay": "20261026",
+   "nhan": "Thứ Hai 26/10",
+   "bo": 30,
+   "chuaXep": {
+    "insertion": 0,
+    "greedy": 6,
+    "engine": 0
+   },
+   "veMuon": {
+    "engine": 0,
+    "static": 0
+   },
+   "lsGiamPhut": {
+    "mean": 3.598236064948045,
+    "min": 0,
+    "median": 2.594851314009672,
+    "max": 14.461732013186944
+   },
+   "lsCoCaiThien": 26,
+   "cachIlsPhut": {
+    "mean": 3.8896054325931613,
+    "min": 0,
+    "median": 3.7716060896239165,
+    "max": 8.131914332157248
+   },
+   "ilsTotHon": 26,
+   "engineMs": {
+    "mean": 17.3517133333341,
+    "min": 5.767299999999523,
+    "median": 13.978800000000774,
+    "max": 40.635299999999916
+   },
+   "lechStaticPhut": {
+    "mean": 0.39182248272785863,
+    "min": 0.15209687068311825,
+    "median": 0.34030545085494546,
+    "max": 1.0304979883966008
+   },
+   "lechStaticMaxPhut": {
+    "mean": 2.46902081420937,
+    "min": 0.6918371926417118,
+    "median": 1.6082528292182057,
+    "max": 12.850156088645964
+   },
+   "doiTuyen": {
+    "danhGia": 420,
+    "dat": 0,
+    "boCoDoi": 0
+   }
+  },
+  {
+   "ngay": "20261112",
+   "nhan": "Thứ Năm 12/11",
+   "bo": 30,
+   "chuaXep": {
+    "insertion": 0,
+    "greedy": 6,
+    "engine": 0
+   },
+   "veMuon": {
+    "engine": 0,
+    "static": 0
+   },
+   "lsGiamPhut": {
+    "mean": 2.518425117384116,
+    "min": 0,
+    "median": 1.9242195897963634,
+    "max": 7.991741758034065
+   },
+   "lsCoCaiThien": 23,
+   "cachIlsPhut": {
+    "mean": 3.6798629626048656,
+    "min": 0,
+    "median": 4.146743177749158,
+    "max": 8.985578036224615
+   },
+   "ilsTotHon": 23,
+   "engineMs": {
+    "mean": 16.840153333335667,
+    "min": 5.727700000003097,
+    "median": 14.544999999998254,
+    "max": 39.210699999995995
+   },
+   "lechStaticPhut": {
+    "mean": 0.46519008789397454,
+    "min": 0.16066691371101116,
+    "median": 0.32385980759848987,
+    "max": 2.3997950497299
+   },
+   "lechStaticMaxPhut": {
+    "mean": 2.655263879774433,
+    "min": 0.7444360810228924,
+    "median": 1.5186357900320824,
+    "max": 13.172002761334806
+   },
+   "doiTuyen": {
+    "danhGia": 419,
+    "dat": 0,
+    "boCoDoi": 0
+   }
+  },
+  {
+   "ngay": "20261114",
+   "nhan": "Thứ Bảy 14/11",
+   "bo": 30,
+   "chuaXep": {
+    "insertion": 0,
+    "greedy": 5,
+    "engine": 0
+   },
+   "veMuon": {
+    "engine": 0,
+    "static": 0
+   },
+   "lsGiamPhut": {
+    "mean": 1.8843725939510922,
+    "min": 0,
+    "median": 1.0502378884682306,
+    "max": 8.821859307031021
+   },
+   "lsCoCaiThien": 20,
+   "cachIlsPhut": {
+    "mean": 3.5214797584436752,
+    "min": 0,
+    "median": 2.9155231192173234,
+    "max": 10.243954789942654
+   },
+   "ilsTotHon": 22,
+   "engineMs": {
+    "mean": 11.299946666667044,
+    "min": 3.8101000000024214,
+    "median": 8.611600000003818,
+    "max": 37.79240000000573
+   },
+   "lechStaticPhut": {
+    "mean": 0.3989257001235099,
+    "min": 0.1423470220019509,
+    "median": 0.26695568006319365,
+    "max": 1.454938159910378
+   },
+   "lechStaticMaxPhut": {
+    "mean": 2.6873945764765605,
+    "min": 0.3873849266975109,
+    "median": 1.428196849536956,
+    "max": 12.344849466722371
+   },
+   "doiTuyen": {
+    "danhGia": 420,
+    "dat": 0,
+    "boCoDoi": 0
+   }
+  }
+ ],
+ "rows": [
+  {
+   "ngay": "20261026",
+   "nhan": "Thứ Hai 26/10",
+   "seed": 1,
+   "points": 26,
+   "insertion": {
+    "finish": 62057.757546315646,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 18.161899999999996
+   },
+   "greedy": {
+    "finish": 62982.05302139037,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 61894.31289524862,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 7905,
+    "ms": 31.952999999999996
+   },
+   "ils": {
+    "finish": 61668.01652987119,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2331.7648000000004
+   },
+   "static": {
+    "finish": 61981.47923487413,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 17.020971160084688,
+    "etaMax": 96.49516975309234
+   },
+   "reroute": {
+    "evaluations": 14,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261026",
+   "nhan": "Thứ Hai 26/10",
+   "seed": 2,
+   "points": 28,
+   "insertion": {
+    "finish": 62383.58499333501,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 4.115099999999984
+   },
+   "greedy": {
+    "finish": 64298.984888800216,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 62338.957681213134,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 8304,
+    "ms": 35.72250000000031
+   },
+   "ils": {
+    "finish": 61878.18739518314,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2323.5386999999996
+   },
+   "static": {
+    "finish": 62338.957681213134,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 15.040134264351098,
+    "etaMax": 56.48406124715984
+   },
+   "reroute": {
+    "evaluations": 16,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261026",
+   "nhan": "Thứ Hai 26/10",
+   "seed": 3,
+   "points": 26,
+   "insertion": {
+    "finish": 62230.10161518899,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 25.588700000000244
+   },
+   "greedy": {
+    "finish": 63220.91203281723,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 62075.25873325648,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 6167,
+    "ms": 14.442299999999705
+   },
+   "ils": {
+    "finish": 61772.41451945479,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2298.2461999999996
+   },
+   "static": {
+    "finish": 62326.77913175555,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 42.78566109010959,
+    "etaMax": 270.2827181647299
+   },
+   "reroute": {
+    "evaluations": 14,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261026",
+   "nhan": "Thứ Hai 26/10",
+   "seed": 4,
+   "points": 27,
+   "insertion": {
+    "finish": 63230.42025493943,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.59729999999945
+   },
+   "greedy": {
+    "finish": 64757.422956935385,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 7,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 63082.16069382057,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 6678,
+    "ms": 13.983900000000176
+   },
+   "ils": {
+    "finish": 62730.69249482307,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2197.820200000001
+   },
+   "static": {
+    "finish": 63152.72318803736,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 20.468602724542748,
+    "etaMax": 132.8289336666203
+   },
+   "reroute": {
+    "evaluations": 15,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261026",
+   "nhan": "Thứ Hai 26/10",
+   "seed": 5,
+   "points": 28,
+   "insertion": {
+    "finish": 62283.36360422905,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 3.143100000001141
+   },
+   "greedy": {
+    "finish": 64422.01341198919,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 62025.32755076433,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 9550,
+    "ms": 40.635299999999916
+   },
+   "ils": {
+    "finish": 61723.14285965485,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2467.3356000000003
+   },
+   "static": {
+    "finish": 61990.590688024524,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 14.538948267738185,
+    "etaMax": 52.319577837632096
+   },
+   "reroute": {
+    "evaluations": 16,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261026",
+   "nhan": "Thứ Hai 26/10",
+   "seed": 6,
+   "points": 26,
+   "insertion": {
+    "finish": 62827.59408276115,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 3.2914999999993597
+   },
+   "greedy": {
+    "finish": 62686.180262311274,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 62304.63083841564,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 8178,
+    "ms": 36.88760000000002
+   },
+   "ils": {
+    "finish": 62304.63083841564,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2433.3696
+   },
+   "static": {
+    "finish": 62304.63083841564,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 22.760906471219034,
+    "etaMax": 110.04255716750777
+   },
+   "reroute": {
+    "evaluations": 14,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261026",
+   "nhan": "Thứ Hai 26/10",
+   "seed": 7,
+   "points": 26,
+   "insertion": {
+    "finish": 62398.617492522,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.058500000001004
+   },
+   "greedy": {
+    "finish": 64371.16158860256,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 62113.671884193835,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 7929,
+    "ms": 17.020199999999022
+   },
+   "ils": {
+    "finish": 61893.995502277845,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2176.243199999999
+   },
+   "static": {
+    "finish": 62043.55765370187,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 20.41832705129673,
+    "etaMax": 82.90775512617984
+   },
+   "reroute": {
+    "evaluations": 14,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261026",
+   "nhan": "Thứ Hai 26/10",
+   "seed": 8,
+   "points": 28,
+   "insertion": {
+    "finish": 63148.820742129625,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.901499999999942
+   },
+   "greedy": {
+    "finish": 63693.28326147299,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 63148.820742129625,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 3042,
+    "ms": 7.676199999998062
+   },
+   "ils": {
+    "finish": 62952.450078693655,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2375.8161
+   },
+   "static": {
+    "finish": 63148.820742129625,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 61.82987930379604,
+    "etaMax": 380.8358333333308
+   },
+   "reroute": {
+    "evaluations": 16,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261026",
+   "nhan": "Thứ Hai 26/10",
+   "seed": 9,
+   "points": 27,
+   "insertion": {
+    "finish": 61845.68690228881,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 3.097799999999552
+   },
+   "greedy": {
+    "finish": 62850.75524289996,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 61770.6988959297,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 5025,
+    "ms": 11.805700000000797
+   },
+   "ils": {
+    "finish": 61402.71591008348,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2589.8137000000024
+   },
+   "static": {
+    "finish": 61719.50585074741,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 15.215256953193117,
+    "etaMax": 61.38174977531162
+   },
+   "reroute": {
+    "evaluations": 15,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261026",
+   "nhan": "Thứ Hai 26/10",
+   "seed": 10,
+   "points": 25,
+   "insertion": {
+    "finish": 61658.53483678409,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.855200000001787
+   },
+   "greedy": {
+    "finish": 64757.94217208328,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 61569.22366737074,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 4882,
+    "ms": 12.589899999999034
+   },
+   "ils": {
+    "finish": 61486.807030031116,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2425.0240999999987
+   },
+   "static": {
+    "finish": 61631.3855186755,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 15.87237626468462,
+    "etaMax": 44.52692252134875
+   },
+   "reroute": {
+    "evaluations": 13,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261026",
+   "nhan": "Thứ Hai 26/10",
+   "seed": 11,
+   "points": 26,
+   "insertion": {
+    "finish": 63037.7002343712,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.025499999999738
+   },
+   "greedy": {
+    "finish": 64627.809641026426,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 2,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 62978.619438920236,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 7857,
+    "ms": 33.22810000000027
+   },
+   "ils": {
+    "finish": 62554.143788403286,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2216.1758999999984
+   },
+   "static": {
+    "finish": 62554.143788403286,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 23.266889605554265,
+    "etaMax": 130.73191604937892
+   },
+   "reroute": {
+    "evaluations": 14,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261026",
+   "nhan": "Thứ Hai 26/10",
+   "seed": 12,
+   "points": 27,
+   "insertion": {
+    "finish": 62157.41645405034,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 3.4139999999970314
+   },
+   "greedy": {
+    "finish": 64745.077371067506,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 3,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 62001.72537520976,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 5724,
+    "ms": 13.978800000000774
+   },
+   "ils": {
+    "finish": 61784.00647500888,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2400.0709000000024
+   },
+   "static": {
+    "finish": 62674.50388260457,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 29.38143848338841,
+    "etaMax": 771.0093653187578
+   },
+   "reroute": {
+    "evaluations": 15,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261026",
+   "nhan": "Thứ Hai 26/10",
+   "seed": 13,
+   "points": 22,
+   "insertion": {
+    "finish": 62620.72377499896,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 1.4887000000016997
+   },
+   "greedy": {
+    "finish": 63243.04201804474,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 62406.81817946228,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 3079,
+    "ms": 7.282500000001164
+   },
+   "ils": {
+    "finish": 62036.70655313939,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2195.3312000000005
+   },
+   "static": {
+    "finish": 62301.871909051784,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 26.78135676680225,
+    "etaMax": 144.87190905178431
+   },
+   "reroute": {
+    "evaluations": 11,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261026",
+   "nhan": "Thứ Hai 26/10",
+   "seed": 14,
+   "points": 25,
+   "insertion": {
+    "finish": 62338.026132226165,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.4192000000002736
+   },
+   "greedy": {
+    "finish": 64005.085298434155,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 62338.026132226165,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 4015,
+    "ms": 8.95430000000124
+   },
+   "ils": {
+    "finish": 61850.11127229673,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2020.6339999999982
+   },
+   "static": {
+    "finish": 62323.60142252413,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 35.63621371627536,
+    "etaMax": 347.0191073333335
+   },
+   "reroute": {
+    "evaluations": 13,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261026",
+   "nhan": "Thứ Hai 26/10",
+   "seed": 15,
+   "points": 25,
+   "insertion": {
+    "finish": 62209.54694233947,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.0605999999970663
+   },
+   "greedy": {
+    "finish": 63748.87392357034,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 62191.21976591578,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 5565,
+    "ms": 10.764600000002247
+   },
+   "ils": {
+    "finish": 62191.21976591578,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2062.6342000000004
+   },
+   "static": {
+    "finish": 62191.21976591578,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 19.709266735019387,
+    "etaMax": 65.69481444801932
+   },
+   "reroute": {
+    "evaluations": 13,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261026",
+   "nhan": "Thứ Hai 26/10",
+   "seed": 16,
+   "points": 26,
+   "insertion": {
+    "finish": 62832.15024564827,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.2027999999991152
+   },
+   "greedy": {
+    "finish": 64576.59227644469,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 2,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 62559.462922020284,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 7016,
+    "ms": 14.155800000000454
+   },
+   "ils": {
+    "finish": 62113.65818950045,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2147.856599999999
+   },
+   "static": {
+    "finish": 62401.42546983506,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 21.286658987850874,
+    "etaMax": 73.3450827731358
+   },
+   "reroute": {
+    "evaluations": 14,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261026",
+   "nhan": "Thứ Hai 26/10",
+   "seed": 17,
+   "points": 27,
+   "insertion": {
+    "finish": 62446.81290006906,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.4020999999993364
+   },
+   "greedy": {
+    "finish": 63254.35912011437,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 62187.0921231299,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 10398,
+    "ms": 23.157599999998638
+   },
+   "ils": {
+    "finish": 62087.97678535545,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2463.814299999998
+   },
+   "static": {
+    "finish": 62397.73254667522,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 27.07815100651302,
+    "etaMax": 111.29159756275476
+   },
+   "reroute": {
+    "evaluations": 15,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261026",
+   "nhan": "Thứ Hai 26/10",
+   "seed": 18,
+   "points": 24,
+   "insertion": {
+    "finish": 61556.80062914085,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.2815999999947962
+   },
+   "greedy": {
+    "finish": 62516.73203519789,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 61450.661927484354,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 3885,
+    "ms": 9.597999999998137
+   },
+   "ils": {
+    "finish": 61410.02514307034,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2358.1644000000015
+   },
+   "static": {
+    "finish": 61613.302618737616,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 12.56903123035554,
+    "etaMax": 71.25136797763116
+   },
+   "reroute": {
+    "evaluations": 12,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261026",
+   "nhan": "Thứ Hai 26/10",
+   "seed": 19,
+   "points": 26,
+   "insertion": {
+    "finish": 63450.55420437507,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 3.0921999999991385
+   },
+   "greedy": {
+    "finish": 64757.26151762497,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 1,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 62842.247824100814,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 7825,
+    "ms": 17.142600000006496
+   },
+   "ils": {
+    "finish": 62842.247824100814,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2230.626900000003
+   },
+   "static": {
+    "finish": 62842.247824100814,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 29.424906437536265,
+    "etaMax": 131.72641111111443
+   },
+   "reroute": {
+    "evaluations": 14,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261026",
+   "nhan": "Thứ Hai 26/10",
+   "seed": 20,
+   "points": 24,
+   "insertion": {
+    "finish": 62164.104641500395,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 1.9029999999984284
+   },
+   "greedy": {
+    "finish": 63441.38182216227,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 61943.43810938301,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 2944,
+    "ms": 9.584499999997206
+   },
+   "ils": {
+    "finish": 61683.58803351571,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2229.065999999999
+   },
+   "static": {
+    "finish": 61918.96813373906,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 11.526691387757818,
+    "etaMax": 49.00085531707737
+   },
+   "reroute": {
+    "evaluations": 12,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261026",
+   "nhan": "Thứ Hai 26/10",
+   "seed": 21,
+   "points": 25,
+   "insertion": {
+    "finish": 61940.00814056543,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.828899999993155
+   },
+   "greedy": {
+    "finish": 63419.80670289201,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 61901.20397565521,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 3244,
+    "ms": 9.050800000004529
+   },
+   "ils": {
+    "finish": 61700.67164095397,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2373.3257000000012
+   },
+   "static": {
+    "finish": 61940.00814056543,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 38.42418343945792,
+    "etaMax": 131.0081405654273
+   },
+   "reroute": {
+    "evaluations": 13,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261026",
+   "nhan": "Thứ Hai 26/10",
+   "seed": 22,
+   "points": 25,
+   "insertion": {
+    "finish": 62133.26626376404,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.3637000000016997
+   },
+   "greedy": {
+    "finish": 62859.16740006042,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 61762.33455928686,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 3244,
+    "ms": 7.866700000005949
+   },
+   "ils": {
+    "finish": 61617.820126725324,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2307.4536000000007
+   },
+   "static": {
+    "finish": 61695.84151334656,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 25.437744149637606,
+    "etaMax": 133.9013024691376
+   },
+   "reroute": {
+    "evaluations": 13,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261026",
+   "nhan": "Thứ Hai 26/10",
+   "seed": 23,
+   "points": 27,
+   "insertion": {
+    "finish": 63774.469059657,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.489399999998568
+   },
+   "greedy": {
+    "finish": 64139.752561089765,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 63774.469059657,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 4730,
+    "ms": 13.46179999999731
+   },
+   "ils": {
+    "finish": 63358.53358685783,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2166.7333
+   },
+   "static": {
+    "finish": 63781.53358685783,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 19.762754941209884,
+    "etaMax": 79.5025953661243
+   },
+   "reroute": {
+    "evaluations": 15,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261026",
+   "nhan": "Thứ Hai 26/10",
+   "seed": 24,
+   "points": 26,
+   "insertion": {
+    "finish": 63285.486200524094,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.1810999999943306
+   },
+   "greedy": {
+    "finish": 64612.51423747235,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 4,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 62695.78053600866,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 5254,
+    "ms": 11.699099999997998
+   },
+   "ils": {
+    "finish": 62349.18637903572,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2199.1570999999967
+   },
+   "static": {
+    "finish": 62349.18637903572,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 9.125812240987095,
+    "etaMax": 41.51023155850271
+   },
+   "reroute": {
+    "evaluations": 14,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261026",
+   "nhan": "Thứ Hai 26/10",
+   "seed": 25,
+   "points": 25,
+   "insertion": {
+    "finish": 63045.26560978961,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.1784000000043306
+   },
+   "greedy": {
+    "finish": 62668.00161819916,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 62177.561688998394,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 9636,
+    "ms": 21.614199999996345
+   },
+   "ils": {
+    "finish": 62177.561688998394,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2180.7202999999936
+   },
+   "static": {
+    "finish": 62177.561688998394,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 17.852956308076923,
+    "etaMax": 96.45913823044975
+   },
+   "reroute": {
+    "evaluations": 13,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261026",
+   "nhan": "Thứ Hai 26/10",
+   "seed": 26,
+   "points": 25,
+   "insertion": {
+    "finish": 61698.95452257675,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.227100000003702
+   },
+   "greedy": {
+    "finish": 62089.714194762695,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 61623.57652067683,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 3276,
+    "ms": 9.030400000003283
+   },
+   "ils": {
+    "finish": 61363.3775737977,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2466.4481000000014
+   },
+   "static": {
+    "finish": 61575.61594215831,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 12.947260484560077,
+    "etaMax": 46.20789687833894
+   },
+   "reroute": {
+    "evaluations": 13,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261026",
+   "nhan": "Thứ Hai 26/10",
+   "seed": 27,
+   "points": 26,
+   "insertion": {
+    "finish": 62317.30357752372,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.933599999996659
+   },
+   "greedy": {
+    "finish": 63611.88175669083,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 62020.4431301764,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 9650,
+    "ms": 22.533300000002782
+   },
+   "ils": {
+    "finish": 61660.152518174174,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2443.2516000000032
+   },
+   "static": {
+    "finish": 62091.147036759874,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 50.54014844456591,
+    "etaMax": 424.4250778641872
+   },
+   "reroute": {
+    "evaluations": 14,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261026",
+   "nhan": "Thứ Hai 26/10",
+   "seed": 28,
+   "points": 28,
+   "insertion": {
+    "finish": 61804.35765748151,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 3.425999999999476
+   },
+   "greedy": {
+    "finish": 62548.297055111434,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 61804.35765748151,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 1038,
+    "ms": 5.767299999999523
+   },
+   "ils": {
+    "finish": 61593.26266267379,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2534.7755999999936
+   },
+   "static": {
+    "finish": 61976.05478840563,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 15.178346256285415,
+    "etaMax": 79.59521037615923
+   },
+   "reroute": {
+    "evaluations": 16,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261026",
+   "nhan": "Thứ Hai 26/10",
+   "seed": 29,
+   "points": 27,
+   "insertion": {
+    "finish": 62770.328099669234,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.7194000000017695
+   },
+   "greedy": {
+    "finish": 63190.218568373806,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 62268.10528567335,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 8442,
+    "ms": 37.6420000000071
+   },
+   "ils": {
+    "finish": 62238.116744855426,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2604.570900000006
+   },
+   "static": {
+    "finish": 62266.18075092027,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 17.45084965030243,
+    "etaMax": 160.6666768518553
+   },
+   "reroute": {
+    "evaluations": 15,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261026",
+   "nhan": "Thứ Hai 26/10",
+   "seed": 30,
+   "points": 26,
+   "insertion": {
+    "finish": 62000.887709275325,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.834100000007311
+   },
+   "greedy": {
+    "finish": 62959.19418312859,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 61921.61235932436,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 4397,
+    "ms": 11.322400000004563
+   },
+   "ils": {
+    "finish": 61745.11046359819,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2237.9794999999867
+   },
+   "static": {
+    "finish": 61892.44566974586,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 15.948745086993222,
+    "etaMax": 66.91348988078244
+   },
+   "reroute": {
+    "evaluations": 14,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261112",
+   "nhan": "Thứ Năm 12/11",
+   "seed": 1,
+   "points": 26,
+   "insertion": {
+    "finish": 61774.887462552506,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 5.680099999997765
+   },
+   "greedy": {
+    "finish": 62980.034223596565,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 61756.93014973217,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 3524,
+    "ms": 10.14560000000347
+   },
+   "ils": {
+    "finish": 61654.08479508349,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2350.520900000003
+   },
+   "static": {
+    "finish": 61757.15253732869,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 10.529427137545644,
+    "etaMax": 82.42897777778126
+   },
+   "reroute": {
+    "evaluations": 14,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261112",
+   "nhan": "Thứ Năm 12/11",
+   "seed": 2,
+   "points": 28,
+   "insertion": {
+    "finish": 62308.89242196123,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.7704999999987194
+   },
+   "greedy": {
+    "finish": 64315.5074983201,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 62265.66616486137,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 4120,
+    "ms": 28.430299999992712
+   },
+   "ils": {
+    "finish": 61855.02684010384,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2315.234899999996
+   },
+   "static": {
+    "finish": 62265.66616486137,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 17.118817375700626,
+    "etaMax": 44.666164861373545
+   },
+   "reroute": {
+    "evaluations": 16,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261112",
+   "nhan": "Thứ Năm 12/11",
+   "seed": 3,
+   "points": 26,
+   "insertion": {
+    "finish": 61849.65651461821,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 3.1477000000013504
+   },
+   "greedy": {
+    "finish": 63242.09078118321,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 61824.1770366311,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 2643,
+    "ms": 7.651700000002165
+   },
+   "ils": {
+    "finish": 61643.460915594864,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2257.188399999999
+   },
+   "static": {
+    "finish": 62013.73719005473,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 40.74622058953125,
+    "etaMax": 232.9994148774931
+   },
+   "reroute": {
+    "evaluations": 14,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261112",
+   "nhan": "Thứ Năm 12/11",
+   "seed": 4,
+   "points": 27,
+   "insertion": {
+    "finish": 63318.5674854463,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.1909000000014203
+   },
+   "greedy": {
+    "finish": 64726.01327435756,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 9,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 63088.466531987884,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 9540,
+    "ms": 18.651900000011665
+   },
+   "ils": {
+    "finish": 62732.10636622834,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2208.707899999994
+   },
+   "static": {
+    "finish": 62906.085540025575,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 24.609363040536117,
+    "etaMax": 94.60489117007819
+   },
+   "reroute": {
+    "evaluations": 15,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261112",
+   "nhan": "Thứ Năm 12/11",
+   "seed": 5,
+   "points": 28,
+   "insertion": {
+    "finish": 62275.34755676435,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 3.240799999999581
+   },
+   "greedy": {
+    "finish": 64473.79558681047,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 62275.34755676435,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 1054,
+    "ms": 6.014899999994668
+   },
+   "ils": {
+    "finish": 61736.21287459087,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2378.6946000000025
+   },
+   "static": {
+    "finish": 61938.40427377617,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 34.22363516470905,
+    "etaMax": 101.1365450921221
+   },
+   "reroute": {
+    "evaluations": 16,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261112",
+   "nhan": "Thứ Năm 12/11",
+   "seed": 6,
+   "points": 26,
+   "insertion": {
+    "finish": 62707.44066187414,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.364900000000489
+   },
+   "greedy": {
+    "finish": 62690.38768951417,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 62707.44066187414,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 1824,
+    "ms": 6.236499999999069
+   },
+   "ils": {
+    "finish": 62308.36200883059,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2486.6157999999996
+   },
+   "static": {
+    "finish": 62308.36200883059,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 27.175764249823622,
+    "etaMax": 114.00932336004189
+   },
+   "reroute": {
+    "evaluations": 14,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261112",
+   "nhan": "Thứ Năm 12/11",
+   "seed": 7,
+   "points": 26,
+   "insertion": {
+    "finish": 62385.89892138804,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.2518999999883818
+   },
+   "greedy": {
+    "finish": 63950.537961269314,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 62385.89892138804,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 2643,
+    "ms": 24.624800000005052
+   },
+   "ils": {
+    "finish": 61968.14849106964,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2142.7091000000073
+   },
+   "static": {
+    "finish": 61996.901666804886,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 18.09510162375009,
+    "etaMax": 109.36410964184324
+   },
+   "reroute": {
+    "evaluations": 14,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261112",
+   "nhan": "Thứ Năm 12/11",
+   "seed": 8,
+   "points": 28,
+   "insertion": {
+    "finish": 63150.693777414985,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.5759000000107335
+   },
+   "greedy": {
+    "finish": 63331.21178606576,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 63095.11401722845,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 4088,
+    "ms": 9.567300000009709
+   },
+   "ils": {
+    "finish": 62958.14437234899,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2350.9977999999974
+   },
+   "static": {
+    "finish": 63155.0460740749,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 64.99588821853176,
+    "etaMax": 406.0660007407423
+   },
+   "reroute": {
+    "evaluations": 16,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261112",
+   "nhan": "Thứ Năm 12/11",
+   "seed": 9,
+   "points": 27,
+   "insertion": {
+    "finish": 61798.142132351735,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.7709999999933643
+   },
+   "greedy": {
+    "finish": 62879.43845072504,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 61560.61415365669,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 4056,
+    "ms": 11.4264000000112
+   },
+   "ils": {
+    "finish": 61452.44056578642,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2602.1754999999976
+   },
+   "static": {
+    "finish": 61707.47388012272,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 13.119916561809926,
+    "etaMax": 77.26256728629232
+   },
+   "reroute": {
+    "evaluations": 15,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261112",
+   "nhan": "Thứ Năm 12/11",
+   "seed": 10,
+   "points": 25,
+   "insertion": {
+    "finish": 62103.77641782063,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.482799999997951
+   },
+   "greedy": {
+    "finish": 64775.25383396639,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 61643.47894751482,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 9828,
+    "ms": 39.210699999995995
+   },
+   "ils": {
+    "finish": 61593.688792439265,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2386.030899999998
+   },
+   "static": {
+    "finish": 62601.70710030205,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 143.98770298379398,
+    "etaMax": 790.3201656800884
+   },
+   "reroute": {
+    "evaluations": 13,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261112",
+   "nhan": "Thứ Năm 12/11",
+   "seed": 11,
+   "points": 26,
+   "insertion": {
+    "finish": 62602.29711630123,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.0019999999931315
+   },
+   "greedy": {
+    "finish": 64633.59190643877,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 2,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 62564.36408947047,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 6920,
+    "ms": 14.544999999998254
+   },
+   "ils": {
+    "finish": 62564.36408947047,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2175.2639999999956
+   },
+   "static": {
+    "finish": 62564.36408947047,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 22.002357979466616,
+    "etaMax": 127.12499232921982
+   },
+   "reroute": {
+    "evaluations": 14,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261112",
+   "nhan": "Thứ Năm 12/11",
+   "seed": 12,
+   "points": 27,
+   "insertion": {
+    "finish": 62292.55209790318,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.7480999999970663
+   },
+   "greedy": {
+    "finish": 64029.62724823136,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 62292.55209790318,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 1924,
+    "ms": 6.65120000000752
+   },
+   "ils": {
+    "finish": 61882.1333958048,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2354.871699999989
+   },
+   "static": {
+    "finish": 62598.67081216232,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 47.39891554795807,
+    "etaMax": 677.346979577429
+   },
+   "reroute": {
+    "evaluations": 15,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261112",
+   "nhan": "Thứ Năm 12/11",
+   "seed": 13,
+   "points": 22,
+   "insertion": {
+    "finish": 62615.04887762714,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 1.4573999999993248
+   },
+   "greedy": {
+    "finish": 63266.453381586216,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 62396.573541601436,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 3698,
+    "ms": 26.70539999999164
+   },
+   "ils": {
+    "finish": 62031.12269587204,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2253.5552000000025
+   },
+   "static": {
+    "finish": 62613.00400882035,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 18.631821368056382,
+    "etaMax": 78.45590640740556
+   },
+   "reroute": {
+    "evaluations": 10,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261112",
+   "nhan": "Thứ Năm 12/11",
+   "seed": 14,
+   "points": 25,
+   "insertion": {
+    "finish": 62491.059556987224,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.3135999999940395
+   },
+   "greedy": {
+    "finish": 64518.5679017088,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 3,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 62319.61735868013,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 4818,
+    "ms": 9.709000000002561
+   },
+   "ils": {
+    "finish": 61844.262564830846,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 1983.2822000000015
+   },
+   "static": {
+    "finish": 62306.52019781442,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 31.69956484168809,
+    "etaMax": 329.61507221264765
+   },
+   "reroute": {
+    "evaluations": 13,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261112",
+   "nhan": "Thứ Năm 12/11",
+   "seed": 15,
+   "points": 25,
+   "insertion": {
+    "finish": 62219.92331109087,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 1.7902999999932945
+   },
+   "greedy": {
+    "finish": 63769.38745344775,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 62219.92331109087,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 4770,
+    "ms": 9.283600000009756
+   },
+   "ils": {
+    "finish": 62219.92331109087,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2071.1129999999976
+   },
+   "static": {
+    "finish": 62219.92331109087,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 18.350883356570556,
+    "etaMax": 82.79108604361682
+   },
+   "reroute": {
+    "evaluations": 13,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261112",
+   "nhan": "Thứ Năm 12/11",
+   "seed": 16,
+   "points": 26,
+   "insertion": {
+    "finish": 63053.3292733642,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.7753000000084285
+   },
+   "greedy": {
+    "finish": 64585.32286499392,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 2,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 62573.82476788216,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 12238,
+    "ms": 24.755000000004657
+   },
+   "ils": {
+    "finish": 62129.974731275506,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2126.7108000000007
+   },
+   "static": {
+    "finish": 62452.09902473001,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 16.173235119622284,
+    "etaMax": 85.2677630968974
+   },
+   "reroute": {
+    "evaluations": 14,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261112",
+   "nhan": "Thứ Năm 12/11",
+   "seed": 17,
+   "points": 27,
+   "insertion": {
+    "finish": 62389.844260040874,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.4407000000064727
+   },
+   "greedy": {
+    "finish": 63266.809397973026,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 62389.844260040874,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 1892,
+    "ms": 5.727700000003097
+   },
+   "ils": {
+    "finish": 62080.22351376523,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2360.765299999999
+   },
+   "static": {
+    "finish": 62389.844260040874,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 25.789127804929983,
+    "etaMax": 108.84426004087436
+   },
+   "reroute": {
+    "evaluations": 15,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261112",
+   "nhan": "Thứ Năm 12/11",
+   "seed": 18,
+   "points": 24,
+   "insertion": {
+    "finish": 61600.653466108844,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.2347000000008848
+   },
+   "greedy": {
+    "finish": 63092.85476956039,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 61569.843838274726,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 4698,
+    "ms": 15.743000000002212
+   },
+   "ils": {
+    "finish": 61414.90422795354,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2356.8229999999894
+   },
+   "static": {
+    "finish": 61592.449572604324,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 13.450856773547397,
+    "etaMax": 70.248881267471
+   },
+   "reroute": {
+    "evaluations": 12,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261112",
+   "nhan": "Thứ Năm 12/11",
+   "seed": 19,
+   "points": 26,
+   "insertion": {
+    "finish": 63003.27353668142,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.5742000000027474
+   },
+   "greedy": {
+    "finish": 64226.500467746046,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 1,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 62844.04860224524,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 1730,
+    "ms": 5.825899999996182
+   },
+   "ils": {
+    "finish": 62844.04860224524,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2155.3283999999985
+   },
+   "static": {
+    "finish": 63098.39814412636,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 34.63547398139126,
+    "etaMax": 171.64001078703586
+   },
+   "reroute": {
+    "evaluations": 14,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261112",
+   "nhan": "Thứ Năm 12/11",
+   "seed": 20,
+   "points": 24,
+   "insertion": {
+    "finish": 62194.62107517421,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 1.83279999998922
+   },
+   "greedy": {
+    "finish": 63214.1134058509,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 61765.73448625388,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 5184,
+    "ms": 29.25470000000496
+   },
+   "ils": {
+    "finish": 61693.00855483394,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2298.2618999999977
+   },
+   "static": {
+    "finish": 61806.664896482165,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 9.64001482266067,
+    "etaMax": 48.604816211962316
+   },
+   "reroute": {
+    "evaluations": 12,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261112",
+   "nhan": "Thứ Năm 12/11",
+   "seed": 21,
+   "points": 25,
+   "insertion": {
+    "finish": 62114.15200535301,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.4860999999946216
+   },
+   "greedy": {
+    "finish": 63413.92879261851,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 61892.836878881644,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 2433,
+    "ms": 8.800700000007055
+   },
+   "ils": {
+    "finish": 61559.45731609321,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2344.5506000000023
+   },
+   "static": {
+    "finish": 61836.43823403478,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 28.304593500909082,
+    "etaMax": 79.56167382969579
+   },
+   "reroute": {
+    "evaluations": 13,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261112",
+   "nhan": "Thứ Năm 12/11",
+   "seed": 22,
+   "points": 25,
+   "insertion": {
+    "finish": 62085.96659121081,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.276499999992666
+   },
+   "greedy": {
+    "finish": 62836.740508254385,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 61762.1462369873,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 4866,
+    "ms": 25.537100000001374
+   },
+   "ils": {
+    "finish": 61623.19942016435,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2243.1774000000005
+   },
+   "static": {
+    "finish": 61773.387267716906,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 18.505591921477027,
+    "etaMax": 80.03037037036847
+   },
+   "reroute": {
+    "evaluations": 13,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261112",
+   "nhan": "Thứ Năm 12/11",
+   "seed": 23,
+   "points": 27,
+   "insertion": {
+    "finish": 63501.828116209115,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.350800000000163
+   },
+   "greedy": {
+    "finish": 64126.94612321897,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 63352.481817840795,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 7520,
+    "ms": 29.528200000000652
+   },
+   "ils": {
+    "finish": 63352.481817840795,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2141.0372999999963
+   },
+   "static": {
+    "finish": 63352.481817840795,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 17.83972172273716,
+    "etaMax": 74.99244156879286
+   },
+   "reroute": {
+    "evaluations": 15,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261112",
+   "nhan": "Thứ Năm 12/11",
+   "seed": 24,
+   "points": 26,
+   "insertion": {
+    "finish": 62385.8188307559,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.1671000000060303
+   },
+   "greedy": {
+    "finish": 64666.23901003621,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 4,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 62385.8188307559,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 5190,
+    "ms": 10.895500000013271
+   },
+   "ils": {
+    "finish": 62385.8188307559,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2142.708700000003
+   },
+   "static": {
+    "finish": 62385.8188307559,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 13.231260987734762,
+    "etaMax": 53.303909739945084
+   },
+   "reroute": {
+    "evaluations": 14,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261112",
+   "nhan": "Thứ Năm 12/11",
+   "seed": 25,
+   "points": 25,
+   "insertion": {
+    "finish": 62277.37436094036,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.2942000000039116
+   },
+   "greedy": {
+    "finish": 62866.85681286283,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 62168.12991488749,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 3180,
+    "ms": 7.877999999996973
+   },
+   "ils": {
+    "finish": 62168.12991488749,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2179.6619999999966
+   },
+   "static": {
+    "finish": 62168.12991488749,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 20.456691961871062,
+    "etaMax": 91.11814740192494
+   },
+   "reroute": {
+    "evaluations": 13,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261112",
+   "nhan": "Thứ Năm 12/11",
+   "seed": 26,
+   "points": 25,
+   "insertion": {
+    "finish": 62044.28655195805,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.3828000000066822
+   },
+   "greedy": {
+    "finish": 62090.44262928493,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 61622.48064995504,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 6544,
+    "ms": 21.90120000000752
+   },
+   "ils": {
+    "finish": 61373.67605929009,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2391.8078000000096
+   },
+   "static": {
+    "finish": 61664.15146416629,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 34.03927715660369,
+    "etaMax": 197.15146416628704
+   },
+   "reroute": {
+    "evaluations": 13,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261112",
+   "nhan": "Thứ Năm 12/11",
+   "seed": 27,
+   "points": 26,
+   "insertion": {
+    "finish": 62095.58510142411,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.7443999999959487
+   },
+   "greedy": {
+    "finish": 63632.78290039082,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 61980.13192603633,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 11556,
+    "ms": 36.97939999999653
+   },
+   "ils": {
+    "finish": 61691.72851976027,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2474.2995999999985
+   },
+   "static": {
+    "finish": 61816.5967837335,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 19.43158845590939,
+    "etaMax": 71.67937340123171
+   },
+   "reroute": {
+    "evaluations": 14,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261112",
+   "nhan": "Thứ Năm 12/11",
+   "seed": 28,
+   "points": 28,
+   "insertion": {
+    "finish": 61980.17486261976,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 3.0842999999877065
+   },
+   "greedy": {
+    "finish": 62550.4605014716,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 61953.87210763629,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 6276,
+    "ms": 16.147400000016205
+   },
+   "ils": {
+    "finish": 61572.423435432305,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2528.4606000000203
+   },
+   "static": {
+    "finish": 61830.518306023754,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 15.668532258377915,
+    "etaMax": 59.17255873626709
+   },
+   "reroute": {
+    "evaluations": 16,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261112",
+   "nhan": "Thứ Năm 12/11",
+   "seed": 29,
+   "points": 27,
+   "insertion": {
+    "finish": 62586.045749134086,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 3.257800000021234
+   },
+   "greedy": {
+    "finish": 63228.60609791641,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 62255.148532545405,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 11296,
+    "ms": 27.349099999992177
+   },
+   "ils": {
+    "finish": 62255.148532545405,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2566.2501000000047
+   },
+   "static": {
+    "finish": 62304.136300668724,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 19.31811698102465,
+    "etaMax": 171.1363006687243
+   },
+   "reroute": {
+    "evaluations": 15,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261112",
+   "nhan": "Thứ Năm 12/11",
+   "seed": 30,
+   "points": 26,
+   "insertion": {
+    "finish": 62265.41410343561,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 3.1040000000211876
+   },
+   "greedy": {
+    "finish": 63121.12857491783,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 62026.87959461255,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 4405,
+    "ms": 10.027399999991758
+   },
+   "ils": {
+    "finish": 61727.928096543365,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2123.793500000029
+   },
+   "static": {
+    "finish": 62027.237845290685,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 18.17269472088592,
+    "etaMax": 68.53081524832669
+   },
+   "reroute": {
+    "evaluations": 14,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261114",
+   "nhan": "Thứ Bảy 14/11",
+   "seed": 1,
+   "points": 26,
+   "insertion": {
+    "finish": 61810.359858811105,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.6996999999973923
+   },
+   "greedy": {
+    "finish": 62993.02081048632,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 61770.47635870015,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 4429,
+    "ms": 10.333399999974063
+   },
+   "ils": {
+    "finish": 61633.35578166577,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2327.7547000000195
+   },
+   "static": {
+    "finish": 61743.403227619994,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 15.919984284475868,
+    "etaMax": 124.76082870370738
+   },
+   "reroute": {
+    "evaluations": 14,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261114",
+   "nhan": "Thứ Bảy 14/11",
+   "seed": 2,
+   "points": 28,
+   "insertion": {
+    "finish": 62587.87710234869,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 3.025099999998929
+   },
+   "greedy": {
+    "finish": 64661.455676931015,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 62058.56554392683,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 11418,
+    "ms": 22.483600000006845
+   },
+   "ils": {
+    "finish": 61904.58761203704,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2252.1416000000027
+   },
+   "static": {
+    "finish": 61957.204596145566,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 13.246805069753949,
+    "etaMax": 51.97181093297695
+   },
+   "reroute": {
+    "evaluations": 16,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261114",
+   "nhan": "Thứ Bảy 14/11",
+   "seed": 3,
+   "points": 26,
+   "insertion": {
+    "finish": 62229.100674680194,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.839799999987008
+   },
+   "greedy": {
+    "finish": 63481.2988325704,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 61914.331524752255,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 5286,
+    "ms": 11.270300000003772
+   },
+   "ils": {
+    "finish": 61580.52999015388,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2200.1157999999996
+   },
+   "static": {
+    "finish": 62418.075203989385,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 44.12498621625891,
+    "etaMax": 396.9913487442682
+   },
+   "reroute": {
+    "evaluations": 14,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261114",
+   "nhan": "Thứ Bảy 14/11",
+   "seed": 4,
+   "points": 27,
+   "insertion": {
+    "finish": 63296.78825297906,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 3.1600000000034925
+   },
+   "greedy": {
+    "finish": 64750.605339058835,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 9,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 63275.01366044677,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 3816,
+    "ms": 7.764100000000326
+   },
+   "ils": {
+    "finish": 62660.37637305021,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2091.496199999994
+   },
+   "static": {
+    "finish": 63275.01366044677,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 20.74551491534221,
+    "etaMax": 115.01366044676979
+   },
+   "reroute": {
+    "evaluations": 15,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261114",
+   "nhan": "Thứ Bảy 14/11",
+   "seed": 5,
+   "points": 28,
+   "insertion": {
+    "finish": 62621.69889025273,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 3.3803999999945518
+   },
+   "greedy": {
+    "finish": 64395.662255627765,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 62267.68923131351,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 7434,
+    "ms": 18.133099999977276
+   },
+   "ils": {
+    "finish": 61684.35317180588,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2425.4089000000095
+   },
+   "static": {
+    "finish": 62301.75152553355,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 12.639942429558506,
+    "etaMax": 49.686483894489356
+   },
+   "reroute": {
+    "evaluations": 16,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261114",
+   "nhan": "Thứ Bảy 14/11",
+   "seed": 6,
+   "points": 26,
+   "insertion": {
+    "finish": 62689.56381979167,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 21.895099999994272
+   },
+   "greedy": {
+    "finish": 62671.26962056776,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 62689.56381979167,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 1824,
+    "ms": 7.46830000000773
+   },
+   "ils": {
+    "finish": 62289.56381979167,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2435.0855999999912
+   },
+   "static": {
+    "finish": 62289.56381979167,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 21.26044873054913,
+    "etaMax": 60.220625000001746
+   },
+   "reroute": {
+    "evaluations": 14,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261114",
+   "nhan": "Thứ Bảy 14/11",
+   "seed": 7,
+   "points": 26,
+   "insertion": {
+    "finish": 62289.60706490834,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.5635999999940395
+   },
+   "greedy": {
+    "finish": 64233.688580832946,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 62289.60706490834,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 881,
+    "ms": 3.8101000000024214
+   },
+   "ils": {
+    "finish": 61851.28020787531,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2172.699800000002
+   },
+   "static": {
+    "finish": 62035.503780758896,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 9.693962526736504,
+    "etaMax": 50.06274678326008
+   },
+   "reroute": {
+    "evaluations": 14,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261114",
+   "nhan": "Thứ Bảy 14/11",
+   "seed": 8,
+   "points": 28,
+   "insertion": {
+    "finish": 63097.4414278656,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.6590999999898486
+   },
+   "greedy": {
+    "finish": 63227.43164761443,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 63096.738538901845,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 8176,
+    "ms": 37.79240000000573
+   },
+   "ils": {
+    "finish": 62987.450458246145,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2386.63930000001
+   },
+   "static": {
+    "finish": 63097.52733998783,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 65.05596300061175,
+    "etaMax": 415.705771606481
+   },
+   "reroute": {
+    "evaluations": 16,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261114",
+   "nhan": "Thứ Bảy 14/11",
+   "seed": 9,
+   "points": 27,
+   "insertion": {
+    "finish": 61652.248074324096,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 3.3489000000117812
+   },
+   "greedy": {
+    "finish": 62817.94825209995,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 61593.92272338909,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 5055,
+    "ms": 14.036300000007031
+   },
+   "ils": {
+    "finish": 61434.5549483053,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2553.8522999999986
+   },
+   "static": {
+    "finish": 61593.92272338909,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 10.162207448121505,
+    "etaMax": 28.922723389092425
+   },
+   "reroute": {
+    "evaluations": 15,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261114",
+   "nhan": "Thứ Bảy 14/11",
+   "seed": 10,
+   "points": 25,
+   "insertion": {
+    "finish": 61823.165294427316,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.559399999998277
+   },
+   "greedy": {
+    "finish": 64683.12903948095,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 61653.01308181267,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 5733,
+    "ms": 12.491099999984726
+   },
+   "ils": {
+    "finish": 61496.05518152113,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2389.599600000016
+   },
+   "static": {
+    "finish": 61514.54380478608,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 8.540821320117054,
+    "etaMax": 23.243095601850655
+   },
+   "reroute": {
+    "evaluations": 13,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261114",
+   "nhan": "Thứ Bảy 14/11",
+   "seed": 11,
+   "points": 26,
+   "insertion": {
+    "finish": 62856.96505594827,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.3968999999924563
+   },
+   "greedy": {
+    "finish": 64599.803129316155,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 2,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 62574.20699136371,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 6071,
+    "ms": 11.68630000000121
+   },
+   "ils": {
+    "finish": 62574.20699136371,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2098.2816999999923
+   },
+   "static": {
+    "finish": 62574.20699136371,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 23.19502303122402,
+    "etaMax": 113.31203512516367
+   },
+   "reroute": {
+    "evaluations": 14,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261114",
+   "nhan": "Thứ Bảy 14/11",
+   "seed": 12,
+   "points": 27,
+   "insertion": {
+    "finish": 62173.33122085819,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.6437999999907333
+   },
+   "greedy": {
+    "finish": 64798.79867172419,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 62035.37651773302,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 2870,
+    "ms": 7.259299999976065
+   },
+   "ils": {
+    "finish": 61792.49033094647,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2350.3426000000036
+   },
+   "static": {
+    "finish": 62563.69096800334,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 87.29628959462268,
+    "etaMax": 740.6909680033423
+   },
+   "reroute": {
+    "evaluations": 15,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261114",
+   "nhan": "Thứ Bảy 14/11",
+   "seed": 13,
+   "points": 22,
+   "insertion": {
+    "finish": 62593.022600681485,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 1.5568000000203028
+   },
+   "greedy": {
+    "finish": 63241.94080529328,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 62344.832138981095,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 3079,
+    "ms": 6.005100000009406
+   },
+   "ils": {
+    "finish": 61966.215992024816,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2268.315899999987
+   },
+   "static": {
+    "finish": 62727.00810682451,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 11.288823064652025,
+    "etaMax": 53.02623089518602
+   },
+   "reroute": {
+    "evaluations": 11,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261114",
+   "nhan": "Thứ Bảy 14/11",
+   "seed": 14,
+   "points": 25,
+   "insertion": {
+    "finish": 62402.88706553044,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.3368999999947846
+   },
+   "greedy": {
+    "finish": 63896.37804697576,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 62247.98949062108,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 4866,
+    "ms": 9.490399999980582
+   },
+   "ils": {
+    "finish": 61830.036732163324,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2018.3866999999736
+   },
+   "static": {
+    "finish": 62257.95732315083,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 25.6466115610537,
+    "etaMax": 348.974727893823
+   },
+   "reroute": {
+    "evaluations": 13,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261114",
+   "nhan": "Thứ Bảy 14/11",
+   "seed": 15,
+   "points": 25,
+   "insertion": {
+    "finish": 62317.096412711915,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.419899999978952
+   },
+   "greedy": {
+    "finish": 63770.86534377131,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 62241.687039552075,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 2385,
+    "ms": 5.229000000021188
+   },
+   "ils": {
+    "finish": 62241.687039552075,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2037.7532000000065
+   },
+   "static": {
+    "finish": 62241.687039552075,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 14.49224360184453,
+    "etaMax": 62.27244374999282
+   },
+   "reroute": {
+    "evaluations": 13,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261114",
+   "nhan": "Thứ Bảy 14/11",
+   "seed": 16,
+   "points": 26,
+   "insertion": {
+    "finish": 62608.620959249856,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.2625000000116415
+   },
+   "greedy": {
+    "finish": 64554.775616375475,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 2,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 62545.60668594176,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 3492,
+    "ms": 7.272300000011455
+   },
+   "ils": {
+    "finish": 62062.11315233748,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2145.0204000000085
+   },
+   "static": {
+    "finish": 62337.31336188158,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 16.740027871430964,
+    "etaMax": 51.89355060977687
+   },
+   "reroute": {
+    "evaluations": 14,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261114",
+   "nhan": "Thứ Bảy 14/11",
+   "seed": 17,
+   "points": 27,
+   "insertion": {
+    "finish": 62066.69181097222,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.3135999999940395
+   },
+   "greedy": {
+    "finish": 63285.51604986018,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 62066.69181097222,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 4690,
+    "ms": 10.178899999998976
+   },
+   "ils": {
+    "finish": 62066.69181097222,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2426.923600000009
+   },
+   "static": {
+    "finish": 62066.69181097222,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 18.008327808460916,
+    "etaMax": 85.69181097221735
+   },
+   "reroute": {
+    "evaluations": 15,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261114",
+   "nhan": "Thứ Bảy 14/11",
+   "seed": 18,
+   "points": 24,
+   "insertion": {
+    "finish": 61540.272949018545,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.2863000000070315
+   },
+   "greedy": {
+    "finish": 62432.40658444543,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 61540.272949018545,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 3132,
+    "ms": 7.916900000011083
+   },
+   "ils": {
+    "finish": 61380.853637697976,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2384.2804999999935
+   },
+   "static": {
+    "finish": 61533.002999221455,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 10.704537241434688,
+    "etaMax": 99.00299922145496
+   },
+   "reroute": {
+    "evaluations": 12,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261114",
+   "nhan": "Thứ Bảy 14/11",
+   "seed": 19,
+   "points": 26,
+   "insertion": {
+    "finish": 63039.39601591504,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.093399999983376
+   },
+   "greedy": {
+    "finish": 64227.0069785619,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 1,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 62871.48893188148,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 4325,
+    "ms": 8.051000000006752
+   },
+   "ils": {
+    "finish": 62871.48893188148,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2190.8905000000086
+   },
+   "static": {
+    "finish": 63039.39601591504,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 33.79462018485428,
+    "etaMax": 352.88366443107225
+   },
+   "reroute": {
+    "evaluations": 14,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261114",
+   "nhan": "Thứ Bảy 14/11",
+   "seed": 20,
+   "points": 24,
+   "insertion": {
+    "finish": 62112.654307642944,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 1.8034000000043306
+   },
+   "greedy": {
+    "finish": 63403.34837601799,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 62005.41415103849,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 4464,
+    "ms": 9.165500000002794
+   },
+   "ils": {
+    "finish": 61700.26082264953,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2354.0930999999982
+   },
+   "static": {
+    "finish": 61811.7071253829,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 10.632362769071067,
+    "etaMax": 38.84896746087179
+   },
+   "reroute": {
+    "evaluations": 12,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261114",
+   "nhan": "Thứ Bảy 14/11",
+   "seed": 21,
+   "points": 25,
+   "insertion": {
+    "finish": 61902.93990333349,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.44539999999688
+   },
+   "greedy": {
+    "finish": 63344.47370790601,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 61733.93490937458,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 3244,
+    "ms": 8.473400000017136
+   },
+   "ils": {
+    "finish": 61559.00352222154,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2383.939000000013
+   },
+   "static": {
+    "finish": 61860.68244675489,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 58.88189891970469,
+    "etaMax": 431.61000787036755
+   },
+   "reroute": {
+    "evaluations": 13,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261114",
+   "nhan": "Thứ Bảy 14/11",
+   "seed": 22,
+   "points": 25,
+   "insertion": {
+    "finish": 61817.93654482794,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.5619000000006054
+   },
+   "greedy": {
+    "finish": 62776.13252390755,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 61817.93654482794,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 3244,
+    "ms": 7.536200000002282
+   },
+   "ils": {
+    "finish": 61562.1504229634,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2257.096499999985
+   },
+   "static": {
+    "finish": 61769.403599723766,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 38.31414782289285,
+    "etaMax": 158.5785846913568
+   },
+   "reroute": {
+    "evaluations": 13,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261114",
+   "nhan": "Thứ Bảy 14/11",
+   "seed": 23,
+   "points": 27,
+   "insertion": {
+    "finish": 63325.12062180265,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.6388000000151806
+   },
+   "greedy": {
+    "finish": 64121.587779832014,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 63325.12062180265,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 2814,
+    "ms": 6.71119999999064
+   },
+   "ils": {
+    "finish": 63325.12062180265,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2170.3496999999916
+   },
+   "static": {
+    "finish": 63521.863626478465,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 28.71334048598304,
+    "etaMax": 223.99093432098744
+   },
+   "reroute": {
+    "evaluations": 15,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261114",
+   "nhan": "Thứ Bảy 14/11",
+   "seed": 24,
+   "points": 26,
+   "insertion": {
+    "finish": 62361.726125,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.1864999999816064
+   },
+   "greedy": {
+    "finish": 64730.70086344916,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 4,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 62361.726125,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 3460,
+    "ms": 7.24900000001071
+   },
+   "ils": {
+    "finish": 62361.726125,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2078.938600000023
+   },
+   "static": {
+    "finish": 62361.726125,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 16.01734080379162,
+    "etaMax": 43.85288886239141
+   },
+   "reroute": {
+    "evaluations": 14,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261114",
+   "nhan": "Thứ Bảy 14/11",
+   "seed": 25,
+   "points": 25,
+   "insertion": {
+    "finish": 62151.06129582189,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.267500000016298
+   },
+   "greedy": {
+    "finish": 62656.711160576844,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 62151.06129582189,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 1590,
+    "ms": 4.538300000014715
+   },
+   "ils": {
+    "finish": 62151.06129582189,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2204.8724999999977
+   },
+   "static": {
+    "finish": 62151.06129582189,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 15.20840297372209,
+    "etaMax": 82.01394192592124
+   },
+   "reroute": {
+    "evaluations": 13,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261114",
+   "nhan": "Thứ Bảy 14/11",
+   "seed": 26,
+   "points": 25,
+   "insertion": {
+    "finish": 61655.913990892564,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.246400000003632
+   },
+   "greedy": {
+    "finish": 62056.383592807695,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 61655.913990892564,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 1622,
+    "ms": 4.704499999992549
+   },
+   "ils": {
+    "finish": 61413.251978628316,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2421.6275000000023
+   },
+   "static": {
+    "finish": 61469.16780937742,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 9.67380932778736,
+    "etaMax": 25.181096151005477
+   },
+   "reroute": {
+    "evaluations": 13,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261114",
+   "nhan": "Thứ Bảy 14/11",
+   "seed": 27,
+   "points": 26,
+   "insertion": {
+    "finish": 62047.8272729158,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.8779000000213273
+   },
+   "greedy": {
+    "finish": 63593.43704381421,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 61822.218952335745,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 7708,
+    "ms": 18.79769999999553
+   },
+   "ils": {
+    "finish": 61638.200227806105,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2486.8726000000024
+   },
+   "static": {
+    "finish": 62090.38228228888,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 41.70342869008479,
+    "etaMax": 349.6012730943112
+   },
+   "reroute": {
+    "evaluations": 14,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261114",
+   "nhan": "Thứ Bảy 14/11",
+   "seed": 28,
+   "points": 28,
+   "insertion": {
+    "finish": 61987.73483679881,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 3.230599999980768
+   },
+   "greedy": {
+    "finish": 62492.18398630351,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 61793.28812993243,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 6276,
+    "ms": 32.260699999984354
+   },
+   "ils": {
+    "finish": 61543.26539646871,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2490.0322999999917
+   },
+   "static": {
+    "finish": 61857.73427753695,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 10.791691425588336,
+    "etaMax": 68.33848978617607
+   },
+   "reroute": {
+    "evaluations": 16,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261114",
+   "nhan": "Thứ Bảy 14/11",
+   "seed": 29,
+   "points": 27,
+   "insertion": {
+    "finish": 62279.60212154115,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.717499999998836
+   },
+   "greedy": {
+    "finish": 63227.19188502377,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 62251.41965503429,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 5628,
+    "ms": 12.278400000010151
+   },
+   "ils": {
+    "finish": 62251.41965503429,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2524.0623999999953
+   },
+   "static": {
+    "finish": 62279.60212154115,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 14.662575380909159,
+    "etaMax": 150.60212154115288
+   },
+   "reroute": {
+    "evaluations": 15,
+    "accepted": 0,
+    "saving": 0
+   }
+  },
+  {
+   "ngay": "20261114",
+   "nhan": "Thứ Bảy 14/11",
+   "seed": 30,
+   "points": 26,
+   "insertion": {
+    "finish": 61913.99446054958,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2.6270000000076834
+   },
+   "greedy": {
+    "finish": 62975.19858575393,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0
+   },
+   "engine": {
+    "finish": 61865.66688322091,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "evaluations": 3516,
+    "ms": 8.611600000003818
+   },
+   "ils": {
+    "finish": 61708.75956630269,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 0,
+    "etaMax": 0,
+    "ms": 2216.237200000003
+   },
+   "static": {
+    "finish": 61945.056167950635,
+    "vehicles": 4,
+    "late": 0,
+    "unassigned": 0,
+    "etaMean": 10.910121721679632,
+    "etaMax": 40.3644059483413
+   },
+   "reroute": {
+    "evaluations": 14,
+    "accepted": 0,
+    "saving": 0
+   }
+  }
+ ]
+}
