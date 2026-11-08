@@ -6,3 +6,8 @@
 
 # Thư viện cài bằng npm, tải lại được bằng npm install
 node_modules/
+
+# Thư mục cấu hình của công cụ AI, không đưa lên git
+.agent/
+.agents/
+.claude/
